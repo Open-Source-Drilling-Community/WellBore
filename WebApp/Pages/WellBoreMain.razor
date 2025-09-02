@@ -1,0 +1,339 @@
+﻿@page "/WellBore"
+@inject ILogger<WellBoreMain> logger
+@inject ISnackbar Snackbar
+
+<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
+                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              DepthReferenceName="WGS84"
+                              GroundMudLineDepthReferenceSource="@groundMudLineDepthSource"
+                              SeaWaterLevelDepthReferenceSource="@topWaterDepthSource"
+                              WellHeadDepthReferenceSource="@wellHeadDepthSource"
+                              RotaryTableDepthReferenceSource="@rotaryTableDepthSource">
+    @if (wellBoreList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div hidden="@isHiddenMainPanel">
+            <MudDataGrid T="WellBore" MultiSelection="true" Items="@wellBoreList" SelectedItemsChanged="@SelectedItemsChanged"
+                         EditMode="DataGridEditMode.Cell"
+                         Hover="true" RowClick="@RowClicked"
+                         SortMode="SortMode.Multiple" QuickFilter="@_wellBoreFilter" Filterable="false"
+                         ReadOnly="false" ColumnResizeMode="ResizeMode.Column" Elevation="0">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">WellBore</MudText>
+                    <MudButton OnClick="@AddWellBore" Color="@Color.Success" Class="add-item-btn">Add</MudButton>
+                    <MudButton OnClick="@DeleteSelectedWellBore" Color="@Color.Error" Class="add-item-btn">Delete</MudButton>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="WellBore" />
+                    <PropertyColumn Property="x => x.Name" Title="@DataUtils.WellBoreNameLabel" CellStyle="width: 30%;" Sortable="true" Editable="false" />
+                    <PropertyColumn Property="x => x.Description" Title="@DataUtils.WellBoreDescrLabel" CellStyle="width: 60%;" Sortable="true" Editable="false" />
+                    <TemplateColumn CellStyle="width: 5%;">
+                        <EditTemplate>
+                            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="(() => DeleteWellBore(context.Item.MetaInfo.ID))" />
+                        </EditTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="WellBore" />
+                </PagerContent>
+            </MudDataGrid>
+        </div>
+    }
+    @if (isHiddenMainPanel && currentWellBore != null)
+    {
+        <WellBoreEdit CurrentWellBore="@currentWellBore"
+                      WellBores="@wellBoreList"
+                      Wells="@wellList"
+                      Clusters="@clusterList"
+                      Fields="@fieldList"                    
+                      GroundMudLineDepthSource="@groundMudLineDepthSource"
+                      TopWaterDepthSource="@topWaterDepthSource"
+                      WellHeadDepthSource="@wellHeadDepthSource"
+                      RotaryTableDepthSource="@rotaryTableDepthSource"
+                      OnUpdate="@ShowMainPanel" />
+    }
+</MudUnitAndReferenceChoiceTag>
+
+@code {
+    // WellBore related variables
+    private List<WellBore> wellBoreList = new();
+    private List<Well> wellList = new();
+    private List<Cluster> clusterList = new();
+    private List<Field> fieldList = new();
+
+    private List<WellBore> selectedWellBoreList = new();
+    private WellBore? currentWellBore;
+    public bool isHiddenMainPanel;
+    public bool isHiddenEditPanel;
+    private string? _searchString;
+
+    private GroundMudLineDepthReferenceSource groundMudLineDepthSource = new GroundMudLineDepthReferenceSource();
+    private SeaWaterLevelDepthReferenceSource topWaterDepthSource = new SeaWaterLevelDepthReferenceSource();
+    private WellHeadDepthReferenceSource wellHeadDepthSource = new WellHeadDepthReferenceSource();
+    private RotaryTableDepthReferenceSource rotaryTableDepthSource = new RotaryTableDepthReferenceSource();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Show main panel
+            isHiddenMainPanel = false;
+            isHiddenEditPanel = true;
+            currentWellBore = null;
+
+            // Starting all loading tasks asynchronously
+            logger.LogInformation("Trying to load list of WellBore from client: " + APIUtils.HostNameWellBore);
+            var wellBoreTask = APIUtils.ClientWellBore.GetAllWellBoreAsync();
+
+            logger.LogInformation("Trying to load list of Well from client: " + APIUtils.HostNameWell);
+            var wellTask = APIUtils.ClientWell.GetAllWellAsync();
+            logger.LogInformation("Trying to load list of Cluster from client: " + APIUtils.HostNameCluster);
+            var clusterTask = APIUtils.ClientCluster.GetAllClusterAsync();
+            logger.LogInformation("Trying to load list of Field from client: " + APIUtils.HostNameField);
+            var fieldTask = APIUtils.ClientField.GetAllFieldAsync();
+
+            List<Task> loadingTaskList = new List<Task> { wellBoreTask, wellTask, clusterTask, fieldTask };
+
+            // Awaiting tasks and retrieve results as they become available
+            while (loadingTaskList.Count > 0)
+            {
+                Task finishedTask = await Task.WhenAny(loadingTaskList);
+                if (finishedTask == wellBoreTask)
+                {
+                    try
+                    {
+                        wellBoreList = (List<WellBore>)await wellBoreTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (wellBoreList != null)
+                        {
+                            wellBoreList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of WellBores was null on initialization");
+                            Snackbar.Add("Returned list of WellBores was null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load WellBore from client");
+                    }
+                }
+                else if (finishedTask == wellTask)
+                {
+                    try
+                    {
+                        wellList = (List<Well>)await wellTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (wellList != null)
+                        {
+                            wellList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of Wells was null on initialization");
+                            Snackbar.Add("Returned list of Wells was null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Wells from client");
+                    }
+                }
+                else if (finishedTask == clusterTask)
+                {
+                    try
+                    {
+                        clusterList = (List<Cluster>)await clusterTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (clusterList != null)
+                        {
+                            clusterList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of Clusters was null on initialization");
+                            Snackbar.Add("Returned list of Clusters was null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Clusters from client");
+                    }
+                }
+                else if (finishedTask == fieldTask)
+                {
+                    try
+                    {
+                        fieldList = (List<Field>)await fieldTask; // awaiting the finished task allows to retrieve its result and throw exception if needed
+                        if (fieldList != null)
+                        {
+                            fieldList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                        else
+                        {
+                            logger.LogWarning("Returned list of Fields was null on initialization");
+                            Snackbar.Add("Returned list of Fields was null on initialization", Severity.Warning);
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Fields from client");
+                    }
+                }
+                loadingTaskList.Remove(finishedTask);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem WellBore initialization");
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    private async Task AddWellBore()
+    {
+        try
+        {
+            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = APIUtils.HostNameWellBore, HttpHostBasePath = APIUtils.HostBasePathWellBore, HttpEndPoint = "WellBore/" };
+            DateTimeOffset creationDate = DateTimeOffset.UtcNow;
+            WellBore currentWellBore = new()
+            {
+                MetaInfo = metaInfo,
+                Name = DataUtils.DEFAULT_NAME_WellBore,
+                Description = DataUtils.DEFAULT_DESCR_WellBore,
+                CreationDate = creationDate,
+                LastModificationDate = creationDate,
+            };
+            await APIUtils.ClientWellBore.PostWellBoreAsync(currentWellBore);
+            logger.LogInformation("WellBore posted successfully");
+            Snackbar.Add("WellBore posted successfully", Severity.Success);
+            await OnInitializedAsync();
+            // Find the newly created wellbore in the refreshed list
+            var addedWellBore = wellBoreList.FirstOrDefault(d => d.MetaInfo?.ID == currentWellBore.MetaInfo?.ID);
+            if (addedWellBore != null)
+            {
+                logger.LogInformation("WellBore posted successfully");
+                Snackbar.Add("WellBore posted successfully", Severity.Success);
+                await RowClicked(new DataGridRowClickEventArgs<WellBore>(new MouseEventArgs(), addedWellBore, -1));
+            }
+            else
+            {
+
+                logger.LogError("Could not retrieve the added WellBore");
+                Snackbar.Add("Could not retrieve the added WellBore", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to add a new WellBore");
+            Snackbar.Add("Impossible to add a new WellBore", Severity.Warning);
+        }
+    }
+
+    private async Task RowClicked(DataGridRowClickEventArgs<WellBore> args)
+    {
+        await EditWellBore(args.Item.MetaInfo.ID);
+    }
+
+    private async Task EditWellBore(Guid id)
+    {
+        try
+        {
+            currentWellBore = await APIUtils.ClientWellBore.GetWellBoreByIdAsync(id);
+            if (currentWellBore != null)
+            {
+                isHiddenMainPanel = true;
+                isHiddenEditPanel = false;
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+            else
+            {
+                logger.LogWarning("Impossible to load WellBore");
+                Snackbar.Add("Impossible to load WellBore", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load WellBore to be edited");
+        }
+    }
+
+    private async Task DeleteWellBore(Guid id)
+    {
+        try
+        {
+            await APIUtils.ClientWellBore.DeleteWellBoreByIdAsync(id);
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete WellBore");
+        }
+    }
+
+    private async Task DeleteSelectedWellBore()
+    {
+        try
+        {
+            foreach (WellBore wellBore in selectedWellBoreList)
+            {
+                await APIUtils.ClientWellBore.DeleteWellBoreByIdAsync(wellBore.MetaInfo.ID);
+            }
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete all WellBore");
+        }
+
+    }
+
+    //Quick filter - filter gobally across multiple columns with the same input
+    private Func<WellBore, bool>
+    _wellBoreFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if ($"{x.Name} {x.Description}".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    //Events
+    private void StartedEditingItem(WellBore item)
+    {
+        //Activating Edit event capture with parameter StartedEditingItem="@StartedEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.StartedEditingItem(...)"
+    }
+
+    private void CancelledEditingItem(WellBore item)
+    {
+        //Activating Cancel event capture with parameter CancelledEditingItem = "@CancelledEditingItem" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CancelledEditingItem(...)"
+    }
+
+    private void CommittedItemChanges(WellBore item)
+    {
+        //Activating Commit event capture with parameter CommittedItemChanges = "@CommittedItemChanges" in MudDataGrid; arguments are specified in OnClick="@context.Actions.CommittedEditingItem(...)"
+    }
+
+    void SelectedItemsChanged(HashSet<WellBore>
+        items)
+    {
+        selectedWellBoreList.Clear();
+        selectedWellBoreList.InsertRange(0, items);
+    }
+
+    private async void ShowMainPanel()
+    {
+        isHiddenMainPanel = false;
+        isHiddenEditPanel = true;
+        await OnInitializedAsync();
+    }
+}

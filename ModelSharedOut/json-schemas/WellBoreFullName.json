@@ -1,0 +1,405 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "version": "1.0"
+  },
+  "paths": {
+    "/WellBore": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PostWellBore",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/MetaInfo": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/{id}": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetWellBoreById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "PutWellBoreById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "DeleteWellBoreById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WellBore/HeavyData": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBore",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreUsageStatistics": {
+      "get": {
+        "tags": [
+          "WellBoreUsageStatistics"
+        ],
+        "operationId": "GetWellBoreUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.UsageStatisticsWellBore"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "NORCE.Drilling.WellBore.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.WellBore.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.WellBore.Model.SidetrackType": {
+        "enum": [
+          "Undefined",
+          "Technical",
+          "Production",
+          "Appraisal",
+          "Lateral"
+        ],
+        "type": "string"
+      },
+      "NORCE.Drilling.WellBore.Model.UsageStatisticsWellBore": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllWellBoreIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreMetaInfoPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "GetWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBorePerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "PostWellBorePerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "PutWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          },
+          "DeleteWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NORCE.Drilling.WellBore.Model.WellBore": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSidetrack": {
+            "type": "boolean"
+          },
+          "ParentWellBoreID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "TieInPointAlongHoleDepth": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+          },
+          "SidetrackType": {
+            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.SidetrackType"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty": {
+        "type": "object",
+        "properties": {
+          "GaussianValue": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Statistics.GaussianDistribution"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.General.Statistics.GaussianDistribution": {
+        "type": "object",
+        "properties": {
+          "MinValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "MaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "Mean": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "StandardDeviation": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

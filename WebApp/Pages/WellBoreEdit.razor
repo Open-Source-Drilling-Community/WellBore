@@ -1,0 +1,355 @@
+﻿@implements IUnitAwareComponent
+@inject ILogger<WellBoreEdit> logger
+@inject ISnackbar Snackbar
+
+<MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit WellBore</MudText>
+<MudContainer Class="d-flex flex-row mt-4 mb-4">
+    <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="Update">Update</MudButton>
+    <MudButton Class="me-1" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+</MudContainer>
+
+<MudGrid>
+    <MudItem xs="12" sm="4" md="4" lg="4" xl="4">
+        <MudTextField @bind-Value="@name" Label="Name" Variant="Variant.Filled"></MudTextField>
+    </MudItem>
+    <MudItem xs="12" sm="8" md="8" lg="8" xl="8">
+        <MudTextField @bind-Value="@descr" Label="Description" Variant="Variant.Filled"></MudTextField>
+    </MudItem>
+
+    @if (Fields != null)
+    {
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudSelect Label="Field" @bind-Value="@_selectedField" Dense="true" ToStringFunc="@(s => s?.Name)">
+                @foreach (var field in Fields.Where(x => string.IsNullOrEmpty(_fieldSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_fieldSearchText, StringComparison.OrdinalIgnoreCase))))
+                {
+                    <MudSelectItem Value="@field">@field.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudTextField @bind-Value="@_fieldSearchText" Label="Filter Fields"></MudTextField>
+        </MudItem>
+    }
+    @if (Clusters != null && _selectedField != null)
+    {
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudSelect Label="Cluster" @bind-Value="@selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
+                @foreach (var cluster in Clusters.Where(x =>
+                            (x != null && x.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.FieldID && !x.IsSingleWell) &&
+                            (string.IsNullOrEmpty(_clusterSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_clusterSearchText, StringComparison.OrdinalIgnoreCase)))))
+                {
+                    <MudSelectItem Value="@cluster">@cluster.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudTextField @bind-Value="@_clusterSearchText" Label="Filter Clusters"></MudTextField>
+        </MudItem>
+    }
+    @if (Wells != null && selectedCluster != null)
+    {
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudSelect Label="Well" @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
+                @foreach (var well in Wells.Where(x =>
+                            (x != null && x.ClusterID != null && selectedCluster != null && selectedCluster.MetaInfo != null && selectedCluster.MetaInfo.ID == x.ClusterID) &&
+                            (string.IsNullOrEmpty(_wellSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_wellSearchText, StringComparison.OrdinalIgnoreCase)))))
+                {
+                    <MudSelectItem Value="@well">@well.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+            <MudTextField @bind-Value="@_wellSearchText" Label="Filter Wells"></MudTextField>
+        </MudItem>
+    }
+    @if (_selectedWell != null)
+    {
+        <MudItem xs="10" sm="4" md="4" lg="4" xl="4">
+            <MudSwitch @bind-Value="@_isSidetrack" Color="Color.Primary">Is Sidetrack</MudSwitch>
+        </MudItem>
+        <MudItem xs="2" sm="4" md="8" lg="8" xl="8">
+        </MudItem>
+        @if (_isSidetrack && WellBores != null && CurrentWellBore != null && CurrentWellBore.MetaInfo != null && CurrentWellBore.MetaInfo.ID != Guid.Empty)
+        {
+            <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+                <MudSelect Label="Wellbore" @bind-Value="@_selectedParentWellBore" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    @foreach (var wellBore in WellBores.Where(x =>
+                                (x != null && x.WellID != null && _selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID == x.WellID && x.MetaInfo != null && x.MetaInfo.ID != CurrentWellBore.MetaInfo.ID) &&
+                                (string.IsNullOrEmpty(_wellBoreSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_wellBoreSearchText, StringComparison.OrdinalIgnoreCase)))))
+                    {
+                        <MudSelectItem Value="@wellBore">@wellBore.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+                <MudTextField @bind-Value="@_wellBoreSearchText" Label="Filter Wellbores"></MudTextField>
+            </MudItem>
+            <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                           QuantityLabel="Sidetrack Along Hole Depth"
+                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                           SIValueNullable="_sidetrackDepth"
+                                           SIValueNullableChanged="(val => _sidetrackDepth = val)" />
+            </MudItem>
+            <MudItem xs="12" sm="4" md="4" lg="4">
+                <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                           QuantityLabel="Sidetrack Along Hole Depth Accuracy"
+                                           SIValueNullable="_sidetrackDepthAccuracy"
+                                           SIValueNullableChanged="@(val => _sidetrackDepthAccuracy = val)" />
+
+            </MudItem>
+            <MudItem xs="12" sm="4" md="4" lg="4" xl="4">
+                <MudSelect T="SidetrackType" Label="Sidetrack Type" @bind-Value="@_sidetrackType" Dense="true">
+                    @foreach (var typ in Enum.GetValues<SidetrackType>())
+                    {
+                        <MudSelectItem Value="@typ">@typ</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+        }
+    }
+</MudGrid>
+
+@code {
+    [CascadingParameter]
+    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    [Parameter]
+    public WellBore? CurrentWellBore { get; set; }
+
+    [Parameter]
+    public List<Field>? Fields { get; set; }
+
+    [Parameter]
+    public List<Cluster>? Clusters { get; set; }
+
+    [Parameter]
+    public List<Well>? Wells { get; set; }
+
+    [Parameter]
+    public List<WellBore>? WellBores { get; set; }
+
+    [Parameter]
+    public GroundMudLineDepthReferenceSource? GroundMudLineDepthSource { get; set; }
+
+    [Parameter]
+    public SeaWaterLevelDepthReferenceSource? TopWaterDepthSource { get; set; }
+
+    [Parameter]
+    public WellHeadDepthReferenceSource? WellHeadDepthSource { get; set; }
+
+    [Parameter]
+    public RotaryTableDepthReferenceSource? RotaryTableDepthSource { get; set; }
+
+    [Parameter]
+    public Action? OnUpdate { get; set; }
+
+    // Local variables used to retrieve user-defined parameters
+    private string? name;
+    private string? descr;
+
+    // Labels
+    private string? inputParamUnitLabel = null;
+
+    // UI related variables
+    private string? _wellBoreSearchString;
+    private Field? _selectedField = null;
+    private Cluster? _selectedCluster = null;
+    private Cluster? selectedCluster { get { return _selectedCluster; } set { _selectedCluster = value; ProcessSelectedCluster(); } }
+    private Well? _selectedWell = null;
+    private WellBore? _selectedParentWellBore = null;
+    private string? _fieldSearchText = null;
+    private string? _clusterSearchText = null;
+    private string? _wellSearchText = null;
+    private string? _wellBoreSearchText = null;
+    private bool _isSidetrack = false;
+    private double? _sidetrackDepth = null;
+    private double? _sidetrackDepthAccuracy = null;
+    private SidetrackType _sidetrackType = SidetrackType.Undefined;
+
+    private void ProcessSelectedCluster()
+    {
+        if (_selectedCluster == null)
+        {
+            if (GroundMudLineDepthSource != null)
+            {
+                GroundMudLineDepthSource.GroundMudLineDepthReference = null;
+            }
+            if (TopWaterDepthSource != null)
+            {
+                TopWaterDepthSource.SeaWaterLevelDepthReference = null;
+            }
+            if (WellHeadDepthSource != null)
+            {
+                WellHeadDepthSource.WellHeadDepthReference = null;
+            }
+        }
+        else
+        {
+            if (GroundMudLineDepthSource != null && _selectedCluster.GroundMudLineDepth != null && _selectedCluster.GroundMudLineDepth.GaussianValue != null)
+            {
+                GroundMudLineDepthSource.GroundMudLineDepthReference = _selectedCluster.GroundMudLineDepth.GaussianValue.Mean;
+            }
+            if (TopWaterDepthSource != null && _selectedCluster.TopWaterDepth != null && _selectedCluster.TopWaterDepth.GaussianValue != null)
+            {
+                TopWaterDepthSource.SeaWaterLevelDepthReference = _selectedCluster.TopWaterDepth.GaussianValue.Mean;
+            }
+            if (WellHeadDepthSource != null && _selectedCluster.ReferenceDepth != null && _selectedCluster.ReferenceDepth.GaussianValue != null)
+            {
+                WellHeadDepthSource.WellHeadDepthReference = _selectedCluster.ReferenceDepth.GaussianValue.Mean;
+            }
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Parent == null)
+                throw new ArgumentNullException(nameof(Parent), "TargetEdit page must exist within a MudUnitAndReferenceChoiceTag");
+            Parent.Add(this);
+            ManageUnits();
+
+            if (CurrentWellBore != null && CurrentWellBore.MetaInfo != null)
+            {
+                name = CurrentWellBore.Name;
+                descr = CurrentWellBore.Description;
+                _isSidetrack = CurrentWellBore.IsSidetrack;
+                if (_isSidetrack && WellBores != null && CurrentWellBore.ParentWellBoreID != null && CurrentWellBore.ParentWellBoreID != Guid.Empty)
+                {
+                    foreach (var wellbore in WellBores)
+                    {
+                        if (wellbore != null && wellbore.MetaInfo != null && wellbore.MetaInfo.ID == CurrentWellBore.ParentWellBoreID)
+                        {
+                            _selectedParentWellBore = wellbore;
+                            break;
+                        }
+                    }
+                }
+                if (_isSidetrack)
+                {
+                    _sidetrackType = CurrentWellBore.SidetrackType;
+                    if (CurrentWellBore.TieInPointAlongHoleDepth != null && CurrentWellBore.TieInPointAlongHoleDepth.GaussianValue != null)
+                    {
+                        _sidetrackDepth = CurrentWellBore.TieInPointAlongHoleDepth.GaussianValue.Mean;
+                        _sidetrackDepthAccuracy = CurrentWellBore.TieInPointAlongHoleDepth.GaussianValue.StandardDeviation;
+                    }
+                }
+                if (Wells != null && CurrentWellBore.WellID != Guid.Empty)
+                {
+                    foreach (var well in Wells)
+                    {
+                        if (well != null && well.MetaInfo != null && well.MetaInfo.ID == CurrentWellBore.WellID)
+                        {
+                            _selectedWell = well;
+                            break;
+                        }
+                    }
+                }
+                if (Clusters != null && _selectedWell != null && _selectedWell.ClusterID != Guid.Empty)
+                {
+                    foreach (var cluster in Clusters)
+                    {
+                        if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == _selectedWell.ClusterID)
+                        {
+                            selectedCluster = cluster;
+                            break;
+                        }
+                    }
+                }
+                if (Fields != null && selectedCluster != null && selectedCluster.FieldID != Guid.Empty)
+                {
+                    foreach (var field in Fields)
+                    {
+                        if (field != null && field.MetaInfo != null && field.MetaInfo.ID == selectedCluster.FieldID)
+                        {
+                            _selectedField = field;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                logger.LogError("Current WellBore is null or badly formed");
+                Snackbar.Add("Current WellBore is null or badly formed", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Problem on WellBore initialization");
+            Snackbar.Add("Problem on WellBore initialization", Severity.Error);
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
+
+    public void ManageUnits()
+    {
+
+    }
+
+    private async Task Update()
+    {
+
+        try
+        {
+            if (CurrentWellBore != null && CurrentWellBore.MetaInfo != null)
+            {
+                WellBore wellBore = new()
+                {
+                    MetaInfo = CurrentWellBore.MetaInfo,
+                    Name = name,
+                    Description = descr,
+                    CreationDate = CurrentWellBore.CreationDate,
+                    LastModificationDate = DateTimeOffset.UtcNow,
+                    IsSidetrack = _isSidetrack,
+                };
+                if (_selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID != Guid.Empty)
+                {
+                    wellBore.WellID = _selectedWell.MetaInfo.ID;
+                }
+                if (_isSidetrack && _selectedParentWellBore != null && _selectedParentWellBore.MetaInfo != null && _selectedParentWellBore.MetaInfo.ID != Guid.Empty)
+                {
+                    wellBore.ParentWellBoreID = _selectedParentWellBore.MetaInfo.ID;
+                }
+                if (_isSidetrack)
+                {
+                    wellBore.SidetrackType = _sidetrackType;
+                    if (_sidetrackDepth != null)
+                    {
+                        wellBore.TieInPointAlongHoleDepth = new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = _sidetrackDepth, StandardDeviation = (_sidetrackDepthAccuracy == null) ? 0.01 : _sidetrackDepthAccuracy } };
+                    }
+                }
+                await APIUtils.ClientWellBore.PutWellBoreByIdAsync(CurrentWellBore.MetaInfo.ID, wellBore);
+                logger.LogInformation("Updated the WellBore successfully");
+                Snackbar.Add("Updated the WellBore successfully", Severity.Success);
+            }
+            else
+            {
+                logger.LogWarning("Problem while updating the WellBore");
+                Snackbar.Add("Problem while updating the WellBore", Severity.Warning);
+            }
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while updating the WellBore");
+            Snackbar.Add("Problem while updating the WellBore", Severity.Warning);
+        }
+        OnUpdate?.Invoke();
+    }
+
+    private void Cancel()
+    {
+        OnUpdate?.Invoke();
+    }
+
+    //Quick filter - filter gobally across multiple columns with the same input
+    private Func<WellBore, bool> _wellBoreFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_wellBoreSearchString))
+            return true;
+        if ($"{x.Name}".Contains(_wellBoreSearchString))
+            return true;
+
+        return false;
+    };
+}
