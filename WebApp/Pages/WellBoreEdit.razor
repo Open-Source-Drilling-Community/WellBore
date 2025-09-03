@@ -32,26 +32,36 @@
     }
     @if (Clusters != null && _selectedField != null)
     {
-        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
-            <MudSelect Label="Cluster" @bind-Value="@selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
-                @foreach (var cluster in Clusters.Where(x =>
-                            (x != null && x.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.FieldID && !x.IsSingleWell) &&
-                            (string.IsNullOrEmpty(_clusterSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_clusterSearchText, StringComparison.OrdinalIgnoreCase)))))
-                {
-                    <MudSelectItem Value="@cluster">@cluster.Name</MudSelectItem>
-                }
-            </MudSelect>
+        <MudItem xs="10" sm="4" md="4" lg="4" xl="4">
+            <MudSwitch @bind-Value="@_useSingleWells" Color="Color.Primary">Use Single Wells</MudSwitch>
         </MudItem>
-        <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
-            <MudTextField @bind-Value="@_clusterSearchText" Label="Filter Clusters"></MudTextField>
+        <MudItem xs="2" sm="4" md="8" lg="8" xl="8">
         </MudItem>
+        if (!_useSingleWells)
+        {
+            <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+                <MudSelect Label="Cluster" @bind-Value="@selectedCluster" Dense="true" ToStringFunc="@(s => s?.Name)">
+                    @foreach (var cluster in Clusters.Where(x =>
+                                (x != null && x.FieldID != null && _selectedField != null && _selectedField.MetaInfo != null && _selectedField.MetaInfo.ID == x.FieldID && !x.IsSingleWell) &&
+                                (string.IsNullOrEmpty(_clusterSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_clusterSearchText, StringComparison.OrdinalIgnoreCase)))))
+                    {
+                        <MudSelectItem Value="@cluster">@cluster.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
+                <MudTextField @bind-Value="@_clusterSearchText" Label="Filter Clusters"></MudTextField>
+            </MudItem>
+        }
     }
-    @if (Wells != null && selectedCluster != null)
+    @if (Wells != null && (selectedCluster != null || _useSingleWells))
     {
         <MudItem xs="12" sm="6" md="6" lg="6" xl="6">
             <MudSelect Label="Well" @bind-Value="@_selectedWell" Dense="true" ToStringFunc="@(s => s?.Name)">
                 @foreach (var well in Wells.Where(x =>
-                            (x != null && x.ClusterID != null && selectedCluster != null && selectedCluster.MetaInfo != null && selectedCluster.MetaInfo.ID == x.ClusterID) &&
+                            (x != null && x.ClusterID != null && 
+                            ((!_useSingleWells && selectedCluster != null && selectedCluster.MetaInfo != null && selectedCluster.MetaInfo.ID == x.ClusterID) || 
+                             (_useSingleWells && x.IsSingleWell))) &&
                             (string.IsNullOrEmpty(_wellSearchText) || (x != null && !string.IsNullOrEmpty(x.Name) && x.Name.Contains(_wellSearchText, StringComparison.OrdinalIgnoreCase)))))
                 {
                     <MudSelectItem Value="@well">@well.Name</MudSelectItem>
@@ -159,6 +169,7 @@
     private Well? _selectedWell = null;
     private WellBore? _selectedParentWellBore = null;
     private string? _fieldSearchText = null;
+    private bool _useSingleWells = false;
     private string? _clusterSearchText = null;
     private string? _wellSearchText = null;
     private string? _wellBoreSearchText = null;
@@ -244,6 +255,10 @@
                             break;
                         }
                     }
+                }
+                if (_selectedWell != null)
+                {
+                    _useSingleWells = _selectedWell.IsSingleWell;
                 }
                 if (Clusters != null && _selectedWell != null && _selectedWell.ClusterID != Guid.Empty)
                 {
