@@ -4,9 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
+using ModelContextProtocol.Protocol;
 using NORCE.Drilling.WellBore.Service;
 using NORCE.Drilling.WellBore.Service.Managers;
+using NORCE.Drilling.WellBore.Service.Mcp;
+using NORCE.Drilling.WellBore.Service.Mcp.Tools;
+using System.Collections.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +31,26 @@ builder.Services.AddSwaggerGen(config =>
 {
     config.CustomSchemaIds(type => type.FullName);
 });
+
+// MCP server registrations
+var serverVersion = typeof(SqlConnectionManager).Assembly.GetName().Version?.ToString() ?? "1.0.0";
+
+builder.Services.AddMcpServer(options =>
+{
+    options.ServerInfo = new Implementation
+    {
+        Name = "WellBoreService",
+        Version = serverVersion
+    };
+    options.Capabilities = new ServerCapabilities
+    {
+        Tools = new ToolsCapability()
+    };
+}).WithHttpTransport();
+
+builder.Services.AddLegacyMcpTool<PingMcpTool>();
+
+// end MCP server
 
 var app = builder.Build();
 
@@ -74,6 +97,8 @@ app.UseCors(cors => cors
                         .AllowCredentials()
            );
 
+app.MapMcp("/mcp");
+app.MapMcpWebSocket("/mcp/ws");
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
