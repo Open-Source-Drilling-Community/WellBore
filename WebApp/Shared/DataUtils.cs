@@ -9,7 +9,7 @@
     public static class UnitAndReferenceParameters
     {
         public static string? UnitSystemName { get; set; } = "Metric";
-        public static string? DepthReferenceName { get; set; }
+        public static string? DepthReferenceName { get; set; } = "WGS84";
         public static string? PositionReferenceName { get; set; }
         public static string? AzimuthReferenceName { get; set; }
         public static string? PressureReferenceName { get; set; }
@@ -19,6 +19,11 @@
     public static void UpdateUnitSystemName(string val)
     {
         UnitAndReferenceParameters.UnitSystemName = (string)val;
+    }
+
+    public static void UpdateDepthReferenceName(string val)
+    {
+        UnitAndReferenceParameters.DepthReferenceName = (string)val;
     }
 
     // units and labels
