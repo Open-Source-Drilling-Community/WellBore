@@ -30,6 +30,8 @@ if (!String.IsNullOrEmpty(builder.Configuration["UnitConversionHostURL"]))
     NORCE.Drilling.WellBore.WebApp.Configuration.UnitConversionHostURL = builder.Configuration["UnitConversionHostURL"];
 if (!String.IsNullOrEmpty(builder.Configuration["FieldHostURL"]))
     NORCE.Drilling.WellBore.WebApp.Configuration.FieldHostURL = builder.Configuration["FieldHostURL"];
+if (!String.IsNullOrEmpty(builder.Configuration["RigHostURL"]))
+    NORCE.Drilling.WellBore.WebApp.Configuration.RigHostURL = builder.Configuration["RigHostURL"];
 if (!String.IsNullOrEmpty(builder.Configuration["ClusterHostURL"]))
     NORCE.Drilling.WellBore.WebApp.Configuration.ClusterHostURL = builder.Configuration["ClusterHostURL"];
 if (!String.IsNullOrEmpty(builder.Configuration["WellHostURL"]))

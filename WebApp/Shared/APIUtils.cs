@@ -23,6 +23,11 @@ public static class APIUtils
     public static readonly HttpClient HttpClientField = APIUtils.SetHttpClient(HostNameField, HostBasePathField);
     public static readonly NORCE.Drilling.WellBore.ModelShared.Client ClientField = new NORCE.Drilling.WellBore.ModelShared.Client(APIUtils.HttpClientField.BaseAddress!.ToString(), APIUtils.HttpClientField);
 
+    public static readonly string HostNameRig = NORCE.Drilling.WellBore.WebApp.Configuration.RigHostURL!;
+    public static readonly string HostBasePathRig = "Rig/api/";
+    public static readonly HttpClient HttpClientRig = APIUtils.SetHttpClient(HostNameRig, HostBasePathRig);
+    public static readonly NORCE.Drilling.WellBore.ModelShared.Client ClientRig = new NORCE.Drilling.WellBore.ModelShared.Client(APIUtils.HttpClientRig.BaseAddress!.ToString(), APIUtils.HttpClientRig);
+
     public static readonly string HostNameUnitConversion = NORCE.Drilling.WellBore.WebApp.Configuration.UnitConversionHostURL!;
     public static readonly string HostBasePathUnitConversion = "UnitConversion/api/";
 
