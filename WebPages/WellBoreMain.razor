@@ -1,9 +1,10 @@
 ﻿@page "/WellBore"
 @inject ILogger<WellBoreMain> logger
 @inject ISnackbar Snackbar
+@inject IWellBoreAPIUtils Api
 
-<MudUnitAndReferenceChoiceTag HttpHost=@APIUtils.HostNameUnitConversion
-                              HttpBasePath=@APIUtils.HostBasePathUnitConversion
+<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
+                              HttpBasePath=@Api.HostBasePathUnitConversion
                               HttpController="UnitSystem/"
                               UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
                               UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
@@ -92,15 +93,15 @@
             currentWellBore = null;
 
             // Starting all loading tasks asynchronously
-            logger.LogInformation("Trying to load list of WellBore from client: " + APIUtils.HostNameWellBore);
-            var wellBoreTask = APIUtils.ClientWellBore.GetAllWellBoreAsync();
+            logger.LogInformation("Trying to load list of WellBore from client: " + Api.HostNameWellBore);
+            var wellBoreTask = Api.ClientWellBore.GetAllWellBoreAsync();
 
-            logger.LogInformation("Trying to load list of Well from client: " + APIUtils.HostNameWell);
-            var wellTask = APIUtils.ClientWell.GetAllWellAsync();
-            logger.LogInformation("Trying to load list of Cluster from client: " + APIUtils.HostNameCluster);
-            var clusterTask = APIUtils.ClientCluster.GetAllClusterAsync();
-            logger.LogInformation("Trying to load list of Field from client: " + APIUtils.HostNameField);
-            var fieldTask = APIUtils.ClientField.GetAllFieldAsync();
+            logger.LogInformation("Trying to load list of Well from client: " + Api.HostNameWell);
+            var wellTask = Api.ClientWell.GetAllWellAsync();
+            logger.LogInformation("Trying to load list of Cluster from client: " + Api.HostNameCluster);
+            var clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            logger.LogInformation("Trying to load list of Field from client: " + Api.HostNameField);
+            var fieldTask = Api.ClientField.GetAllFieldAsync();
 
             List<Task> loadingTaskList = new List<Task> { wellBoreTask, wellTask, clusterTask, fieldTask };
 
@@ -202,7 +203,7 @@
     {
         try
         {
-            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = APIUtils.HostNameWellBore, HttpHostBasePath = APIUtils.HostBasePathWellBore, HttpEndPoint = "WellBore/" };
+            MetaInfo metaInfo = new() { ID = Guid.NewGuid(), HttpHostName = Api.HostNameWellBore, HttpHostBasePath = Api.HostBasePathWellBore, HttpEndPoint = "WellBore/" };
             DateTimeOffset creationDate = DateTimeOffset.UtcNow;
             WellBore currentWellBore = new()
             {
@@ -212,7 +213,7 @@
                 CreationDate = creationDate,
                 LastModificationDate = creationDate,
             };
-            await APIUtils.ClientWellBore.PostWellBoreAsync(currentWellBore);
+            await Api.ClientWellBore.PostWellBoreAsync(currentWellBore);
             logger.LogInformation("WellBore posted successfully");
             Snackbar.Add("WellBore posted successfully", Severity.Success);
             await OnInitializedAsync();
@@ -247,7 +248,7 @@
     {
         try
         {
-            currentWellBore = await APIUtils.ClientWellBore.GetWellBoreByIdAsync(id);
+            currentWellBore = await Api.ClientWellBore.GetWellBoreByIdAsync(id);
             if (currentWellBore != null)
             {
                 isHiddenMainPanel = true;
@@ -270,7 +271,7 @@
     {
         try
         {
-            await APIUtils.ClientWellBore.DeleteWellBoreByIdAsync(id);
+            await Api.ClientWellBore.DeleteWellBoreByIdAsync(id);
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -285,7 +286,7 @@
         {
             foreach (WellBore wellBore in selectedWellBoreList)
             {
-                await APIUtils.ClientWellBore.DeleteWellBoreByIdAsync(wellBore.MetaInfo.ID);
+                await Api.ClientWellBore.DeleteWellBoreByIdAsync(wellBore.MetaInfo.ID);
             }
             await OnInitializedAsync();
         }

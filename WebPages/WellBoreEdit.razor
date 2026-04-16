@@ -1,6 +1,7 @@
 ﻿@implements IUnitAwareComponent
 @inject ILogger<WellBoreEdit> logger
 @inject ISnackbar Snackbar
+@inject IWellBoreAPIUtils Api
 
 <MudText Class="mt-4 mb-4" Typo="Typo.h6">Edit WellBore</MudText>
 <MudContainer Class="d-flex flex-row mt-4 mb-4">
@@ -334,7 +335,7 @@
                         wellBore.TieInPointAlongHoleDepth = new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = _sidetrackDepth, StandardDeviation = (_sidetrackDepthAccuracy == null) ? 0.01 : _sidetrackDepthAccuracy } };
                     }
                 }
-                await APIUtils.ClientWellBore.PutWellBoreByIdAsync(CurrentWellBore.MetaInfo.ID, wellBore);
+                await Api.ClientWellBore.PutWellBoreByIdAsync(CurrentWellBore.MetaInfo.ID, wellBore);
                 logger.LogInformation("Updated the WellBore successfully");
                 Snackbar.Add("Updated the WellBore successfully", Severity.Success);
             }

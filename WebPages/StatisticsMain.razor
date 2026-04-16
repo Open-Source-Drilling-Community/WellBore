@@ -1,6 +1,7 @@
 ﻿@page "/Statistics"
 @inject ILogger<StatisticsMain> logger
 @inject ISnackbar Snackbar
+@inject IWellBoreAPIUtils Api
 
 @if (statistics_ == null)
 {
@@ -41,7 +42,7 @@ else
     {
         try
         {
-            statistics_ = await APIUtils.ClientWellBore.GetWellBoreUsageStatisticsAsync();
+            statistics_ = await Api.ClientWellBore.GetWellBoreUsageStatisticsAsync();
             if (statistics_ != null)
             {
                 totalCount_ = 0;

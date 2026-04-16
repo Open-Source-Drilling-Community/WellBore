@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -23,12 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="8.14.0" />
     <PackageReference Include="OSDC.DotnetLibraries.General.DataManagement" Version="2.1.0" />
-    <PackageReference Include="OSDC.UnitConversion.DrillingRazorMudComponents" Version="3.3.39" />
+    <PackageReference Include="OSDC.UnitConversion.DrillingRazorMudComponents" Version="3.3.47" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
+    <ProjectReference Include="..\WebPages\WebPages.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,11 +1,11 @@
-﻿public static class DataUtils
+namespace NORCE.Drilling.WellBore.WebPages;
+
+public static class DataUtils
 {
-    // default values
     public const double DEFAULT_VALUE = 999.25;
     public static string DEFAULT_NAME_WellBore = "Default WellBore Name";
     public static string DEFAULT_DESCR_WellBore = "Default WellBore Description";
 
-    // unit management
     public static class UnitAndReferenceParameters
     {
         public static string? UnitSystemName { get; set; } = "Metric";
@@ -18,15 +18,14 @@
 
     public static void UpdateUnitSystemName(string val)
     {
-        UnitAndReferenceParameters.UnitSystemName = (string)val;
+        UnitAndReferenceParameters.UnitSystemName = val;
     }
 
     public static void UpdateDepthReferenceName(string val)
     {
-        UnitAndReferenceParameters.DepthReferenceName = (string)val;
+        UnitAndReferenceParameters.DepthReferenceName = val;
     }
 
-    // units and labels
     public static readonly string WellBoreMyBaseDataListLabel = "MyBaseDataList";
     public static readonly string WellBoreOutputParamLabel = "WellBoreOutputParam";
     public static readonly string WellBoreNameLabel = "WellBore name";
