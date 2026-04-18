@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -27,12 +27,14 @@
     <PackageReference Include="OSDC.UnitConversion.DrillingRazorMudComponents" Version="3.3.47" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<!-- Include generated DTO source files directly from ModelSharedOut -->
+	<ItemGroup>
+		<Compile Include="..\ModelSharedOut\WellBoreMergedModel.cs"
+				 Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
 
 </Project>
