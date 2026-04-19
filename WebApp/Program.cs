@@ -13,6 +13,7 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     RigHostURL = builder.Configuration["RigHostURL"] ?? string.Empty,
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
+    TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
 };
 
 builder.Services.AddRazorPages();

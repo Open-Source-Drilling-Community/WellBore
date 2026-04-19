@@ -1,0 +1,341 @@
+@implements IUnitAwareComponent
+@implements IDisposable
+@using System.Text
+
+<PlotlyChart Config="config" Layout="layout" Data="data" @ref="chart" Id="@ID" />
+
+@code {
+    [CascadingParameter]
+    private MudUnitAndReferenceChoiceTag? Parent { get; set; }
+
+    [Parameter] public string ID { get; set; } = "default";
+    [Parameter] public string? XUnit { get; set; }
+    [Parameter] public string? YUnit { get; set; }
+    [Parameter] public List<string>? NameList { get; set; }
+    [Parameter] public List<int>? ModeFlagList { get; set; }
+    [Parameter] public List<string>? ColorList { get; set; }
+    [Parameter] public List<bool>? ShowLegends { get; set; }
+    [Parameter] public List<bool>? ShowMarkers { get; set; }
+    [Parameter] public List<List<object>>? XValuesList { get; set; }
+    [Parameter] public List<List<object>>? YValuesList { get; set; }
+    [Parameter] public int PlotHeight { get; set; }
+    [Parameter] public int PlotWidth { get; set; }
+    [Parameter] public string? PlotTitle { get; set; }
+    [Parameter] public string? XAxisTitle { get; set; }
+    [Parameter] public string? YAxisTitle { get; set; }
+    [Parameter] public bool XAxisReversed { get; set; }
+    [Parameter] public bool YAxisReversed { get; set; }
+    [Parameter] public decimal? AspectRatio { get; set; } = null;
+    [Parameter] public DrillingSignalReferenceType DrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public DrillingSignalReferenceType XDrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public DrillingSignalReferenceType YDrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public PositionDirectionType PositionDirectionX { get; set; } = PositionDirectionType.Independent;
+    [Parameter] public PositionDirectionType PositionDirectionY { get; set; } = PositionDirectionType.Independent;
+
+    private PlotlyChart? chart;
+    private bool _plotlyReady;
+    private bool _disposed;
+    private readonly SemaphoreSlim _plotSemaphore = new(1, 1);
+    private string? _lastPlotSignature;
+    private bool _forceReplot = true;
+    private readonly Config config = new() { Responsive = true };
+    private readonly Layout layout = new()
+    {
+        Title = new Plotly.Blazor.LayoutLib.Title { Text = "" },
+        XAxis = [new XAxis { Title = new Plotly.Blazor.LayoutLib.XAxisLib.Title { Text = "" } }],
+        YAxis = [new YAxis { Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title { Text = "" } }]
+    };
+    private readonly IList<ITrace> data = new List<ITrace>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (Parent == null)
+        {
+            throw new ArgumentNullException(nameof(Parent), "ScatterPlot must exist within a UnitAndReferenceChoiceTag");
+        }
+        Parent.Add(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _plotlyReady = true;
+            await PlotAsync();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await PlotAsync();
+    }
+
+    public void Dispose() => _disposed = true;
+
+    public void ManageUnits()
+    {
+        _forceReplot = true;
+        _ = InvokeAsync(PlotAsync);
+    }
+
+    public void Plot()
+    {
+        _forceReplot = true;
+        _ = InvokeAsync(PlotAsync);
+    }
+
+    private DrillingSignalReferenceType GetXDrillingSignalReference() =>
+        XDrillingSignalReference != DrillingSignalReferenceType.Independent ? XDrillingSignalReference : DrillingSignalReference;
+
+    private DrillingSignalReferenceType GetYDrillingSignalReference() =>
+        YDrillingSignalReference != DrillingSignalReferenceType.Independent ? YDrillingSignalReference : DrillingSignalReference;
+
+    private async Task PlotAsync()
+    {
+        await _plotSemaphore.WaitAsync();
+        try
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            ManageLayout();
+            if (!_plotlyReady || chart == null)
+            {
+                return;
+            }
+
+            string plotSignature = BuildPlotSignature();
+            if (!_forceReplot && _lastPlotSignature == plotSignature)
+            {
+                return;
+            }
+
+            await ManageTracesAsync();
+            try { await chart.React(); } catch { }
+            await InvokeAsync(StateHasChanged);
+            _lastPlotSignature = plotSignature;
+            _forceReplot = false;
+        }
+        finally
+        {
+            _plotSemaphore.Release();
+        }
+    }
+
+    private async Task ManageTracesAsync()
+    {
+        if (_disposed || !_plotlyReady || chart == null || Parent == null || XUnit == null || YUnit == null)
+        {
+            return;
+        }
+
+        if (XValuesList == null || YValuesList == null || !XValuesList.Any() || XValuesList.Count != YValuesList.Count)
+        {
+            return;
+        }
+
+        try { await chart.Clear(); } catch (NullReferenceException) { return; }
+
+        for (int i = 0; i < XValuesList.Count; i++)
+        {
+            List<object> xValues = [];
+            List<object> yValues = [];
+
+            foreach (object x in XValuesList[i])
+            {
+                if (TryGetDouble(x, out double value))
+                {
+                    double? converted = ConvertValue(value, XUnit, GetXDrillingSignalReference(), PositionDirectionX);
+                    if (converted.HasValue) xValues.Add(converted.Value);
+                }
+            }
+
+            foreach (object y in YValuesList[i])
+            {
+                if (TryGetDouble(y, out double value))
+                {
+                    double? converted = ConvertValue(value, YUnit, GetYDrillingSignalReference(), PositionDirectionY);
+                    if (converted.HasValue) yValues.Add(converted.Value);
+                }
+            }
+
+            if (xValues.Count == 0 || xValues.Count != yValues.Count)
+            {
+                continue;
+            }
+
+            string name = NameList != null && i < NameList.Count ? NameList[i] : $"trace_{i}";
+            Plotly.Blazor.Traces.ScatterLib.ModeFlag mode =
+                ModeFlagList != null && i < ModeFlagList.Count
+                    ? (Plotly.Blazor.Traces.ScatterLib.ModeFlag)ModeFlagList[i]
+                    : Plotly.Blazor.Traces.ScatterLib.ModeFlag.Lines;
+
+            Marker marker = ColorList != null && i < ColorList.Count
+                ? new Marker { Color = ColorList[i] }
+                : new Marker { AutoColorScale = true };
+
+            bool showLegend = ShowLegends != null && i < ShowLegends.Count ? ShowLegends[i] : true;
+            bool showMarker = ShowMarkers != null && i < ShowMarkers.Count ? ShowMarkers[i] : false;
+
+            if (showMarker)
+            {
+                await chart.AddTrace(new Scatter
+                {
+                    Name = name,
+                    Mode = ModeFlag.Text,
+                    Marker = marker,
+                    ShowLegend = showLegend,
+                    Text = name,
+                    TextPosition = TextPositionEnum.TopCenter,
+                    X = xValues,
+                    Y = yValues
+                });
+            }
+            else
+            {
+                await chart.AddTrace(new Scatter
+                {
+                    Name = name,
+                    Mode = mode,
+                    Marker = marker,
+                    ShowLegend = showLegend,
+                    X = xValues,
+                    Y = yValues
+                });
+            }
+        }
+    }
+
+    private double? ConvertValue(double value, string quantityName, DrillingSignalReferenceType drillingSignalReference, PositionDirectionType direction)
+    {
+        if (Parent == null)
+        {
+            return null;
+        }
+
+        return drillingSignalReference switch
+        {
+            DrillingSignalReferenceType.Pressure => Parent.FromAbsolutePressureSI((double?)value, quantityName),
+            DrillingSignalReferenceType.Azimuth => Parent.FromTrueNorthAzimuthSI((double?)value, quantityName),
+            DrillingSignalReferenceType.Depth => Parent.FromWGS84DepthSI((double?)value, quantityName),
+            DrillingSignalReferenceType.Position => direction == PositionDirectionType.Independent ? null : Parent.FromWGS84PositionSI((double?)value, quantityName, direction),
+            _ => Parent.FromSI((double?)value, quantityName)
+        };
+    }
+
+    private void ManageLayout()
+    {
+        if (Parent == null || XAxisTitle == null || YAxisTitle == null || XUnit == null || YUnit == null)
+        {
+            return;
+        }
+
+        string xAxisTitle = GetAxisTitle(XAxisTitle, XUnit, GetXDrillingSignalReference());
+        string yAxisTitle = GetAxisTitle(YAxisTitle, YUnit, GetYDrillingSignalReference());
+
+        layout.Height = PlotHeight > 0 ? PlotHeight : null;
+        layout.Width = PlotWidth > 0 ? PlotWidth : null;
+        layout.Title.Text = PlotTitle;
+
+        foreach (var axis in layout.XAxis)
+        {
+            axis.Title.Text = xAxisTitle;
+            axis.AutoRange = XAxisReversed ? Plotly.Blazor.LayoutLib.XAxisLib.AutoRangeEnum.Reversed : Plotly.Blazor.LayoutLib.XAxisLib.AutoRangeEnum.True;
+            axis.RangeMode = Plotly.Blazor.LayoutLib.XAxisLib.RangeModeEnum.Normal;
+        }
+
+        foreach (var axis in layout.YAxis)
+        {
+            axis.Title.Text = yAxisTitle;
+            axis.AutoRange = YAxisReversed ? Plotly.Blazor.LayoutLib.YAxisLib.AutoRangeEnum.Reversed : Plotly.Blazor.LayoutLib.YAxisLib.AutoRangeEnum.True;
+            axis.RangeMode = Plotly.Blazor.LayoutLib.YAxisLib.RangeModeEnum.Normal;
+            if (AspectRatio is { } aspectRatio && aspectRatio > 0)
+            {
+                axis.ScaleAnchor = "x";
+                axis.ScaleRatio = aspectRatio;
+            }
+        }
+    }
+
+    private string GetAxisTitle(string axisTitle, string unit, DrillingSignalReferenceType drillingSignalReference)
+    {
+        if (Parent == null)
+        {
+            return axisTitle;
+        }
+
+        if (drillingSignalReference == DrillingSignalReferenceType.Depth)
+        {
+            var depthUnitLabel = Parent.GetDepthUnitLabel(unit);
+            return string.IsNullOrWhiteSpace(depthUnitLabel) ? axisTitle : depthUnitLabel;
+        }
+
+        string unitLabel = drillingSignalReference == DrillingSignalReferenceType.Position
+            ? Parent.GetPositionUnitLabel(unit)
+            : Parent.GetUnitLabel(unit);
+        return string.IsNullOrWhiteSpace(unitLabel) ? axisTitle : axisTitle + " (" + unitLabel + ")";
+    }
+
+    private static bool TryGetDouble(object v, out double d)
+    {
+        switch (v)
+        {
+            case double dd: d = dd; return true;
+            case float ff: d = ff; return true;
+            case decimal mm: d = (double)mm; return true;
+            case int ii: d = ii; return true;
+            case long ll: d = ll; return true;
+            default: d = default; return false;
+        }
+    }
+
+    private string BuildPlotSignature()
+    {
+        StringBuilder builder = new();
+        builder.Append(ID).Append('|').Append(XUnit).Append('|').Append(YUnit).Append('|')
+            .Append(XAxisTitle).Append('|').Append(YAxisTitle).Append('|').Append(PlotTitle).Append('|')
+            .Append(XAxisReversed).Append('|').Append(YAxisReversed).Append('|').Append(AspectRatio).Append('|')
+            .Append(GetXDrillingSignalReference()).Append('|').Append(GetYDrillingSignalReference()).Append('|')
+            .Append(PositionDirectionX).Append('|').Append(PositionDirectionY).Append('|');
+        AppendListSignature(builder, NameList);
+        AppendListSignature(builder, ModeFlagList);
+        AppendListSignature(builder, ColorList);
+        AppendListSignature(builder, ShowLegends);
+        AppendListSignature(builder, ShowMarkers);
+        AppendNestedListSignature(builder, XValuesList);
+        AppendNestedListSignature(builder, YValuesList);
+        return builder.ToString();
+    }
+
+    private static void AppendListSignature<T>(StringBuilder builder, List<T>? values)
+    {
+        if (values == null)
+        {
+            builder.Append("null|");
+            return;
+        }
+        builder.Append(values.Count).Append('|');
+        foreach (T? value in values) builder.Append(value).Append(';');
+        builder.Append('|');
+    }
+
+    private static void AppendNestedListSignature(StringBuilder builder, List<List<object>>? values)
+    {
+        if (values == null)
+        {
+            builder.Append("null|");
+            return;
+        }
+        builder.Append(values.Count).Append('|');
+        foreach (List<object> list in values)
+        {
+            builder.Append(list.Count).Append(':');
+            foreach (object? value in list) builder.Append(value).Append(',');
+            builder.Append(';');
+        }
+        builder.Append('|');
+    }
+}

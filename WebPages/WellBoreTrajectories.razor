@@ -1,0 +1,447 @@
+@page "/WellBoreTrajectories"
+@inject ILogger<WellBoreTrajectories> logger
+@inject ISnackbar Snackbar
+@inject IWellBoreAPIUtils Api
+@using WellBoreModelShared = NORCE.Drilling.WellBore.ModelShared
+
+<MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
+                              HttpBasePath=@Api.HostBasePathUnitConversion
+                              HttpController="UnitSystem/"
+                              UnitSystemName="@DataUtils.UnitAndReferenceParameters.UnitSystemName"
+                              UnitSystemNameChanged="@DataUtils.UpdateUnitSystemName"
+                              DepthReferenceName="@DataUtils.UnitAndReferenceParameters.DepthReferenceName"
+                              DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
+                              GroundMudLineDepthReferenceSource="@groundMudLineDepthSource"
+                              SeaWaterLevelDepthReferenceSource="@topWaterDepthSource"
+                              WellHeadDepthReferenceSource="@wellHeadDepthSource"
+                              RotaryTableDepthReferenceSource="@rotaryTableDepthSource">
+    @if (fieldList == null || clusterList == null || wellList == null || wellBoreList == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <MudStack Spacing="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudGrid>
+                    <MudItem xs="12" md="3">
+                        <MudText Typo="Typo.h5">WellBore Trajectories</MudText>
+                        <MudText Typo="Typo.body2">All trajectories for the selected wellbore, shown in 3D and as a horizontal projection.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudSelect Label="Field" T="Guid?" Value="@selectedFieldId" ValueChanged="OnFieldChanged" ShrinkLabel Clearable="true">
+                            @foreach (WellBoreModelShared.Field field in AvailableFields)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)field.MetaInfo.ID)">@field.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudSelect Label="Cluster" T="Guid?" Value="@selectedClusterId" ValueChanged="OnClusterChanged" ShrinkLabel Clearable="true" Disabled="@(selectedFieldId == null || AvailableClusters.Count == 0)">
+                            @foreach (WellBoreModelShared.Cluster cluster in AvailableClusters)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)cluster.MetaInfo.ID)">@cluster.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudSelect Label="Well" T="Guid?" Value="@selectedWellId" ValueChanged="OnWellChanged" ShrinkLabel Clearable="true" Disabled="@(selectedFieldId == null || AvailableWells.Count == 0)">
+                            @foreach (WellBoreModelShared.Well well in AvailableWells)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)well.MetaInfo.ID)">@well.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="2">
+                        <MudSelect Label="Wellbore" T="Guid?" Value="@selectedWellBoreId" ValueChanged="OnWellBoreChanged" ShrinkLabel Clearable="true" Disabled="@(selectedWellId == null || AvailableWellBores.Count == 0)">
+                            @foreach (WellBoreModelShared.WellBore wellBore in AvailableWellBores)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)wellBore.MetaInfo.ID)">@wellBore.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="1">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="ReloadSelectedWellBoreAsync" Disabled="@(selectedWellBoreId == null)">Reload</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            @if (!string.IsNullOrWhiteSpace(errorMessage))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true">@errorMessage</MudAlert>
+            }
+            else if (isLoadingTrajectories)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Loading trajectories for the selected wellbore.</MudAlert>
+            }
+            else if (selectedFieldId == null)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Select a field to display its wellbores.</MudAlert>
+            }
+            else if (selectedWellId == null)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Select a well to display its wellbores.</MudAlert>
+            }
+            else if (AvailableWellBores.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">No wellbores were found for the selected filters.</MudAlert>
+            }
+            else if (selectedWellBoreId == null)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Select a wellbore to display its trajectories.</MudAlert>
+            }
+            else if (trajectoryList.Count == 0)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">No trajectories were found for the selected wellbore.</MudAlert>
+            }
+            else
+            {
+                <MudGrid>
+                    <MudItem xs="12" xl="6">
+                        <MudPaper Class="pa-4" Elevation="2">
+                            <MudText Typo="Typo.h6">3D View</MudText>
+                            <Scatter3DPlot XUnit="PositionDrilling" YUnit="PositionDrilling" ZUnit="DepthDrilling"
+                                           NameList="@PlotNames" ModeFlagList="@PlotModeFlags" ColorList="@PlotColors"
+                                           XValuesList="@EastValuesList" YValuesList="@NorthValuesList" ZValuesList="@TvdValuesList"
+                                           XAxisTitle="Easting" YAxisTitle="Northing" ZAxisTitle="TVD"
+                                           PlotTitle="Wellbore trajectories" PlotHeight="600" ZAxisReversed="true"
+                                           XDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           YDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                           ZDrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                           PositionDirectionX="@PositionDirectionType.East"
+                                           PositionDirectionY="@PositionDirectionType.North" />
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" xl="6">
+                        <MudPaper Class="pa-4" Elevation="2">
+                            <MudText Typo="Typo.h6">Horizontal Projection</MudText>
+                            <ScatterPlot XUnit="PositionDrilling" YUnit="PositionDrilling"
+                                         NameList="@PlotNames" ModeFlagList="@PlotModeFlags" ColorList="@PlotColors"
+                                         XValuesList="@EastValuesList" YValuesList="@NorthValuesList"
+                                         XAxisTitle="Easting" YAxisTitle="Northing"
+                                         PlotTitle="Horizontal projection" PlotHeight="600" AspectRatio="1"
+                                         XDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                         YDrillingSignalReference="@DrillingSignalReferenceType.Position"
+                                         PositionDirectionX="@PositionDirectionType.East"
+                                         PositionDirectionY="@PositionDirectionType.North" />
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6">Legend</MudText>
+                    <MudGrid>
+                        @foreach (var trace in plotTraces)
+                        {
+                            <MudItem xs="12" sm="6" md="4" lg="3">
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <span style="@($"width:18px;height:18px;border-radius:50%;display:inline-block;background:{trace.Color};")"></span>
+                                    <MudText Typo="Typo.body2">@trace.Name</MudText>
+                                </div>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            }
+        </MudStack>
+    }
+</MudUnitAndReferenceChoiceTag>
+
+@code {
+    private List<WellBoreModelShared.Field>? fieldList;
+    private List<WellBoreModelShared.Cluster>? clusterList;
+    private List<WellBoreModelShared.Well>? wellList;
+    private List<WellBoreModelShared.WellBore>? wellBoreList;
+    private List<WellBoreModelShared.TrajectoryLight> trajectoryLightList = [];
+    private List<WellBoreModelShared.Trajectory> trajectoryList = [];
+    private Guid? selectedFieldId;
+    private Guid? selectedClusterId;
+    private Guid? selectedWellId;
+    private Guid? selectedWellBoreId;
+    private string? errorMessage;
+    private bool isLoadingTrajectories;
+    private List<PlotTrace> plotTraces = [];
+
+    private GroundMudLineDepthReferenceSource groundMudLineDepthSource = new();
+    private SeaWaterLevelDepthReferenceSource topWaterDepthSource = new();
+    private WellHeadDepthReferenceSource wellHeadDepthSource = new();
+    private RotaryTableDepthReferenceSource rotaryTableDepthSource = new();
+
+    private List<string> PlotNames => plotTraces.Select(trace => trace.Name).ToList();
+    private List<int> PlotModeFlags => plotTraces.Select(trace => trace.ModeFlag).ToList();
+    private List<string> PlotColors => plotTraces.Select(trace => trace.Color).ToList();
+    private List<List<object>> NorthValuesList => plotTraces.Select(trace => trace.NorthValues).ToList();
+    private List<List<object>> EastValuesList => plotTraces.Select(trace => trace.EastValues).ToList();
+    private List<List<object>> TvdValuesList => plotTraces.Select(trace => trace.TvdValues).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            logger.LogInformation("Trying to load list of Fields, Clusters, Wells and WellBores");
+            Task<ICollection<WellBoreModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
+            Task<ICollection<WellBoreModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            Task<ICollection<WellBoreModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
+            Task<ICollection<WellBoreModelShared.WellBore>> wellBoreTask = Api.ClientWellBore.GetAllWellBoreAsync();
+            await Task.WhenAll(fieldTask, clusterTask, wellTask, wellBoreTask);
+
+            fieldList = fieldTask.Result.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList();
+            clusterList = clusterTask.Result.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList();
+            wellList = wellTask.Result.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList();
+            wellBoreList = wellBoreTask.Result.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while loading fields, clusters, wells and wellbores");
+            errorMessage = "Unable to load fields, clusters, wells and wellbores.";
+            Snackbar.Add(errorMessage, Severity.Error);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected problem while loading fields, clusters, wells and wellbores");
+            errorMessage = "Unable to load fields, clusters, wells and wellbores.";
+            Snackbar.Add(errorMessage, Severity.Error);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private List<WellBoreModelShared.Field> AvailableFields => fieldList?.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList() ?? [];
+
+    private List<WellBoreModelShared.Cluster> AvailableClusters =>
+        clusterList?.Where(x => x?.MetaInfo != null && x.FieldID == selectedFieldId && !x.IsSingleWell).OrderBy(x => x.Name).ToList() ?? [];
+
+    private List<WellBoreModelShared.Well> AvailableWells =>
+        wellList?.Where(well => MatchesSelectedField(well) && MatchesSelectedCluster(well)).OrderBy(well => well.Name).ToList() ?? [];
+
+    private List<WellBoreModelShared.WellBore> AvailableWellBores =>
+        wellBoreList?.Where(wb => selectedWellId != null && wb?.WellID == selectedWellId).OrderBy(wb => wb.Name).ToList() ?? [];
+
+    private bool MatchesSelectedField(WellBoreModelShared.Well? well)
+    {
+        if (selectedFieldId == null || well?.ClusterID == null || clusterList == null) return false;
+        WellBoreModelShared.Cluster? cluster = clusterList.FirstOrDefault(c => c?.MetaInfo?.ID == well.ClusterID);
+        return cluster?.FieldID == selectedFieldId;
+    }
+
+    private bool MatchesSelectedCluster(WellBoreModelShared.Well? well)
+    {
+        if (selectedClusterId == null) return true;
+        return well?.ClusterID == selectedClusterId;
+    }
+
+    private async Task OnFieldChanged(Guid? fieldId)
+    {
+        selectedFieldId = fieldId;
+        selectedClusterId = null;
+        selectedWellId = null;
+        selectedWellBoreId = null;
+        ResetViewState();
+        UpdateSelectedClusterDepthReferenceSources(null);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnClusterChanged(Guid? clusterId)
+    {
+        selectedClusterId = clusterId;
+        selectedWellId = null;
+        selectedWellBoreId = null;
+        ResetViewState();
+        UpdateSelectedClusterDepthReferenceSources(clusterId);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnWellChanged(Guid? wellId)
+    {
+        selectedWellId = wellId;
+        selectedWellBoreId = null;
+        ResetViewState();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnWellBoreChanged(Guid? wellBoreId)
+    {
+        selectedWellBoreId = wellBoreId;
+        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId && selectedWellBoreId is Guid selected)
+        {
+            await LoadTrajectoriesAsync(fieldId, selectedClusterId, wellId, selected);
+        }
+        else
+        {
+            ResetViewState();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ReloadSelectedWellBoreAsync()
+    {
+        if (selectedFieldId is Guid fieldId && selectedWellId is Guid wellId && selectedWellBoreId is Guid wellBoreId)
+        {
+            await LoadTrajectoriesAsync(fieldId, selectedClusterId, wellId, wellBoreId);
+        }
+    }
+
+    private void UpdateSelectedClusterDepthReferenceSources(Guid? clusterId)
+    {
+        groundMudLineDepthSource.GroundMudLineDepthReference = null;
+        topWaterDepthSource.SeaWaterLevelDepthReference = null;
+        wellHeadDepthSource.WellHeadDepthReference = null;
+        rotaryTableDepthSource.RotaryTableDepthReference = null;
+
+        if (clusterId == null || clusterList == null)
+        {
+            return;
+        }
+
+        WellBoreModelShared.Cluster? selectedCluster = clusterList.FirstOrDefault(cluster => cluster.MetaInfo?.ID == clusterId);
+        if (selectedCluster?.GroundMudLineDepth?.GaussianValue != null)
+        {
+            groundMudLineDepthSource.GroundMudLineDepthReference = selectedCluster.GroundMudLineDepth.GaussianValue.Mean;
+        }
+        if (selectedCluster?.TopWaterDepth?.GaussianValue != null)
+        {
+            topWaterDepthSource.SeaWaterLevelDepthReference = selectedCluster.TopWaterDepth.GaussianValue.Mean;
+        }
+        if (selectedCluster?.ReferenceDepth?.GaussianValue != null)
+        {
+            wellHeadDepthSource.WellHeadDepthReference = selectedCluster.ReferenceDepth.GaussianValue.Mean;
+        }
+    }
+
+    private void ResetViewState()
+    {
+        trajectoryLightList.Clear();
+        trajectoryList.Clear();
+        ClearPlots();
+        errorMessage = null;
+    }
+
+    private async Task LoadTrajectoriesAsync(Guid fieldId, Guid? clusterId, Guid wellId, Guid wellBoreId)
+    {
+        try
+        {
+            errorMessage = null;
+            isLoadingTrajectories = true;
+            trajectoryLightList.Clear();
+            trajectoryList.Clear();
+            ClearPlots();
+            await InvokeAsync(StateHasChanged);
+
+            logger.LogInformation("Loading trajectory light data for field {FieldId}, cluster {ClusterId}, well {WellId} and wellbore {WellBoreId}", fieldId, clusterId, wellId, wellBoreId);
+            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId, wellBoreId: wellBoreId))
+                .Where(t => t?.MetaInfo != null && t.MetaInfo.ID != Guid.Empty)
+                .OrderBy(t => t.Name)
+                .ToList();
+
+            List<Task<WellBoreModelShared.Trajectory>> detailTasks = trajectoryLightList
+                .Select(light => Api.ClientTrajectory.GetTrajectoryByIdAsync(light.MetaInfo.ID))
+                .ToList();
+
+            trajectoryList = (await Task.WhenAll(detailTasks))
+                .Where(t => t != null)
+                .OrderBy(t => t.Name)
+                .ToList();
+
+            UpdatePlots();
+        }
+        catch (ApiException ex)
+        {
+            logger.LogError(ex, "Problem while loading trajectories for wellbore {WellBoreId}", wellBoreId);
+            errorMessage = "Unable to load trajectories for the selected wellbore.";
+            Snackbar.Add(errorMessage, Severity.Error);
+            ResetViewState();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected problem while loading trajectories for wellbore {WellBoreId}", wellBoreId);
+            errorMessage = "Unable to load trajectories for the selected wellbore.";
+            Snackbar.Add(errorMessage, Severity.Error);
+            ResetViewState();
+        }
+        finally
+        {
+            isLoadingTrajectories = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdatePlots()
+    {
+        int colorIndex = 0;
+        List<PlotTrace> nextPlotTraces = [];
+        foreach (WellBoreModelShared.Trajectory trajectory in trajectoryList)
+        {
+            if (trajectory?.SurveyStationList == null || trajectory.SurveyStationList.Count == 0) continue;
+            List<object> northValues = [];
+            List<object> eastValues = [];
+            List<object> tvdValues = [];
+            foreach (WellBoreModelShared.SurveyStation station in trajectory.SurveyStationList)
+            {
+                AppendPoint(station, northValues, eastValues, tvdValues);
+            }
+            if (northValues.Count < 2 || northValues.Count != eastValues.Count || northValues.Count != tvdValues.Count) continue;
+            nextPlotTraces.Add(new PlotTrace(
+                string.IsNullOrWhiteSpace(trajectory.Name) ? "trajectory" : trajectory.Name,
+                1,
+                Colors[colorIndex % Colors.Length],
+                northValues,
+                eastValues,
+                tvdValues));
+            colorIndex++;
+        }
+        plotTraces = nextPlotTraces;
+    }
+
+    private static void AppendPoint(WellBoreModelShared.SurveyStation? point, List<object> northValues, List<object> eastValues, List<object> tvdValues)
+    {
+        if (point?.X is not { } north || point.Y is not { } east) return;
+        double tvd = point.TVD ?? point.Z ?? 0.0;
+        AppendPointValues(north, east, tvd, northValues, eastValues, tvdValues);
+    }
+
+    private static void AppendPointValues(double north, double east, double tvd, List<object> northValues, List<object> eastValues, List<object> tvdValues)
+    {
+        if (northValues.Count > 0 &&
+            eastValues.Count == northValues.Count &&
+            tvdValues.Count == northValues.Count &&
+            TryGetLastDouble(northValues, out double lastNorth) &&
+            TryGetLastDouble(eastValues, out double lastEast) &&
+            TryGetLastDouble(tvdValues, out double lastTvd) &&
+            AreClose(lastNorth, north) &&
+            AreClose(lastEast, east) &&
+            AreClose(lastTvd, tvd))
+        {
+            return;
+        }
+        northValues.Add(north);
+        eastValues.Add(east);
+        tvdValues.Add(tvd);
+    }
+
+    private static bool TryGetLastDouble(List<object> values, out double value)
+    {
+        value = default;
+        if (values.Count == 0) return false;
+        object last = values[^1];
+        return last switch
+        {
+            double d => (value = d) == d,
+            float f => (value = f) == f,
+            decimal m => (value = (double)m) == (double)m,
+            int i => (value = i) == i,
+            long l => (value = l) == l,
+            _ => false
+        };
+    }
+
+    private static bool AreClose(double left, double right) => Math.Abs(left - right) <= 1e-6;
+    private void ClearPlots() => plotTraces = [];
+
+    private static readonly string[] Colors =
+    [
+        "black","blue","grey","red","orange","green","yellow","pink","brown","purple"
+    ];
+
+    private sealed record PlotTrace(string Name, int ModeFlag, string Color, List<object> NorthValues, List<object> EastValues, List<object> TvdValues);
+}

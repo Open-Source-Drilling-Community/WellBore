@@ -29,6 +29,11 @@ public interface IWellBoreAPIUtils
     HttpClient HttpClientRig { get; }
     Client ClientRig { get; }
 
+    string HostNameTrajectory { get; }
+    string HostBasePathTrajectory { get; }
+    HttpClient HttpClientTrajectory { get; }
+    Client ClientTrajectory { get; }
+
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
 }

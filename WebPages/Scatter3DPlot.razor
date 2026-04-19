@@ -1,0 +1,257 @@
+@implements IUnitAwareComponent
+@implements IDisposable
+@using System.Text
+
+<PlotlyChart Config="config" Layout="layout" Data="data" @ref="chart" />
+
+@code {
+    [CascadingParameter] private MudUnitAndReferenceChoiceTag Parent { get; set; } = null!;
+
+    [Parameter] public string XUnit { get; set; } = string.Empty;
+    [Parameter] public string YUnit { get; set; } = string.Empty;
+    [Parameter] public string ZUnit { get; set; } = string.Empty;
+    [Parameter] public List<string> NameList { get; set; } = [];
+    [Parameter] public List<int> ModeFlagList { get; set; } = [];
+    [Parameter] public List<string> ColorList { get; set; } = [];
+    [Parameter] public List<List<object>> XValuesList { get; set; } = [];
+    [Parameter] public List<List<object>> YValuesList { get; set; } = [];
+    [Parameter] public List<List<object>> ZValuesList { get; set; } = [];
+    [Parameter] public int PlotHeight { get; set; }
+    [Parameter] public int PlotWidth { get; set; }
+    [Parameter] public string PlotTitle { get; set; } = string.Empty;
+    [Parameter] public string XAxisTitle { get; set; } = string.Empty;
+    [Parameter] public string YAxisTitle { get; set; } = string.Empty;
+    [Parameter] public string ZAxisTitle { get; set; } = string.Empty;
+    [Parameter] public bool ZAxisReversed { get; set; }
+    [Parameter] public bool YAxisReversed { get; set; }
+    [Parameter] public DrillingSignalReferenceType XDrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public DrillingSignalReferenceType YDrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public DrillingSignalReferenceType ZDrillingSignalReference { get; set; } = DrillingSignalReferenceType.Independent;
+    [Parameter] public PositionDirectionType PositionDirectionX { get; set; } = PositionDirectionType.Independent;
+    [Parameter] public PositionDirectionType PositionDirectionY { get; set; } = PositionDirectionType.Independent;
+
+    private PlotlyChart? chart;
+    private bool _plotlyReady;
+    private bool _disposed;
+    private readonly SemaphoreSlim _plotSemaphore = new(1, 1);
+    private string? _lastPlotSignature;
+    private bool _forceReplot = true;
+    private readonly IList<ITrace> data = new List<ITrace>();
+    private readonly Config config = new() { Responsive = true };
+    private readonly Layout layout = new()
+    {
+        Title = new Plotly.Blazor.LayoutLib.Title { Text = "" },
+        Scene =
+        [
+            new Scene
+            {
+                XAxis = new Plotly.Blazor.LayoutLib.SceneLib.XAxis { Title = new Plotly.Blazor.LayoutLib.SceneLib.XAxisLib.Title { Text = "" } },
+                YAxis = new Plotly.Blazor.LayoutLib.SceneLib.YAxis { Title = new Plotly.Blazor.LayoutLib.SceneLib.YAxisLib.Title { Text = "" } },
+                ZAxis = new Plotly.Blazor.LayoutLib.SceneLib.ZAxis { Title = new Plotly.Blazor.LayoutLib.SceneLib.ZAxisLib.Title { Text = "" } }
+            }
+        ]
+    };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Parent.Add(this);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _plotlyReady = true;
+            await PlotAsync();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await PlotAsync();
+    }
+
+    public void Dispose() => _disposed = true;
+
+    public void ManageUnits()
+    {
+        _forceReplot = true;
+        _ = InvokeAsync(PlotAsync);
+    }
+
+    private async Task PlotAsync()
+    {
+        await _plotSemaphore.WaitAsync();
+        try
+        {
+            if (_disposed) return;
+            ManageLayout();
+            if (!_plotlyReady || chart == null) return;
+            string plotSignature = BuildPlotSignature();
+            if (!_forceReplot && _lastPlotSignature == plotSignature) return;
+            await ManageTracesAsync();
+            try { await chart.React(); } catch { }
+            await InvokeAsync(StateHasChanged);
+            _lastPlotSignature = plotSignature;
+            _forceReplot = false;
+        }
+        finally
+        {
+            _plotSemaphore.Release();
+        }
+    }
+
+    private async Task ManageTracesAsync()
+    {
+        if (_disposed || !_plotlyReady || chart == null) return;
+        if (XValuesList == null || YValuesList == null || ZValuesList == null || !XValuesList.Any() || !YValuesList.Any() || !ZValuesList.Any()) return;
+        try { await chart.Clear(); } catch (NullReferenceException) { return; }
+
+        int nTraces = new[] { XValuesList.Count, YValuesList.Count, ZValuesList.Count }.Min();
+        for (int i = 0; i < nTraces; i++)
+        {
+            List<double> xOut = ConvertValues(XValuesList[i], XUnit, XDrillingSignalReference, PositionDirectionX);
+            List<double> yOut = ConvertValues(YValuesList[i], YUnit, YDrillingSignalReference, PositionDirectionY);
+            List<double> zOut = ConvertValues(ZValuesList[i], ZUnit, ZDrillingSignalReference, PositionDirectionType.Independent);
+            int n = xOut.Count;
+            if (n == 0 || yOut.Count != n || zOut.Count != n) continue;
+
+            string name = i < NameList.Count ? NameList[i] : $"trace_{i}";
+            int modeInt = i < ModeFlagList.Count ? ModeFlagList[i] : 1;
+            var mode = MapMode(modeInt);
+            bool wantsMarkers = (mode & Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Markers) != 0;
+            bool wantsLines = (mode & Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Lines) != 0;
+
+            Plotly.Blazor.Traces.Scatter3DLib.Marker? marker = wantsMarkers
+                ? (i < ColorList.Count ? new Plotly.Blazor.Traces.Scatter3DLib.Marker { Color = ColorList[i] } : new Plotly.Blazor.Traces.Scatter3DLib.Marker { AutoColorScale = true })
+                : null;
+            Plotly.Blazor.Traces.Scatter3DLib.Line? line = wantsLines
+                ? (i < ColorList.Count ? new Plotly.Blazor.Traces.Scatter3DLib.Line { Color = ColorList[i], Width = 3 } : new Plotly.Blazor.Traces.Scatter3DLib.Line { Width = 3 })
+                : null;
+
+            Scatter3D trace = new()
+            {
+                Name = name,
+                Mode = mode,
+                X = xOut.Cast<object>().ToList(),
+                Y = yOut.Cast<object>().ToList(),
+                Z = zOut.Cast<object>().ToList()
+            };
+            if (marker != null) trace.Marker = marker;
+            if (line != null) trace.Line = line;
+            await chart.AddTrace(trace);
+        }
+    }
+
+    private List<double> ConvertValues(IEnumerable<object> values, string quantityName, DrillingSignalReferenceType drillingSignalReference, PositionDirectionType direction)
+    {
+        List<double> convertedValues = [];
+        foreach (object value in values)
+        {
+            if (!TryGetDouble(value, out double numericValue)) continue;
+            double? converted = drillingSignalReference switch
+            {
+                DrillingSignalReferenceType.Pressure => Parent.FromAbsolutePressureSI((double?)numericValue, quantityName),
+                DrillingSignalReferenceType.Azimuth => Parent.FromTrueNorthAzimuthSI((double?)numericValue, quantityName),
+                DrillingSignalReferenceType.Depth => Parent.FromWGS84DepthSI((double?)numericValue, quantityName),
+                DrillingSignalReferenceType.Position => direction == PositionDirectionType.Independent ? null : Parent.FromWGS84PositionSI((double?)numericValue, quantityName, direction),
+                _ => Parent.FromSI((double?)numericValue, quantityName)
+            };
+            if (converted.HasValue && !double.IsNaN(converted.Value)) convertedValues.Add(converted.Value);
+        }
+        return convertedValues;
+    }
+
+    private void ManageLayout()
+    {
+        layout.Margin = new Plotly.Blazor.LayoutLib.Margin { L = 0, R = 0, T = 30, B = 0 };
+        layout.Height = PlotHeight > 0 ? PlotHeight : null;
+        layout.Width = PlotWidth > 0 ? PlotWidth : null;
+        layout.Title.Text = PlotTitle;
+        string xAxisTitle = GetAxisTitle(XAxisTitle, XUnit, XDrillingSignalReference);
+        string yAxisTitle = GetAxisTitle(YAxisTitle, YUnit, YDrillingSignalReference);
+        string zAxisTitle = GetAxisTitle(ZAxisTitle, ZUnit, ZDrillingSignalReference);
+        foreach (var scene in layout.Scene)
+        {
+            scene.Domain = new Plotly.Blazor.LayoutLib.SceneLib.Domain { X = [0, 1], Y = [0, 1] };
+            scene.AspectMode = Plotly.Blazor.LayoutLib.SceneLib.AspectModeEnum.Data;
+            scene.XAxis.Title.Text = xAxisTitle;
+            scene.XAxis.AutoRange = Plotly.Blazor.LayoutLib.SceneLib.XAxisLib.AutoRangeEnum.True;
+            scene.YAxis.Title.Text = yAxisTitle;
+            scene.YAxis.AutoRange = YAxisReversed ? Plotly.Blazor.LayoutLib.SceneLib.YAxisLib.AutoRangeEnum.Reversed : Plotly.Blazor.LayoutLib.SceneLib.YAxisLib.AutoRangeEnum.True;
+            scene.ZAxis.Title.Text = zAxisTitle;
+            scene.ZAxis.AutoRange = ZAxisReversed ? Plotly.Blazor.LayoutLib.SceneLib.ZAxisLib.AutoRangeEnum.Reversed : Plotly.Blazor.LayoutLib.SceneLib.ZAxisLib.AutoRangeEnum.True;
+        }
+    }
+
+    private string GetAxisTitle(string axisTitle, string unit, DrillingSignalReferenceType drillingSignalReference)
+    {
+        string? unitLabel = drillingSignalReference switch
+        {
+            DrillingSignalReferenceType.Depth => Parent.GetDepthUnitLabel(unit),
+            DrillingSignalReferenceType.Position => Parent.GetPositionUnitLabel(unit),
+            _ => Parent.GetUnitLabel(unit)
+        };
+        return string.IsNullOrWhiteSpace(unitLabel) ? axisTitle : $"{axisTitle} ({unitLabel})";
+    }
+
+    private static bool TryGetDouble(object value, out double result)
+    {
+        switch (value)
+        {
+            case double d: result = d; return true;
+            case float f: result = f; return true;
+            case decimal m: result = (double)m; return true;
+            case int i: result = i; return true;
+            case long l: result = l; return true;
+            default: result = default; return false;
+        }
+    }
+
+    private static Plotly.Blazor.Traces.Scatter3DLib.ModeFlag MapMode(int mode) => mode switch
+    {
+        1 => Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Lines,
+        2 => Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Markers,
+        3 => Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Lines | Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Markers,
+        _ => Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Lines
+    };
+
+    private string BuildPlotSignature()
+    {
+        StringBuilder builder = new();
+        builder.Append(XUnit).Append('|').Append(YUnit).Append('|').Append(ZUnit).Append('|')
+            .Append(XAxisTitle).Append('|').Append(YAxisTitle).Append('|').Append(ZAxisTitle).Append('|')
+            .Append(PlotTitle).Append('|').Append(YAxisReversed).Append('|').Append(ZAxisReversed).Append('|')
+            .Append(XDrillingSignalReference).Append('|').Append(YDrillingSignalReference).Append('|').Append(ZDrillingSignalReference).Append('|')
+            .Append(PositionDirectionX).Append('|').Append(PositionDirectionY).Append('|');
+        AppendListSignature(builder, NameList);
+        AppendListSignature(builder, ModeFlagList);
+        AppendListSignature(builder, ColorList);
+        AppendNestedListSignature(builder, XValuesList);
+        AppendNestedListSignature(builder, YValuesList);
+        AppendNestedListSignature(builder, ZValuesList);
+        return builder.ToString();
+    }
+
+    private static void AppendListSignature<T>(StringBuilder builder, List<T>? values)
+    {
+        if (values == null) { builder.Append("null|"); return; }
+        builder.Append(values.Count).Append('|');
+        foreach (T? value in values) builder.Append(value).Append(';');
+        builder.Append('|');
+    }
+
+    private static void AppendNestedListSignature(StringBuilder builder, List<List<object>>? values)
+    {
+        if (values == null) { builder.Append("null|"); return; }
+        builder.Append(values.Count).Append('|');
+        foreach (List<object> list in values)
+        {
+            builder.Append(list.Count).Append(':');
+            foreach (object? value in list) builder.Append(value).Append(',');
+            builder.Append(';');
+        }
+        builder.Append('|');
+    }
+}

@@ -8,6 +8,7 @@ public interface IWellBoreWebPagesConfiguration :
     IRigHostURL,
     IWellHostURL,
     IWellBoreHostURL,
+    ITrajectoryHostURL,
     IUnitConversionHostURL
 {
 }
