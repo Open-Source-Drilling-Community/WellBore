@@ -24,6 +24,11 @@
 
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.14.0" />
+    <PackageReference Include="NORCE.Drilling.CartographicProjection.WebPages" Version="1.0.4" />
+    <PackageReference Include="NORCE.Drilling.Cluster.WebPages" Version="1.0.4" />
+    <PackageReference Include="NORCE.Drilling.Field.WebPages" Version="1.0.5" />
+    <PackageReference Include="NORCE.Drilling.GeodeticDatum.WebPages" Version="1.0.4" />
+    <PackageReference Include="NORCE.Drilling.Well.WebPages" Version="1.0.4" />
     <PackageReference Include="OSDC.DotnetLibraries.General.DataManagement" Version="2.1.0" />
     <PackageReference Include="OSDC.UnitConversion.DrillingRazorMudComponents" Version="3.3.47" />
   </ItemGroup>

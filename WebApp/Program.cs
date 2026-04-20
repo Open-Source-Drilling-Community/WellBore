@@ -14,6 +14,8 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
     TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
+    CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
+    GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
 };
 
 builder.Services.AddRazorPages();
@@ -31,6 +33,7 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddSingleton<IWellBoreWebPagesConfiguration>(webPagesConfiguration);
 builder.Services.AddSingleton<IWellBoreAPIUtils, WellBoreAPIUtils>();
+builder.Services.AddExternalWebPages(webPagesConfiguration);
 
 var app = builder.Build();
 
