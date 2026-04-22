@@ -402,7 +402,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT WellBore FROM WellBoreTable WHERE IsSidetrack = 'true'";
+                command.CommandText = "SELECT WellBore FROM WellBoreTable WHERE IsSidetrack = true";
                 try
                 {
                     using var reader = command.ExecuteReader();
