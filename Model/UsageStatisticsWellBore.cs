@@ -69,6 +69,12 @@ namespace NORCE.Drilling.WellBore.Model
         public History GetAllWellBoreMetaInfoPerDay { get; set; } = new History();
         public History GetWellBoreByIdPerDay { get; set; } = new History();
         public History GetAllWellBorePerDay { get; set; } = new History();
+        public History GetAllWellBoreByWellIDPerDay { get; set; } = new History();
+        public History GetAllWellBoreByRigIDPerDay { get; set; } = new History();
+        public History GetAllWellBoreByParentIDPerDay { get; set; } = new History();
+        public History GetAllSidetrackedWellBorePerDay { get; set; } = new History();
+
+
         public History PostWellBorePerDay { get; set; } = new History();
         public History PutWellBoreByIdPerDay { get; set; } = new History();
         public History DeleteWellBoreByIdPerDay { get; set; } = new History();
@@ -171,6 +177,56 @@ namespace NORCE.Drilling.WellBore.Model
                     GetAllWellBorePerDay = new History();
                 }
                 GetAllWellBorePerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllWellBoreByWellIDPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllWellBoreByWellIDPerDay == null)
+                {
+                    GetAllWellBoreByWellIDPerDay = new History();
+                }
+                GetAllWellBoreByWellIDPerDay.Increment();
+                ManageBackup();
+            }
+        }
+
+        public void IncrementGetAllWellBoreByRigIDPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllWellBoreByRigIDPerDay == null)
+                {
+                    GetAllWellBoreByRigIDPerDay = new History();
+                }
+                GetAllWellBoreByRigIDPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        public void IncrementGetAllWellBoreParentWellBoreIDPerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllWellBoreByParentIDPerDay == null)
+                {
+                    GetAllWellBoreByParentIDPerDay = new History();
+                }
+                GetAllWellBoreByParentIDPerDay.Increment();
+                ManageBackup();
+            }
+        }
+        
+        public void IncrementGetAllSidetrackedWellBorePerDay()
+        {
+            lock (lock_)
+            {
+                if (GetAllSidetrackedWellBorePerDay == null)
+                {
+                    GetAllSidetrackedWellBorePerDay = new History();
+                }
+                GetAllSidetrackedWellBorePerDay.Increment();
                 ManageBackup();
             }
         }

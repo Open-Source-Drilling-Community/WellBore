@@ -283,7 +283,149 @@ namespace NORCE.Drilling.WellBore.Service.Managers
             return null;
         }
 
+        /// <summary>
+        /// Returns the list of all WellBore with given Well ID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all WellBore present with given Well ID in the microservice database</returns>
+        public List<Model.WellBore?>? GetAllWellBoreByWellID(Guid wellID)
+        {
+            List<Model.WellBore?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT WellBore FROM WellBoreTable WHERE WellID = '{wellID}'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                        vals.Add(wellBore);
+                    }
+                    _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get WellBore from WellBoreTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
 
+        /// <summary>
+        /// Returns the list of all WellBore with given Rig ID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all WellBore present with given Rig ID in the microservice database</returns>
+        public List<Model.WellBore?>? GetAllWellBoreByRigID(Guid RigID)
+        {
+            List<Model.WellBore?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT WellBore FROM WellBoreTable WHERE RigID = '{RigID}'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                        vals.Add(wellBore);
+                    }
+                    _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get WellBore from WellBoreTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the list of all WellBore with given Parent Wellbore ID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all WellBore present with given Parent Wellbore ID in the microservice database</returns>
+        public List<Model.WellBore?>? GetAllWellBoreByParentWellBoreID(Guid ParentID)
+        {
+            List<Model.WellBore?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = $"SELECT WellBore FROM WellBoreTable WHERE ParentWellBoreID = '{ParentID}'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                        vals.Add(wellBore);
+                    }
+                    _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get WellBore from WellBoreTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the list of all WellBore with given Parent Wellbore ID present in the microservice database 
+        /// </summary>
+        /// <returns>the list of all WellBore present with given Parent Wellbore ID in the microservice database</returns>
+        public List<Model.WellBore?>? GetAllSideTrackedWellBore()
+        {
+            List<Model.WellBore?> vals = [];
+            var connection = _connectionManager.GetConnection();
+            if (connection != null)
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = "SELECT WellBore FROM WellBoreTable WHERE IsSidetrack = 'true'";
+                try
+                {
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read() && !reader.IsDBNull(0))
+                    {
+                        string data = reader.GetString(0);
+                        Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                        vals.Add(wellBore);
+                    }
+                    _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");
+                    return vals;
+                }
+                catch (SqliteException ex)
+                {
+                    _logger.LogError(ex, "Impossible to get WellBore from WellBoreTable");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Impossible to access the SQLite database");
+            }
+            return null;
+        }
         /// <summary>
         /// Performs calculation on the given WellBore and adds it to the microservice database
         /// </summary>

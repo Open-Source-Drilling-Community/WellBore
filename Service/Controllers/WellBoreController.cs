@@ -109,6 +109,81 @@ namespace NORCE.Drilling.WellBore.Service.Controllers
         }
 
         /// <summary>
+        /// Returns the list of all WellBore with given Well ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
+        /// </summary>
+        /// <returns>the list of all WellBore with given Well ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
+        [HttpGet("ByWellID", Name = "GetAllWellBoreByWellID")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByWellID(Guid wellID)
+        {
+            UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreByWellIDPerDay();
+            var vals = _wellBoreManager.GetAllWellBoreByWellID(wellID);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        /// <summary>
+        /// Returns the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
+        /// </summary>
+        /// <returns>the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
+        [HttpGet("ByRigID", Name = "GetAllWellBoreByRigID")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByRigID(Guid rigID)
+        {
+            UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreByRigIDPerDay();
+            var vals = _wellBoreManager.GetAllWellBoreByRigID(rigID);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
+        /// </summary>
+        /// <returns>the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
+        [HttpGet("ByParentID", Name = "GetAllWellBoreByParentWellBoreID")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByParentWellBoreID(Guid parentID)
+        {
+            UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreParentWellBoreIDPerDay();
+            var vals = _wellBoreManager.GetAllWellBoreByParentWellBoreID(parentID);
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
+        /// </summary>
+        /// <returns>the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
+        [HttpGet("IsSidetracked", Name = "GetAllSideTrackedWellBore")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllSideTrackedWellBore(Guid parentID)
+        {
+            UsageStatisticsWellBore.Instance.IncrementGetAllSidetrackedWellBorePerDay();
+            var vals = _wellBoreManager.GetAllSideTrackedWellBore();
+            if (vals != null)
+            {
+                return Ok(vals);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Performs calculation on the given WellBore and adds it to the microservice database, at the endpoint WellBore/api/WellBore
         /// </summary>
         /// <param name="wellBore"></param>

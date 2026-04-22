@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<OutputType>Exe</OutputType>
+    	<_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+	</PropertyGroup>
+
+	<ItemGroup>
+    	<ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
+  	</ItemGroup>
+</Project>
