@@ -3535,6 +3535,138 @@
           }
         }
       }
+    },
+    "/WellBore/ByWellID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByWellID",
+        "parameters": [
+          {
+            "name": "wellID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ByRigID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByRigID",
+        "parameters": [
+          {
+            "name": "rigID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/ByParentID": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllWellBoreByParentWellBoreID",
+        "parameters": [
+          {
+            "name": "parentID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBore/IsSidetracked": {
+      "get": {
+        "tags": [
+          "WellBore"
+        ],
+        "operationId": "GetAllSideTrackedWellBore",
+        "parameters": [
+          {
+            "name": "parentID",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WellBore"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -10198,6 +10330,18 @@
             "$ref": "#/components/schemas/History"
           },
           "GetAllWellBorePerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllWellBoreByWellIDPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllWellBoreByRigIDPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllWellBoreByParentIDPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllSidetrackedWellBorePerDay": {
             "$ref": "#/components/schemas/History"
           },
           "PostWellBorePerDay": {

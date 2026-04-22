@@ -7,7 +7,7 @@ using NORCE.Drilling.WellBore.ModelShared;
 
 string localHostName = "https://localhost:5001/";
 string devHostName = "https://dev.digiwells.no/";
-string wellHostBase = "Well/api/";
+string wellHostBase = "WellBore/api/";
 
 // Create clients to access databases from dev/ environment
 Client wellBoreClient = ClientSetup(devHostName, wellHostBase);
@@ -24,10 +24,12 @@ foreach (var well in wells)
     await wellBoreLocalClient.PostWellBoreAsync(well);
 }
 // Test if the new method works...
-//Guid slotID = wells[0].SlotID!.Value;
-//List<Well> wellsBySlotId = (List<Well>) (await wellBoreLocalClient.GetAllWellBySlotIdAsync(slotID)).ToList();
-//Console.WriteLine($"Number of wells with slot ID {slotID} in local database: {wellsBySlotId.Count}");
+Guid wellID = wells[0].WellID!.Value;
+List<WellBore> wellBoresByWellId = (List<WellBore>) (await wellBoreLocalClient.GetAllWellBoreByWellIDAsync(wellID)).ToList();
+Console.WriteLine($"Number of wells with slot ID {wellID} in local database: {wellBoresByWellId.Count}");
 
+List<WellBore> sidetrackedWellBores = (List<WellBore>) (await wellBoreLocalClient.GetAllSideTrackedWellBoreAsync()).ToList();
+Console.WriteLine($"Number of sidetracked wells in local database: {sidetrackedWellBores.Count}");
 
 
 // Functions
