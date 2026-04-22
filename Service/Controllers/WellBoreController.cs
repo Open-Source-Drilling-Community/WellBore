@@ -130,8 +130,8 @@ namespace NORCE.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("ByRigID", Name = "GetAllWellBoreByRigID")]
-        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByRigID(Guid rigID)
+        [HttpGet("ByRigID", Name = "GetAllWellBoreByRigId")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByRigId(Guid rigID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreByRigIDPerDay();
             var vals = _wellBoreManager.GetAllWellBoreByRigID(rigID);
@@ -149,8 +149,8 @@ namespace NORCE.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("ByParentID", Name = "GetAllWellBoreByParentWellBoreID")]
-        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByParentWellBoreID(Guid parentID)
+        [HttpGet("ByParentID", Name = "GetAllWellBoreByParentWellBoreId")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByParentWellBoreId(Guid parentID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreParentWellBoreIDPerDay();
             var vals = _wellBoreManager.GetAllWellBoreByParentWellBoreID(parentID);
@@ -168,8 +168,8 @@ namespace NORCE.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("IsSidetracked", Name = "GetAllSideTrackedWellBore")]
-        public ActionResult<IEnumerable<Model.WellBore?>> GetAllSideTrackedWellBore(Guid parentID)
+        [HttpGet("IsSidetracked", Name = "GetAllSidetrackedWellBore")]
+        public ActionResult<IEnumerable<Model.WellBore?>> GetAllSidetrackedWellBore(Guid parentID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllSidetrackedWellBorePerDay();
             var vals = _wellBoreManager.GetAllSideTrackedWellBore();
