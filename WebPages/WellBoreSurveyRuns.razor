@@ -128,8 +128,8 @@
                         <MudPaper Class="pa-4" Elevation="2">
                             <MudText Typo="Typo.h6">3D View</MudText>
                             <Scatter3DPlot XUnit="PositionDrilling" YUnit="PositionDrilling" ZUnit="DepthDrilling"
-                                           NameList="@PlotNames" ModeFlagList="@PlotModeFlags" ColorList="@PlotColors"
-                                           XValuesList="@EastValuesList" YValuesList="@NorthValuesList" ZValuesList="@TvdValuesList"
+                                           NameList="@Plot3DNames" ModeFlagList="@Plot3DModeFlags" ColorList="@Plot3DColors"
+                                           XValuesList="@Plot3DEastValuesList" YValuesList="@Plot3DNorthValuesList" ZValuesList="@Plot3DTvdValuesList"
                                            XAxisTitle="Easting" YAxisTitle="Northing" ZAxisTitle="TVD"
                                            PlotTitle="Wellbore survey runs" PlotHeight="600" ZAxisReversed="true"
                                            XDrillingSignalReference="@DrillingSignalReferenceType.Position"
@@ -137,22 +137,22 @@
                                            ZDrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                            PositionDirectionX="@PositionDirectionType.East"
                                            PositionDirectionY="@PositionDirectionType.North"
-                                           ShowLegends="@PlotShowLegends" />
+                                           ShowLegends="@Plot3DShowLegends" />
                         </MudPaper>
                     </MudItem>
                     <MudItem xs="12" xl="6">
                         <MudPaper Class="pa-4" Elevation="2">
                             <MudText Typo="Typo.h6">Horizontal Projection</MudText>
                             <ScatterPlot XUnit="PositionDrilling" YUnit="PositionDrilling"
-                                         NameList="@PlotNames" ModeFlagList="@PlotModeFlags" ColorList="@PlotColors"
-                                         XValuesList="@EastValuesList" YValuesList="@NorthValuesList"
+                                         NameList="@PlotHorizontalNames" ModeFlagList="@PlotHorizontalModeFlags" ColorList="@PlotHorizontalColors"
+                                         XValuesList="@PlotHorizontalEastValuesList" YValuesList="@PlotHorizontalNorthValuesList"
                                          XAxisTitle="Easting" YAxisTitle="Northing"
                                          PlotTitle="Horizontal projection" PlotHeight="600" AspectRatio="1"
                                          XDrillingSignalReference="@DrillingSignalReferenceType.Position"
                                          YDrillingSignalReference="@DrillingSignalReferenceType.Position"
                                          PositionDirectionX="@PositionDirectionType.East"
                                          PositionDirectionY="@PositionDirectionType.North"
-                                           ShowLegends="@PlotShowLegends" />
+                                           ShowLegends="@PlotHorizontalShowLegends" />
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
@@ -210,6 +210,19 @@
     private List<List<object>> NorthValuesList => plotTraces.Select(trace => trace.NorthValues).ToList();
     private List<List<object>> EastValuesList => plotTraces.Select(trace => trace.EastValues).ToList();
     private List<List<object>> TvdValuesList => plotTraces.Select(trace => trace.TvdValues).ToList();
+    private List<string> Plot3DNames => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.Name).ToList();
+    private List<int> Plot3DModeFlags => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.ModeFlag).ToList();
+    private List<string> Plot3DColors => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.Color).ToList();
+    private List<bool> Plot3DShowLegends => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.ShowLegend).ToList();
+    private List<List<object>> Plot3DNorthValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.NorthValues).ToList();
+    private List<List<object>> Plot3DEastValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.EastValues).ToList();
+    private List<List<object>> Plot3DTvdValuesList => plotTraces.Where(trace => trace.ShowIn3D).Select(trace => trace.TvdValues).ToList();
+    private List<string> PlotHorizontalNames => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.Name).ToList();
+    private List<int> PlotHorizontalModeFlags => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.ModeFlag).ToList();
+    private List<string> PlotHorizontalColors => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.Color).ToList();
+    private List<bool> PlotHorizontalShowLegends => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.ShowLegend).ToList();
+    private List<List<object>> PlotHorizontalNorthValuesList => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.NorthValues).ToList();
+    private List<List<object>> PlotHorizontalEastValuesList => plotTraces.Where(trace => trace.ShowInHorizontal).Select(trace => trace.EastValues).ToList();
 
     protected override async Task OnInitializedAsync()
     {
@@ -668,7 +681,7 @@
             tvdValues.Add(centerTvd);
         }
 
-        return new PlotTrace($"{surveyRunName ?? "survey run"} horizontal ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
+        return new PlotTrace($"{surveyRunName ?? "survey run"} horizontal ellipses", 1, color, showLegend, northValues, eastValues, tvdValues, false, true);
     }
 
     private static PlotTrace? BuildPerpendicularEllipseTrace(WellBoreModelShared.SurveyStation station, WellBoreModelShared.SurveyStationEllipse? ellipse, string color, bool showLegend, string? surveyRunName)
@@ -706,7 +719,7 @@
             tvdValues.Add(centerTvd - sinI * localX);
         }
 
-        return new PlotTrace($"{surveyRunName ?? "survey run"} perpendicular ellipses", 1, color, showLegend, northValues, eastValues, tvdValues);
+        return new PlotTrace($"{surveyRunName ?? "survey run"} perpendicular ellipses", 1, color, showLegend, northValues, eastValues, tvdValues, true, false);
     }
 
     private static void AppendPoint(WellBoreModelShared.SurveyStation? point, List<object> northValues, List<object> eastValues, List<object> tvdValues)
@@ -759,7 +772,9 @@
         "black","blue","grey","red","orange","green","yellow","pink","brown","purple"
     ];
 
-    private sealed record PlotTrace(string Name, int ModeFlag, string Color, bool ShowLegend, List<object> NorthValues, List<object> EastValues, List<object> TvdValues);
+    private sealed record PlotTrace(string Name, int ModeFlag, string Color, bool ShowLegend, List<object> NorthValues, List<object> EastValues, List<object> TvdValues,
+        bool ShowIn3D = true,
+        bool ShowInHorizontal = true);
 
 
     private const int MaxDisplayedUncertaintyEllipses = 200;
