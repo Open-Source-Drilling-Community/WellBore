@@ -2,6 +2,7 @@
 @inject ILogger<WellBoreTrajectories> logger
 @inject ISnackbar Snackbar
 @inject IWellBoreAPIUtils Api
+@using System.Net.Http.Json
 @using WellBoreModelShared = NORCE.Drilling.WellBore.ModelShared
 
 <MudUnitAndReferenceChoiceTag HttpHost=@Api.HostNameUnitConversion
@@ -334,7 +335,7 @@
                 .ToList();
 
             List<Task<WellBoreModelShared.Trajectory>> detailTasks = trajectoryLightList
-                .Select(light => Api.ClientTrajectory.GetTrajectoryByIdAsync(light.MetaInfo.ID))
+                .Select(light => LoadTrajectoryWithSurveyStationsAsync(light.MetaInfo.ID))
                 .ToList();
 
             trajectoryList = (await Task.WhenAll(detailTasks))
@@ -364,6 +365,30 @@
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task<WellBoreModelShared.Trajectory> LoadTrajectoryWithSurveyStationsAsync(Guid trajectoryId)
+    {
+        WellBoreModelShared.Trajectory trajectory = await Api.ClientTrajectory.GetTrajectoryByIdAsync(trajectoryId);
+        int chunkCount = await Api.HttpClientTrajectory.GetFromJsonAsync<int>($"Trajectory/{trajectoryId}/SurveyStations/ChunkCount");
+        if (chunkCount <= 0)
+        {
+            trajectory.SurveyStationList ??= [];
+            return trajectory;
+        }
+
+        List<WellBoreModelShared.SurveyStation> stations = [];
+        for (int chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++)
+        {
+            TrajectorySurveyStationChunk? chunk = await Api.HttpClientTrajectory.GetFromJsonAsync<TrajectorySurveyStationChunk>($"Trajectory/{trajectoryId}/SurveyStations/Chunks/{chunkIndex}");
+            if (chunk?.SurveyStationList is { Count: > 0 } chunkStations)
+            {
+                stations.AddRange(chunkStations);
+            }
+        }
+
+        trajectory.SurveyStationList = stations;
+        return trajectory;
     }
 
     private void UpdatePlots()
@@ -444,4 +469,9 @@
     ];
 
     private sealed record PlotTrace(string Name, int ModeFlag, string Color, List<object> NorthValues, List<object> EastValues, List<object> TvdValues);
+
+    private sealed class TrajectorySurveyStationChunk
+    {
+        public ICollection<WellBoreModelShared.SurveyStation>? SurveyStationList { get; set; }
+    }
 }
