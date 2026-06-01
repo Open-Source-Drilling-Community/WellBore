@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 using Microsoft.OpenApi;
 using NJsonSchema;
@@ -57,7 +57,7 @@ class Program
     static async Task Main()
     {
         bool finished = false;
-        Console.Clear();
+        TryClearConsole();
         Console.BackgroundColor = ConsoleColor.Black;
         do
         {
@@ -73,6 +73,17 @@ class Program
         } while (!finished);
 
         return;
+    }
+
+    private static void TryClearConsole()
+    {
+        try
+        {
+            Console.Clear();
+        }
+        catch (IOException)
+        {
+        }
     }
 
     static async Task<bool> GenerateModelFromDependencies()

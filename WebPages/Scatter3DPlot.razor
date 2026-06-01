@@ -13,6 +13,7 @@
     [Parameter] public List<string> NameList { get; set; } = [];
     [Parameter] public List<int> ModeFlagList { get; set; } = [];
     [Parameter] public List<string> ColorList { get; set; } = [];
+    [Parameter] public List<bool>? ShowLegends { get; set; }
     [Parameter] public List<List<object>> XValuesList { get; set; } = [];
     [Parameter] public List<List<object>> YValuesList { get; set; } = [];
     [Parameter] public List<List<object>> ZValuesList { get; set; } = [];
@@ -118,6 +119,7 @@
             if (n == 0 || yOut.Count != n || zOut.Count != n) continue;
 
             string name = i < NameList.Count ? NameList[i] : $"trace_{i}";
+            bool showLegend = ShowLegends != null && i < ShowLegends.Count ? ShowLegends[i] : true;
             int modeInt = i < ModeFlagList.Count ? ModeFlagList[i] : 1;
             var mode = MapMode(modeInt);
             bool wantsMarkers = (mode & Plotly.Blazor.Traces.Scatter3DLib.ModeFlag.Markers) != 0;
@@ -133,6 +135,7 @@
             Scatter3D trace = new()
             {
                 Name = name,
+                ShowLegend = showLegend,
                 Mode = mode,
                 X = xOut.Cast<object>().ToList(),
                 Y = yOut.Cast<object>().ToList(),
@@ -228,6 +231,7 @@
         AppendListSignature(builder, NameList);
         AppendListSignature(builder, ModeFlagList);
         AppendListSignature(builder, ColorList);
+        AppendListSignature(builder, ShowLegends);
         AppendNestedListSignature(builder, XValuesList);
         AppendNestedListSignature(builder, YValuesList);
         AppendNestedListSignature(builder, ZValuesList);
@@ -255,3 +259,5 @@
         builder.Append('|');
     }
 }
+
+
