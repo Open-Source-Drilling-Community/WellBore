@@ -32,7 +32,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
+		<Compile Include="..\ModelSharedOut\WellBoreMergedModel.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>
