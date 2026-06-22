@@ -237,7 +237,7 @@
         "tags": [
           "WellBore"
         ],
-        "operationId": "GetAllWellBoreByRigID",
+        "operationId": "GetAllWellBoreByRigId",
         "parameters": [
           {
             "name": "rigID",
@@ -270,7 +270,7 @@
         "tags": [
           "WellBore"
         ],
-        "operationId": "GetAllWellBoreByParentWellBoreID",
+        "operationId": "GetAllWellBoreByParentWellBoreId",
         "parameters": [
           {
             "name": "parentID",
@@ -303,7 +303,7 @@
         "tags": [
           "WellBore"
         ],
-        "operationId": "GetAllSideTrackedWellBore",
+        "operationId": "GetAllSidetrackedWellBore",
         "parameters": [
           {
             "name": "parentID",

@@ -28,7 +28,7 @@ Guid wellID = wells[0].WellID!.Value;
 List<WellBore> wellBoresByWellId = (List<WellBore>) (await wellBoreLocalClient.GetAllWellBoreByWellIDAsync(wellID)).ToList();
 Console.WriteLine($"Number of wells with slot ID {wellID} in local database: {wellBoresByWellId.Count}");
 
-List<WellBore> sidetrackedWellBores = (List<WellBore>) (await wellBoreLocalClient.GetAllSideTrackedWellBoreAsync()).ToList();
+List<WellBore> sidetrackedWellBores = (List<WellBore>) (await wellBoreLocalClient.GetAllSidetrackedWellBoreAsync()).ToList();
 Console.WriteLine($"Number of sidetracked wells in local database: {sidetrackedWellBores.Count}");
 
 

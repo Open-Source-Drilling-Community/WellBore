@@ -31,9 +31,8 @@
 		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
-	<!-- Include generated DTO source files directly from ModelSharedOut -->
 	<ItemGroup>
-		<Compile Include="..\ModelSharedOut\WellBoreMergedModel.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<ProjectReference Include="..\ModelSharedOut\ModelSharedOut.csproj" />
 	</ItemGroup>
 
 </Project>
