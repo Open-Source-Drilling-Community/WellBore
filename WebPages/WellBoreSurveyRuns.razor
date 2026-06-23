@@ -357,16 +357,16 @@
         WellBoreModelShared.Cluster? selectedCluster = clusterList.FirstOrDefault(cluster => cluster.MetaInfo?.ID == resolvedClusterId);
         if (selectedCluster?.GroundMudLineDepth?.GaussianValue != null)
         {
-            groundMudLineDepthSource.GroundMudLineDepthReference = selectedCluster.GroundMudLineDepth.GaussianValue.Mean;
+            groundMudLineDepthSource.GroundMudLineDepthReference = -selectedCluster.GroundMudLineDepth.GaussianValue.Mean;
         }
         if (selectedCluster?.TopWaterDepth?.GaussianValue != null)
         {
-            topWaterDepthSource.SeaWaterLevelDepthReference = selectedCluster.TopWaterDepth.GaussianValue.Mean;
+            topWaterDepthSource.SeaWaterLevelDepthReference = -selectedCluster.TopWaterDepth.GaussianValue.Mean;
         }
         meanSeaLevelDepthSource.MeanSeaLevelDepthReference = await ResolveMeanSeaLevelDepthReferenceAsync(selectedWellBore);
         if (selectedCluster?.ReferenceDepth?.GaussianValue != null)
         {
-            wellHeadDepthSource.WellHeadDepthReference = selectedCluster.ReferenceDepth.GaussianValue.Mean;
+            wellHeadDepthSource.WellHeadDepthReference = -selectedCluster.ReferenceDepth.GaussianValue.Mean;
         }
         rotaryTableDepthSource.RotaryTableDepthReference = ResolveRotaryTableReference(selectedCluster);
     }
@@ -391,7 +391,9 @@
             return null;
         }
 
-        return rigList.FirstOrDefault(rig => rig.MetaInfo?.ID == rigId)?.DrillFloorElevation;
+        return rigList.FirstOrDefault(rig => rig.MetaInfo?.ID == rigId)?.DrillFloorElevation is double drillFloorElevation
+            ? -drillFloorElevation
+            : null;
     }
 
     private void ResetViewState()
