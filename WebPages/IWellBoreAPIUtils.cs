@@ -36,4 +36,9 @@ public interface IWellBoreAPIUtils
 
     string HostNameUnitConversion { get; }
     string HostBasePathUnitConversion { get; }
+
+    string HostNameVerticalDatum { get; }
+    string HostBasePathVerticalDatum { get; }
+    HttpClient HttpClientVerticalDatum { get; }
+    Client ClientVerticalDatum { get; }
 }

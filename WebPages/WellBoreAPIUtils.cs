@@ -32,6 +32,10 @@ public class WellBoreAPIUtils : APIUtils, IWellBoreAPIUtils
         ClientTrajectory = new Client(HttpClientTrajectory.BaseAddress!.ToString(), HttpClientTrajectory);
 
         HostNameUnitConversion = Require(configuration.UnitConversionHostURL, nameof(configuration.UnitConversionHostURL));
+
+        HostNameVerticalDatum = Require(configuration.VerticalDatumHostURL, nameof(configuration.VerticalDatumHostURL));
+        HttpClientVerticalDatum = SetHttpClient(HostNameVerticalDatum, HostBasePathVerticalDatum);
+        ClientVerticalDatum = new Client(HttpClientVerticalDatum.BaseAddress!.ToString(), HttpClientVerticalDatum);
     }
 
     private static string Require(string? value, string propertyName)
@@ -76,4 +80,9 @@ public class WellBoreAPIUtils : APIUtils, IWellBoreAPIUtils
 
     public string HostNameUnitConversion { get; }
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";
+
+    public string HostNameVerticalDatum { get; }
+    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
+    public HttpClient HttpClientVerticalDatum { get; }
+    public Client ClientVerticalDatum { get; }
 }

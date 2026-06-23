@@ -18,5 +18,6 @@ public class WebPagesHostConfiguration :
     public string TrajectoryHostURL { get; set; } = string.Empty;
     public string CartographicProjectionHostURL { get; set; } = string.Empty;
     public string GeodeticDatumHostURL { get; set; } = string.Empty;
+    public string? VerticalDatumHostURL { get; set; } = string.Empty;
     public string UnitConversionHostURL { get; set; } = string.Empty;
 }

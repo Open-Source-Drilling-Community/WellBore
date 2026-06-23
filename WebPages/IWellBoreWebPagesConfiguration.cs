@@ -11,4 +11,5 @@ public interface IWellBoreWebPagesConfiguration :
     ITrajectoryHostURL,
     IUnitConversionHostURL
 {
+    string? VerticalDatumHostURL { get; set; }
 }

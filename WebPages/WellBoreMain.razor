@@ -12,6 +12,7 @@
                               DepthReferenceNameChanged="@DataUtils.UpdateDepthReferenceName"
                               GroundMudLineDepthReferenceSource="@groundMudLineDepthSource"
                               SeaWaterLevelDepthReferenceSource="@topWaterDepthSource"
+                              MeanSeaLevelDepthReferenceSource="@meanSeaLevelDepthSource"
                               WellHeadDepthReferenceSource="@wellHeadDepthSource"
                               RotaryTableDepthReferenceSource="@rotaryTableDepthSource">
     @if (wellBoreList == null)
@@ -55,10 +56,12 @@
         <WellBoreEdit CurrentWellBore="@currentWellBore"
                       WellBores="@wellBoreList"
                       Wells="@wellList"
+                      Rigs="@rigList"
                       Clusters="@clusterList"
                       Fields="@fieldList"                    
                       GroundMudLineDepthSource="@groundMudLineDepthSource"
                       TopWaterDepthSource="@topWaterDepthSource"
+                      MeanSeaLevelDepthSource="@meanSeaLevelDepthSource"
                       WellHeadDepthSource="@wellHeadDepthSource"
                       RotaryTableDepthSource="@rotaryTableDepthSource"
                       OnUpdate="@ShowMainPanel" />
@@ -71,6 +74,7 @@
     private List<Well> wellList = new();
     private List<Cluster> clusterList = new();
     private List<Field> fieldList = new();
+    private List<Rig> rigList = new();
 
     private List<WellBore> selectedWellBoreList = new();
     private WellBore? currentWellBore;
@@ -80,6 +84,7 @@
 
     private GroundMudLineDepthReferenceSource groundMudLineDepthSource = new GroundMudLineDepthReferenceSource();
     private SeaWaterLevelDepthReferenceSource topWaterDepthSource = new SeaWaterLevelDepthReferenceSource();
+    private MeanSeaLevelDepthReferenceSource meanSeaLevelDepthSource = new MeanSeaLevelDepthReferenceSource();
     private WellHeadDepthReferenceSource wellHeadDepthSource = new WellHeadDepthReferenceSource();
     private RotaryTableDepthReferenceSource rotaryTableDepthSource = new RotaryTableDepthReferenceSource();
 
@@ -102,8 +107,10 @@
             var clusterTask = Api.ClientCluster.GetAllClusterAsync();
             logger.LogInformation("Trying to load list of Field from client: " + Api.HostNameField);
             var fieldTask = Api.ClientField.GetAllFieldAsync();
+            logger.LogInformation("Trying to load list of Rig from client: " + Api.HostNameRig);
+            var rigTask = Api.ClientRig.GetAllRigAsync();
 
-            List<Task> loadingTaskList = new List<Task> { wellBoreTask, wellTask, clusterTask, fieldTask };
+            List<Task> loadingTaskList = new List<Task> { wellBoreTask, wellTask, clusterTask, fieldTask, rigTask };
 
             // Awaiting tasks and retrieve results as they become available
             while (loadingTaskList.Count > 0)
@@ -187,6 +194,21 @@
                     catch (ApiException ex)
                     {
                         logger.LogError(ex, "Impossible to load Fields from client");
+                    }
+                }
+                else if (finishedTask == rigTask)
+                {
+                    try
+                    {
+                        rigList = (List<Rig>)await rigTask;
+                        if (rigList != null)
+                        {
+                            rigList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));
+                        }
+                    }
+                    catch (ApiException ex)
+                    {
+                        logger.LogError(ex, "Impossible to load Rigs from client");
                     }
                 }
                 loadingTaskList.Remove(finishedTask);

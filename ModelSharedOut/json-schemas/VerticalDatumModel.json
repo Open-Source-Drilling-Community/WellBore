@@ -1,0 +1,613 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ModelShared (Service)",
+    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "version": "1.0"
+  },
+  "paths": {
+    "/VerticalDatum": {
+      "get": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "GetAllVerticalDatumId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "PostVerticalDatum",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/VerticalDatum/MetaInfo": {
+      "get": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "GetAllVerticalDatumMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/VerticalDatum/{id}": {
+      "get": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "GetVerticalDatumById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerticalDatum"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "PutVerticalDatumById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatum"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "DeleteVerticalDatumById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/VerticalDatum/HeavyData": {
+      "get": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "GetAllVerticalDatum",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VerticalDatum"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/VerticalDatum/CompletedVerticalDatum": {
+      "get": {
+        "tags": [
+          "VerticalDatum"
+        ],
+        "operationId": "GetAllCompletedVerticalDatum",
+        "parameters": [
+          {
+            "name": "isCompleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VerticalDatum"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/VerticalDatumOrder": {
+      "get": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "GetAllVerticalDatumOrderId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "PostVerticalDatumOrder",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/VerticalDatumOrder/MetaInfo": {
+      "get": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "GetAllVerticalDatumOrderMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/VerticalDatumOrder/{id}": {
+      "get": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "GetVerticalDatumOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerticalDatumOrder"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "PutVerticalDatumOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerticalDatumOrder"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "DeleteVerticalDatumOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/VerticalDatumOrder/LightData": {
+      "get": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "GetAllVerticalDatumOrderLight",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VerticalDatumOrderLight"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/VerticalDatumOrder/HeavyData": {
+      "get": {
+        "tags": [
+          "VerticalDatumOrder"
+        ],
+        "operationId": "GetAllVerticalDatumOrder",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VerticalDatumOrder"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VerticalDatum": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "DatumSet": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VerticalDatumSet"
+            },
+            "nullable": true
+          },
+          "ConversionFrom": {
+            "$ref": "#/components/schemas/VerticalDatumConversion"
+          },
+          "Type": {
+            "$ref": "#/components/schemas/VerticalDatumType"
+          }
+        }
+      },
+      "VerticalDatumConversion": {
+        "enum": [
+          "FromMeanSeaLevel",
+          "FromMeanHighWater",
+          "FromMeanLowWater",
+          "LowestAstronimalTide",
+          "HighestAstronimalTide",
+          "MeanHigherHighWater",
+          "MeanLowerLowWater"
+        ],
+        "type": "string"
+      },
+      "VerticalDatumOrder": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "VerticalDatum": {
+            "$ref": "#/components/schemas/VerticalDatum"
+          }
+        }
+      },
+      "VerticalDatumOrderLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "VerticalDatumSet": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "VerticalDatumWGS64": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "GenericVerticalDatum": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "VerticalDatumType": {
+        "enum": [
+          "Completed",
+          "Raw"
+        ],
+        "type": "string"
+      },
+      "MetaInfo": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "HttpHostName": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpHostBasePath": {
+            "type": "string",
+            "nullable": true
+          },
+          "HttpEndPoint": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

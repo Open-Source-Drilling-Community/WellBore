@@ -17,6 +17,11 @@ public class SeaWaterLevelDepthReferenceSource : ISeaWaterLevelDepthReferenceSou
     public double? SeaWaterLevelDepthReference { get; set; }
 }
 
+public class MeanSeaLevelDepthReferenceSource : IMeanSeaLevelDepthReferenceSource
+{
+    public double? MeanSeaLevelDepthReference { get; set; }
+}
+
 public class WellHeadDepthReferenceSource : IWellHeadDepthReferenceSource
 {
     public double? WellHeadDepthReference { get; set; }

@@ -141,10 +141,16 @@
     public List<WellBore>? WellBores { get; set; }
 
     [Parameter]
+    public List<Rig>? Rigs { get; set; }
+
+    [Parameter]
     public GroundMudLineDepthReferenceSource? GroundMudLineDepthSource { get; set; }
 
     [Parameter]
     public SeaWaterLevelDepthReferenceSource? TopWaterDepthSource { get; set; }
+
+    [Parameter]
+    public MeanSeaLevelDepthReferenceSource? MeanSeaLevelDepthSource { get; set; }
 
     [Parameter]
     public WellHeadDepthReferenceSource? WellHeadDepthSource { get; set; }
@@ -166,7 +172,7 @@
     private string? _wellBoreSearchString;
     private Field? _selectedField = null;
     private Cluster? _selectedCluster = null;
-    private Cluster? selectedCluster { get { return _selectedCluster; } set { _selectedCluster = value; ProcessSelectedCluster(); } }
+    private Cluster? selectedCluster { get { return _selectedCluster; } set { _selectedCluster = value; _ = ProcessSelectedClusterAsync(); } }
     private Well? _selectedWell = null;
     private WellBore? _selectedParentWellBore = null;
     private string? _fieldSearchText = null;
@@ -179,7 +185,7 @@
     private double? _sidetrackDepthAccuracy = null;
     private SidetrackType _sidetrackType = SidetrackType.Undefined;
 
-    private void ProcessSelectedCluster()
+    private async Task ProcessSelectedClusterAsync()
     {
         if (_selectedCluster == null)
         {
@@ -191,9 +197,17 @@
             {
                 TopWaterDepthSource.SeaWaterLevelDepthReference = null;
             }
+            if (MeanSeaLevelDepthSource != null)
+            {
+                MeanSeaLevelDepthSource.MeanSeaLevelDepthReference = null;
+            }
             if (WellHeadDepthSource != null)
             {
                 WellHeadDepthSource.WellHeadDepthReference = null;
+            }
+            if (RotaryTableDepthSource != null)
+            {
+                RotaryTableDepthSource.RotaryTableDepthReference = null;
             }
         }
         else
@@ -206,11 +220,62 @@
             {
                 TopWaterDepthSource.SeaWaterLevelDepthReference = _selectedCluster.TopWaterDepth.GaussianValue.Mean;
             }
+            if (MeanSeaLevelDepthSource != null)
+            {
+                MeanSeaLevelDepthSource.MeanSeaLevelDepthReference = await ResolveMeanSeaLevelDepthReferenceAsync();
+            }
             if (WellHeadDepthSource != null && _selectedCluster.ReferenceDepth != null && _selectedCluster.ReferenceDepth.GaussianValue != null)
             {
                 WellHeadDepthSource.WellHeadDepthReference = _selectedCluster.ReferenceDepth.GaussianValue.Mean;
             }
+            if (RotaryTableDepthSource != null)
+            {
+                RotaryTableDepthSource.RotaryTableDepthReference = ResolveRotaryTableReference(_selectedCluster, CurrentWellBore);
+            }
         }
+    }
+
+    private async Task<double?> ResolveMeanSeaLevelDepthReferenceAsync()
+    {
+        try
+        {
+            WellBore? referenceWellBore = null;
+            if (_selectedWell?.MetaInfo?.ID is Guid wellId)
+            {
+                referenceWellBore = new WellBore()
+                {
+                    MetaInfo = CurrentWellBore?.MetaInfo,
+                    Name = CurrentWellBore?.Name,
+                    Description = CurrentWellBore?.Description,
+                    WellID = wellId,
+                    IsSidetrack = _isSidetrack,
+                    ParentWellBoreID = _selectedParentWellBore?.MetaInfo?.ID
+                };
+            }
+
+            return await DepthReferenceUtils.ResolveMeanSeaLevelDepthReferenceAsync(Api, referenceWellBore, WellBores, Wells, Clusters);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Unable to resolve MSL depth reference for selected wellbore");
+            return null;
+        }
+    }
+
+    private double? ResolveRotaryTableReference(Cluster? cluster, WellBore? wellBore)
+    {
+        Guid? rigId = cluster?.RigID;
+        if (rigId == null || rigId == Guid.Empty)
+        {
+            rigId = wellBore?.RigID;
+        }
+
+        if (rigId is not Guid resolvedRigId || Rigs == null)
+        {
+            return null;
+        }
+
+        return Rigs.FirstOrDefault(rig => rig?.MetaInfo?.ID == resolvedRigId)?.DrillFloorElevation;
     }
     protected override async Task OnInitializedAsync()
     {
@@ -267,7 +332,8 @@
                     {
                         if (cluster != null && cluster.MetaInfo != null && cluster.MetaInfo.ID == _selectedWell.ClusterID)
                         {
-                            selectedCluster = cluster;
+                            _selectedCluster = cluster;
+                            await ProcessSelectedClusterAsync();
                             break;
                         }
                     }
