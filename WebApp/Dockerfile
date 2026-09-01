@@ -7,6 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
 COPY ["WebApp/WebApp.csproj", "WebApp/"]
+COPY ["WebPages/WebPages.csproj", "WebPages/"]
 RUN dotnet restore "WebApp/WebApp.csproj"
 
 COPY . .

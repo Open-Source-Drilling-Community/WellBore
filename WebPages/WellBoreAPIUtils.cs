@@ -1,7 +1,7 @@
-using NORCE.Drilling.WellBore.ModelShared;
+using OSDC.Drilling.WellBore.ModelShared;
 using OSDC.DotnetLibraries.Drilling.WebAppUtils;
 
-namespace NORCE.Drilling.WellBore.WebPages;
+namespace OSDC.Drilling.WellBore.WebPages;
 
 public class WellBoreAPIUtils : APIUtils, IWellBoreAPIUtils
 {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Text.Json;
 
-namespace NORCE.Drilling.WellBore.Service.Managers
+namespace OSDC.Drilling.WellBore.Service.Managers
 {
     /// <summary>
     /// A manager for WellBore. The manager implements the singleton pattern as defined by 

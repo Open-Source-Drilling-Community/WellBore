@@ -1,7 +1,7 @@
-using NORCE.Drilling.WellBore.ModelShared;
-using ModelShared = NORCE.Drilling.WellBore.ModelShared;
+using OSDC.Drilling.WellBore.ModelShared;
+using ModelShared = OSDC.Drilling.WellBore.ModelShared;
 
-namespace NORCE.Drilling.WellBore.WebPages;
+namespace OSDC.Drilling.WellBore.WebPages;
 
 public static class DepthReferenceUtils
 {

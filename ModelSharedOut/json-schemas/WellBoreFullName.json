@@ -37,17 +37,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             }
           }
@@ -105,7 +105,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                 }
               }
             }
@@ -132,17 +132,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
               }
             }
           }
@@ -190,7 +190,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                   }
                 }
               }
@@ -223,7 +223,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                   }
                 }
               }
@@ -256,7 +256,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                   }
                 }
               }
@@ -289,7 +289,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                   }
                 }
               }
@@ -322,7 +322,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.WellBore"
+                    "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.WellBore"
                   }
                 }
               }
@@ -343,7 +343,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.UsageStatisticsWellBore"
+                  "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.UsageStatisticsWellBore"
                 }
               }
             }
@@ -354,141 +354,6 @@
   },
   "components": {
     "schemas": {
-      "NORCE.Drilling.WellBore.Model.CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "NORCE.Drilling.WellBore.Model.History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.CountPerDay"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "NORCE.Drilling.WellBore.Model.SidetrackType": {
-        "enum": [
-          "Undefined",
-          "Technical",
-          "Production",
-          "Appraisal",
-          "Lateral"
-        ],
-        "type": "string"
-      },
-      "NORCE.Drilling.WellBore.Model.UsageStatisticsWellBore": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllWellBoreIdPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllWellBoreMetaInfoPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllWellBorePerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllWellBoreByWellIDPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllWellBoreByRigIDPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllWellBoreByParentIDPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "GetAllSidetrackedWellBorePerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "PostWellBorePerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "PutWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          },
-          "DeleteWellBoreByIdPerDay": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.History"
-          }
-        },
-        "additionalProperties": false
-      },
-      "NORCE.Drilling.WellBore.Model.WellBore": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "WellID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "RigID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSidetrack": {
-            "type": "boolean"
-          },
-          "ParentWellBoreID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "TieInPointAlongHoleDepth": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
-          },
-          "SidetrackType": {
-            "$ref": "#/components/schemas/NORCE.Drilling.WellBore.Model.SidetrackType"
-          }
-        },
-        "additionalProperties": false
-      },
       "OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty": {
         "type": "object",
         "properties": {
@@ -540,6 +405,141 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.CountPerDay": {
+        "type": "object",
+        "properties": {
+          "Date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Count": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.SidetrackType": {
+        "enum": [
+          "Undefined",
+          "Technical",
+          "Production",
+          "Appraisal",
+          "Lateral"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.WellBore.Model.UsageStatisticsWellBore": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllWellBoreIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreMetaInfoPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBorePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByWellIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByRigIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllWellBoreByParentIDPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "GetAllSidetrackedWellBorePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "PostWellBorePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "PutWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          },
+          "DeleteWellBoreByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.History"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.WellBore": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSidetrack": {
+            "type": "boolean"
+          },
+          "ParentWellBoreID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "TieInPointAlongHoleDepth": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+          },
+          "SidetrackType": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.SidetrackType"
           }
         },
         "additionalProperties": false

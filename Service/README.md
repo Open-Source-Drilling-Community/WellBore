@@ -42,19 +42,21 @@ SQLite storage
 - Database file: `home/WellBore.db`
 - Usage stats: `home/history.json`
 
+The namespace and workload identity change does not require a database migration. On an empty database the service creates `WellBoreTable`; on an existing database it validates the expected schema. An unexpected schema aborts startup and is left unchanged—the service never drops tables as an automatic repair. In Kubernetes, preserve `wellbore-claim`, keep one writer, take an independent SQLite or volume snapshot, and follow [../deployment/identity-cutover.md](../deployment/identity-cutover.md).
+
 ## Docker
 Build the image
 ```
-docker build -t norcedrillingwellboreservice ./Service
+docker build -t docker.io/digiwells/osdcdrillingwellboreservice:local -f Service/Dockerfile .
 ```
 
 Run the container (map port 8080 and persist `/home` volume)
 ```
-docker run --rm -p 8080:8080 -v wellbore-home:/home --name wellbore-service norcedrillingwellboreservice
+docker run --rm -p 8080:8080 -v wellbore-home:/home --name wellbore-service docker.io/digiwells/osdcdrillingwellboreservice:local
 ```
 
 Public registry (digiwells org)
-- Image name: `norcedrillingwellboreservice`
+- Image name: `digiwells/osdcdrillingwellboreservice`
 - Hub: https://hub.docker.com/?namespace=digiwells
 
 ## Endpoints
@@ -176,3 +178,13 @@ The service publishes all 11 non-statistics WellBore REST operations as MCP tool
 - WebSocket: `/wellbore/api/mcp/ws`
 - Utility tool: `ping`
 - Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default
+
+## Helm
+
+- Service chart: `Service/charts/osdcdrillingwellboreservice`
+- Image: `docker.io/digiwells/osdcdrillingwellboreservice:stable`
+- Deployment/Service name: `osdcwellboreservice`
+- Persistent claim: `wellbore-claim` (unchanged from the legacy deployment)
+- Strategy: `Recreate`, because SQLite must not have overlapping writer pods
+
+Use `persistence.existingClaim=wellbore-claim` while the new release references the old release's PVC. Never uninstall the PVC-owning legacy release until the claim has the Helm keep annotation and an independent backup has been verified.

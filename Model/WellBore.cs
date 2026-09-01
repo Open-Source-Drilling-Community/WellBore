@@ -1,11 +1,11 @@
-﻿using DWIS.Vocabulary.Schemas;
+using DWIS.Vocabulary.Schemas;
 using OSDC.DotnetLibraries.Drilling.DrillingProperties;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.UnitConversion.Conversion;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System;
 
-namespace NORCE.Drilling.WellBore.Model
+namespace OSDC.Drilling.WellBore.Model
 {
     public enum SidetrackType { Undefined, Technical, Production, Appraisal, Lateral }
     public class WellBore

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "norcedrillingwellborewebappclient.fullname" . }}
+  name: {{ include "osdcdrillingwellborewebappclient.fullname" . }}
   labels:
-    {{- include "norcedrillingwellborewebappclient.labels" . | nindent 4 }}  {{- with .Values.service.annotations }}
+    {{- include "osdcdrillingwellborewebappclient.labels" . | nindent 4 }}  {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "norcedrillingwellborewebappclient.selectorLabels" . | nindent 4 }}
+    {{- include "osdcdrillingwellborewebappclient.selectorLabels" . | nindent 4 }}
 

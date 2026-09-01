@@ -5,10 +5,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ModelContextProtocol.Protocol;
-using NORCE.Drilling.WellBore.Service;
-using NORCE.Drilling.WellBore.Service.Managers;
-using NORCE.Drilling.WellBore.Service.Mcp;
-using NORCE.Drilling.WellBore.Service.Mcp.Tools;
+using OSDC.Drilling.WellBore.Service;
+using OSDC.Drilling.WellBore.Service.Managers;
+using OSDC.Drilling.WellBore.Service.Mcp;
+using OSDC.Drilling.WellBore.Service.Mcp.Tools;
 using System.Collections.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,7 +60,6 @@ builder.Services.AddWellBoreRestMcpTools();
 var app = builder.Build();
 
 var basePath = "/wellbore/api";
-var scheme = "http";
 
 app.UsePathBase(basePath);
 

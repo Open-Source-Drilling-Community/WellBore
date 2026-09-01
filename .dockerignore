@@ -1,0 +1,13 @@
+**/bin
+**/obj
+.git
+.github
+.vs
+artifacts
+deployment/backups
+deployment/snapshots
+home
+*.db
+*.db-shm
+*.db-wal
+*.nupkg

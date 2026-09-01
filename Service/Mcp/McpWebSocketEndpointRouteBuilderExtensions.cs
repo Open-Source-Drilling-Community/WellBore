@@ -12,7 +12,7 @@ using ModelContextProtocol.AspNetCore;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
-namespace NORCE.Drilling.WellBore.Service.Mcp;
+namespace OSDC.Drilling.WellBore.Service.Mcp;
 
 /// <summary>
 /// Adds WebSocket transport support alongside the standard HTTP endpoints provided by ModelContextProtocol.AspNetCore.

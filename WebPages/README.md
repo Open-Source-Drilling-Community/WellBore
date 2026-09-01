@@ -1,6 +1,6 @@
-# NORCE.Drilling.WellBore.WebPages
+# OSDC.Drilling.WellBore.WebPages
 
-`NORCE.Drilling.WellBore.WebPages` is a Razor class library that packages the `WellBoreMain`, `WellBoreEdit`, and `StatisticsMain` pages together with the supporting page utilities they need.
+`OSDC.Drilling.WellBore.WebPages` is a Razor class library that packages the `WellBoreMain`, `WellBoreEdit`, and `StatisticsMain` pages together with the supporting page utilities they need.
 
 ## Contents
 
@@ -46,5 +46,5 @@ Example routing:
 
 ```razor
 <Router AppAssembly="@typeof(App).Assembly"
-        AdditionalAssemblies="new[] { typeof(NORCE.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
+        AdditionalAssemblies="new[] { typeof(OSDC.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
 ```

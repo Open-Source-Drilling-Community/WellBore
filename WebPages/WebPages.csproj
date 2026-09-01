@@ -1,14 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <AssemblyName>NORCE.Drilling.WellBore.WebPages</AssemblyName>
-    <RootNamespace>NORCE.Drilling.WellBore.WebPages</RootNamespace>
-    <PackageId>NORCE.Drilling.WellBore.WebPages</PackageId>
-    <Title>NORCE.Drilling.WellBore.WebPages</Title>
+    <AssemblyName>OSDC.Drilling.WellBore.WebPages</AssemblyName>
+    <RootNamespace>OSDC.Drilling.WellBore.WebPages</RootNamespace>
+    <PackageId>OSDC.Drilling.WellBore.WebPages</PackageId>
+    <Title>OSDC.Drilling.WellBore.WebPages</Title>
     <Authors>Eric Cayeux</Authors>
     <Company>NORCE</Company>
     <Description>Reusable Razor class library containing the WellBore and statistics web pages. See the package README for setup, dependencies, and usage.</Description>

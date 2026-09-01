@@ -1,8 +1,8 @@
 using NUnit.Framework;
-using NORCE.Drilling.WellBore.Model;
+using OSDC.Drilling.WellBore.Model;
 using System;
 
-namespace NORCE.Drilling.WellBore.ModelTest
+namespace OSDC.Drilling.WellBore.ModelTest
 {
     public class WellBoreTests
     {

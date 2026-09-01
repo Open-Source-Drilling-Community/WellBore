@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "norcedrillingwellboreservice.fullname" . }}
+  name: {{ include "osdcdrillingwellborewebappclient.fullname" . }}
   labels:
-    {{- include "norcedrillingwellboreservice.labels" . | nindent 4 }}
+    {{- include "osdcdrillingwellborewebappclient.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "norcedrillingwellboreservice.selectorLabels" . | nindent 6 }}
+      {{- include "osdcdrillingwellborewebappclient.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "norcedrillingwellboreservice.selectorLabels" . | nindent 8 }}
+        {{- include "osdcdrillingwellborewebappclient.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "norcedrillingwellboreservice.serviceAccountName" . }}
+      serviceAccountName: {{ include "osdcdrillingwellborewebappclient.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -49,13 +49,6 @@ spec:
           {{- end}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-          - mountPath: /home/
-            name: wellboredb
-      volumes:
-      - name: wellboredb
-        persistentVolumeClaim:
-          claimName: wellbore-claim
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

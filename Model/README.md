@@ -36,7 +36,7 @@ Create a new `WellBore` domain object in any consumer (service, tests, or tools)
 
 ```csharp
 using System;
-using NORCE.Drilling.WellBore.Model;
+using OSDC.Drilling.WellBore.Model;
 using OSDC.DotnetLibraries.General.DataManagement; // for MetaInfo
 
 var wb = new WellBore

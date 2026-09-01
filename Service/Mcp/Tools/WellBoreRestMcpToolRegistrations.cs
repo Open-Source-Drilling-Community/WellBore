@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.WellBore.Service.Controllers;
-using NORCE.Drilling.WellBore.Service.Managers;
-using WellBoreModel = NORCE.Drilling.WellBore.Model.WellBore;
+using OSDC.Drilling.WellBore.Service.Controllers;
+using OSDC.Drilling.WellBore.Service.Managers;
+using WellBoreModel = OSDC.Drilling.WellBore.Model.WellBore;
 
-namespace NORCE.Drilling.WellBore.Service.Mcp.Tools;
+namespace OSDC.Drilling.WellBore.Service.Mcp.Tools;
 
 public static class WellBoreRestMcpToolRegistrations
 {

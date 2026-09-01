@@ -2,11 +2,11 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
-using NORCE.Drilling.WellBore.Service.Controllers;
-using NORCE.Drilling.WellBore.Service.Mcp;
-using NORCE.Drilling.WellBore.Service.Mcp.Tools;
+using OSDC.Drilling.WellBore.Service.Controllers;
+using OSDC.Drilling.WellBore.Service.Mcp;
+using OSDC.Drilling.WellBore.Service.Mcp.Tools;
 
-namespace NORCE.Drilling.WellBore.ServiceTest;
+namespace OSDC.Drilling.WellBore.ServiceTest;
 
 [TestFixture]
 public sealed class McpToolRegistrationTests

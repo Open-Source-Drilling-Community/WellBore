@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NORCE.Drilling.WellBore.Service;
-using NORCE.Drilling.WellBore.Service.Managers;
-using NORCE.Drilling.WellBore.ModelShared;
+using OSDC.Drilling.WellBore.Service;
+using OSDC.Drilling.WellBore.Service.Managers;
+using OSDC.Drilling.WellBore.ModelShared;
 using NUnit.Framework;
 
-namespace NORCE.Drilling.WellBore.ServiceTest
+namespace OSDC.Drilling.WellBore.ServiceTest
 {
     [TestFixture]
     public class WellBoreControllerTests

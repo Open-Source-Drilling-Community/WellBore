@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using NORCE.Drilling.WellBore.ModelShared;
+using OSDC.Drilling.WellBore.ModelShared;
 
 string localHostName = "https://localhost:5001/";
 string devHostName = "https://dev.digiwells.no/";

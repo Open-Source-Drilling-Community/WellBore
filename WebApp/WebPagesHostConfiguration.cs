@@ -1,6 +1,6 @@
-using NORCE.Drilling.WellBore.WebPages;
+using OSDC.Drilling.WellBore.WebPages;
 
-namespace NORCE.Drilling.WellBore.WebApp;
+namespace OSDC.Drilling.WellBore.WebApp;
 
 public class WebPagesHostConfiguration :
     IWellBoreWebPagesConfiguration,

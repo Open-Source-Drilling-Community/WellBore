@@ -2,9 +2,9 @@ using System;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using NORCE.Drilling.WellBore.Service.Mcp;
+using OSDC.Drilling.WellBore.Service.Mcp;
 
-namespace NORCE.Drilling.WellBore.Service.Mcp.Tools;
+namespace OSDC.Drilling.WellBore.Service.Mcp.Tools;
 
 public sealed class PingMcpTool : IMcpTool
 {

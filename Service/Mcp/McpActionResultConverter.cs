@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace NORCE.Drilling.WellBore.Service.Mcp;
+namespace OSDC.Drilling.WellBore.Service.Mcp;
 
 internal static class McpActionResultConverter
 {

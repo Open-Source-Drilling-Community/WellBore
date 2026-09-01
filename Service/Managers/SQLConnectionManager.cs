@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -7,12 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Data.Sqlite;
 
-namespace NORCE.Drilling.WellBore.Service.Managers
+namespace OSDC.Drilling.WellBore.Service.Managers
 {
     /// <summary>
     /// A manager for the sql database connection, registered as a singleton through dependency injection (see Program.cs)
     /// Prior to creating a database, existing database structure is checked for consistency with the structure defined in tableStructureDict_
-    /// If inconsistent (table count, table names, fields count, fields names), a timestamped backup of the existing database is generated first
+    /// If the schema is inconsistent (table count, table names, field count, or field names), startup stops and leaves the database unchanged.
     /// </summary>
     /// <remarks>
     /// SQLite database connection strategy:
@@ -121,114 +121,41 @@ namespace NORCE.Drilling.WellBore.Service.Managers
         }
 
         /// <summary>
-        /// This function parses the existing database and check that its structure matches the expected one.
-        /// If not, the existing database is backed-up and the actual database is recreated from scratch
+        /// Validates an existing database without modifying it, or creates the initial schema for an empty database.
+        /// An unexpected schema aborts startup so persisted WellBore data is never dropped automatically.
         /// </summary>
         private void ManageDataBase()
         {
-            var connection = GetConnection();
-            if (connection != null)
+            using var connection = GetConnection() ??
+                throw new InvalidOperationException("The WellBore database could not be opened.");
+            List<string> tableNames = [];
+            using (var command = new SqliteCommand(
+                       "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';", connection))
+            using (var reader = command.ExecuteReader())
             {
-                bool parseOk = true;
-                bool createDb = false;
-                List<string> tableNameList = new();
-                string query = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';";
-
-                using (var command = new SqliteCommand(query, connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            tableNameList.Add(reader.GetString(0));
-                        }
-                    }
-                }
-
-                if (tableNameList.Count != _tableStructureDict.Count) // unexpected number of tables
-                {
-                    parseOk = false;
-                }
-                else
-                {
-                    foreach (var tableStruct in _tableStructureDict)
-                    {
-                        bool tmpSuccess = false;
-                        foreach (string tableName in tableNameList)
-                        {
-                            if (tableName == tableStruct.Key) // unexpected table names
-                            {
-                                tmpSuccess = true;
-                                break;
-                            }
-                        }
-                        if (!tmpSuccess ||
-                            !CheckDatabaseStructure(tableStruct)) // badly formatted table
-                        {
-                            parseOk = false;
-                            break;
-                        }
-                    }
-                }
-                if (!parseOk)
-                {
-                    createDb = true;
-                    if (tableNameList.Count > 0)
-                    {
-                        _logger.LogWarning("Unexpected structure of the existing database. A timestamped backup copy will be generated");
-                        // backup existing database
-                        string backupFileName = HOME_DIRECTORY + Path.DirectorySeparatorChar + DATABASE_FILENAME;
-                        string timeStamp = DateTime.UtcNow.ToString(DATE_TIME_FORMAT);
-                        backupFileName = backupFileName.Insert(backupFileName.Length - 3, "-" + timeStamp);
-                        try
-                        {
-                            File.Copy(HOME_DIRECTORY + Path.DirectorySeparatorChar + DATABASE_FILENAME, backupFileName);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Problem while generating a timestamped backup copy of the existing database");
-                        }
-                        // drop existing tables
-                        _logger.LogWarning("Dropping tables from existing database");
-                        foreach (string tableName in tableNameList)
-                        {
-                            if (!DropTable(tableName))
-                            {
-                                createDb = false;
-                                _logger.LogError("Impossible to drop {tableName}. Database may be corrupted, consider deleting it", tableName);
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (createDb)
-                {
-                    _logger.LogInformation("Creating database tables");
-                    bool success = true;
-                    foreach (var tableStruct in _tableStructureDict)
-                    {
-                        string tableName = tableStruct.Key;
-                        if (CreateTable(tableStruct))
-                        {
-                            if (!IndexTable(tableName))
-                                success = false;
-                        }
-                        else
-                        {
-                            success = false;
-                        }
-                        if (!success)
-                        {
-                            if (!DropTable(tableName))
-                                _logger.LogError("Impossible to drop {key}. Database may be corrupted, consider deleting it", tableName);
-                        }
-
-                    }
-                }
+                while (reader.Read()) tableNames.Add(reader.GetString(0));
             }
-            else
+
+            if (tableNames.Count == 0)
             {
-                _logger.LogError("Problem opening a new connection while managing database");
+                _logger.LogInformation("Creating the initial WellBore database schema");
+                foreach (var tableStructure in _tableStructureDict)
+                {
+                    if (!CreateTable(tableStructure) || !IndexTable(tableStructure.Key))
+                        throw new InvalidOperationException("The initial WellBore database schema could not be created.");
+                }
+                return;
+            }
+
+            bool schemaMatches = tableNames.Count == _tableStructureDict.Count &&
+                _tableStructureDict.All(tableStructure =>
+                    tableNames.Contains(tableStructure.Key, StringComparer.Ordinal) &&
+                    CheckDatabaseStructure(tableStructure));
+            if (!schemaMatches)
+            {
+                _logger.LogCritical("Unexpected WellBore database schema. Startup is aborted and the database is left unchanged.");
+                throw new InvalidOperationException(
+                    "Unexpected WellBore database schema. No automatic destructive repair was attempted.");
             }
         }
 
@@ -239,7 +166,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
         /// <returns>true if the expected fields exactly match fields of the stored database</returns>
         private bool CheckDatabaseStructure(KeyValuePair<string, string[]> tableStructure)
         {
-            var connection = GetConnection();
+            using var connection = GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -286,7 +213,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
 
         private bool CreateTable(KeyValuePair<string, string[]> tabStruct)
         {
-            var connection = GetConnection();
+            using var connection = GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -307,7 +234,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
                 }
                 catch (SqliteException ex)
                 {
-                    _logger.LogError(ex, "Impossible to create {key} which will be dropped", key);
+                    _logger.LogError(ex, "Impossible to create {key}", key);
                     return false;
                 }
             }
@@ -321,7 +248,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
 
         private bool IndexTable(string dbName)
         {
-            var connection = GetConnection();
+            using var connection = GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -333,7 +260,7 @@ namespace NORCE.Drilling.WellBore.Service.Managers
                 }
                 catch (SqliteException ex)
                 {
-                    _logger.LogError(ex, "Impossible to index {dbName} which will be dropped", dbName);
+                    _logger.LogError(ex, "Impossible to index {dbName}", dbName);
                     return false;
                 }
             }
@@ -345,31 +272,5 @@ namespace NORCE.Drilling.WellBore.Service.Managers
             return true;
         }
 
-        private bool DropTable(string dbName)
-        {
-            var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText =
-                            $"DROP TABLE {dbName}";
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogWarning("{dbName} has been successfully dropped", dbName);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to drop {dbName}", dbName);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
-                return false;
-            }
-            return true;
-        }
     }
 }

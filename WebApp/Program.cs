@@ -1,7 +1,7 @@
 using MudBlazor;
 using MudBlazor.Services;
-using NORCE.Drilling.WellBore.WebApp;
-using NORCE.Drilling.WellBore.WebPages;
+using OSDC.Drilling.WellBore.WebApp;
+using OSDC.Drilling.WellBore.WebPages;
 
 var builder = WebApplication.CreateBuilder(args);
 

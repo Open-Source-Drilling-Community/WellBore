@@ -1,6 +1,6 @@
 # WellBore
 
-End-to-end solution for WellBore management consisting of a backend microservice (REST API), a Blazor Server web application, a shared domain model, and generated client SDK. Targets .NET 8.
+End-to-end OSDC WellBore solution consisting of a backend microservice (REST API), a Blazor Server web application, a shared domain model, and generated client SDK. The code, WebPages package, images, and charts use the `OSDC.Drilling.WellBore` identity and target .NET 8.
 
 ## Projects
 - Model (`Model/`)
@@ -85,17 +85,17 @@ curl -k "$BASE/WellBore/11111111-1111-1111-1111-111111111111"
 ## Docker
 Service
 ```
-docker build -t norcedrillingwellboreservice ./Service
-docker run --rm -p 8080:8080 -v wellbore-home:/home --name wellbore-service norcedrillingwellboreservice
+docker build -t docker.io/digiwells/osdcdrillingwellboreservice:local -f Service/Dockerfile .
+docker run --rm -p 8080:8080 -v wellbore-home:/home --name wellbore-service docker.io/digiwells/osdcdrillingwellboreservice:local
 # Swagger: http://localhost:8080/WellBore/api/swagger
 ```
 
 WebApp
 ```
-docker build -t norcedrillingwellborewebappclient ./WebApp
+docker build -t docker.io/digiwells/osdcdrillingwellborewebappclient:local -f WebApp/Dockerfile .
 docker run --rm -p 8081:8080 \
   -e WellBoreHostURL=http://host.docker.internal:8080/ \
-  --name wellbore-webapp norcedrillingwellborewebappclient
+  --name wellbore-webapp docker.io/digiwells/osdcdrillingwellborewebappclient:local
 # UI:     http://localhost:8081/WellBore/webapp/WellBore
 ```
 
@@ -109,8 +109,8 @@ Solution-wide
 - MudBlazor UI toolkit and OSDC UnitConversion components used by the WebApp.
 
 Project references
-- `Service` → `Model`
-- `WebApp` → `ModelSharedOut`
+- `Service` references `Model`.
+- `WebApp` references `WebPages`; `WebPages` links the generated client from `ModelSharedOut`.
 
 ## Deployment
 Microservice
@@ -125,7 +125,7 @@ Swagger
 - Dev: https://dev.digiwells.no/WellBore/api/swagger
 - Prod: https://app.digiwells.no/WellBore/api/swagger
 
-The microservice and webapp are typically deployed as Docker containers using Kubernetes and Helm. More info: https://github.com/NORCE-DrillingAndWells/DrillingAndWells/wiki
+The OSDC charts are `Service/charts/osdcdrillingwellboreservice` and `WebApp/charts/osdcdrillingwellborewebappclient`. The service chart keeps the existing `wellbore-claim`, mounts it at `/home`, and uses a `Recreate` strategy so two SQLite writers cannot overlap. Follow [deployment/identity-cutover.md](deployment/identity-cutover.md) for the staged dev, prod, and awe migration; do not replace or delete the PVC during the identity change.
 
 ## Security/Confidentiality
 - Data persist in clear text within a single SQLite DB inside the Service container: `home/WellBore.db`.
@@ -148,5 +148,6 @@ The current work has been funded by the [Research Council of Norway](https://www
 ## Current implementation
 
 - The service exposes all 11 non-statistics WellBore REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded.
+- Root namespaces, generated clients, NuGet packaging, Docker repositories, and Helm chart identities use `OSDC.Drilling.WellBore`.
 - MCP is available over streamable HTTP at `/wellbore/api/mcp` and WebSocket at `/wellbore/api/mcp/ws`. Optional external MCP-hub registration is disabled by default.
 - The WebApp uses the current embedded WebPages packages for Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), Geodetic Datum (1.0.7), and Well (1.0.11).

@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Nodes;
 
-namespace NORCE.Drilling.WellBore.Service.Mcp.Tools;
+namespace OSDC.Drilling.WellBore.Service.Mcp.Tools;
 
 internal static class McpToolArgumentHelpers
 {

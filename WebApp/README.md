@@ -53,7 +53,7 @@ dotnet run --project WebApp/WebApp.csproj
 ## Docker
 Build the image
 ```
-docker build -t norcedrillingwellborewebappclient ./WebApp
+docker build -t docker.io/digiwells/osdcdrillingwellborewebappclient:local -f WebApp/Dockerfile .
 ```
 
 Run the container (map 8080 and configure service hosts)
@@ -61,7 +61,7 @@ Run the container (map 8080 and configure service hosts)
 docker run --rm -p 8080:8080 \
   -e WellBoreHostURL=https://my-wellbore-host/ \
   -e UnitConversionHostURL=https://my-unitconv-host/ \
-  --name wellbore-webapp norcedrillingwellborewebappclient
+  --name wellbore-webapp docker.io/digiwells/osdcdrillingwellborewebappclient:local
 ```
 
 Open: `http://localhost:8080/WellBore/webapp/WellBore`
@@ -98,3 +98,5 @@ The current work has been funded by the [Research Council of Norway](https://www
 ## Current shared-page dependencies
 
 The WebApp's embedded service pages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, and Well 1.0.11. Keep external Razor assembly registration synchronized when these packages are upgraded.
+
+The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses the migrated OSDC DNS names for WellBore, Well, Field, Cluster, and Rig while retaining legacy DNS names for services that have not yet migrated.

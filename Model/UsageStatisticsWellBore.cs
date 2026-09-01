@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace NORCE.Drilling.WellBore.Model
+namespace OSDC.Drilling.WellBore.Model
 {
     public struct CountPerDay
     {

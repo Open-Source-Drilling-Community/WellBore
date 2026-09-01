@@ -5,8 +5,9 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<RootNamespace>OSDC.Drilling.WellBore.ModelShared</RootNamespace>
 		<Authors>Energy Modelling and Automation group</Authors>
-		<Company>NORCE</Company>
+		<Company>NORCE Research</Company>
 		<Title>Auto-generation of the API of the WellBore microservice (distributed shared model approach)</Title>
 	</PropertyGroup>
 
