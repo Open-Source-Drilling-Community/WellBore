@@ -1,9 +1,12 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
+using OSDC.Drilling.WellBore.Model;
+using OSDC.Drilling.WellBore.Service;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using System.Linq;
 using System.Text.Json;
 
 namespace OSDC.Drilling.WellBore.Service.Managers
@@ -37,7 +40,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             get
             {
                 int count = 0;
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     var command = connection.CreateCommand();
@@ -63,9 +66,69 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             }
         }
 
+        /// <summary>Creates a dependency-closed WellBore backup from one SQLite snapshot.</summary>
+        public WellBoreBatchExportOutcome ExportBatch(WellBoreBatchExportRequest? request)
+        {
+            using SqliteConnection? connection = _connectionManager.GetConnection();
+            if (connection == null) return WellBoreBatchExporter.StorageFailure("The WellBore database is unavailable.");
+            using SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                List<Model.WellBore?> wellBores = ReadDocuments<Model.WellBore>(connection, transaction, "WellBoreTable", "WellBore");
+                List<WellBoreIdentity> identities = ReadDocuments<WellBoreIdentity>(connection, transaction,
+                    "WellBoreIdentityTable", "WellBoreIdentity").Where(value => value != null).Cast<WellBoreIdentity>().ToList();
+                List<WellBoreFeatureCategory> categories = ReadDocuments<WellBoreFeatureCategory>(connection, transaction,
+                    "WellBoreFeatureCategoryTable", "WellBoreFeatureCategory").Where(value => value != null).Cast<WellBoreFeatureCategory>().ToList();
+                WellBoreBatchExportOutcome outcome = WellBoreBatchExporter.Create(request, wellBores,
+                    DateTimeOffset.UtcNow, identities, categories);
+                transaction.Commit();
+                return outcome;
+            }
+            catch (Exception exception) when (exception is SqliteException or JsonException or InvalidOperationException)
+            {
+                try { transaction.Rollback(); } catch (InvalidOperationException) { }
+                _logger.LogError(exception, "Unable to create a dependency-closed WellBore backup");
+                return WellBoreBatchExporter.StorageFailure("The stored WellBores or catalog dependencies could not be read.");
+            }
+        }
+
+        /// <summary>Validates and restores a WellBore backup in one transaction.</summary>
+        public WellBoreBatchRestoreOutcome RestoreBatch(WellBoreBatchRestoreRequest? request)
+        {
+            try
+            {
+                using SqliteConnection? connection = _connectionManager.GetConnection();
+                if (connection == null) return WellBoreBatchRestorer.StorageFailure("The WellBore database is unavailable.");
+                return WellBoreBatchRestorer.Restore(connection, request, DateTimeOffset.UtcNow);
+            }
+            catch (SqliteException exception)
+            {
+                _logger.LogError(exception, "Unable to open the WellBore database for batch restore");
+                return WellBoreBatchRestorer.StorageFailure("The WellBore database is unavailable.");
+            }
+        }
+
+        private static List<T?> ReadDocuments<T>(SqliteConnection connection, SqliteTransaction transaction,
+            string table, string documentColumn)
+        {
+            using SqliteCommand command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = $"SELECT {documentColumn} FROM {table} ORDER BY ID";
+            using SqliteDataReader reader = command.ExecuteReader();
+            List<T?> result = [];
+            while (reader.Read())
+            {
+                if (reader.IsDBNull(0)) throw new JsonException($"{table} contains a null document.");
+                T? value = JsonSerializer.Deserialize<T>(reader.GetString(0), JsonSettings.Options);
+                if (value == null) throw new JsonException($"{table} contains an invalid document.");
+                result.Add(value);
+            }
+            return result;
+        }
+
         public bool Clear()
         {
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 bool success = false;
@@ -100,7 +163,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public bool Contains(Guid guid)
         {
             int count = 0;
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -132,7 +195,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Guid>? GetAllWellBoreId()
         {
             List<Guid> ids = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -167,7 +230,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<MetaInfo?>? GetAllWellBoreMetaInfo()
         {
             List<MetaInfo?> metaInfos = new();
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -205,7 +268,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     Model.WellBore? wellBore;
@@ -254,7 +317,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Model.WellBore?>? GetAllWellBore()
         {
             List<Model.WellBore?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -290,7 +353,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Model.WellBore?>? GetAllWellBoreByWellID(Guid wellID)
         {
             List<Model.WellBore?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -326,7 +389,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Model.WellBore?>? GetAllWellBoreByRigID(Guid RigID)
         {
             List<Model.WellBore?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -362,7 +425,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Model.WellBore?>? GetAllWellBoreByParentWellBoreID(Guid ParentID)
         {
             List<Model.WellBore?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -398,7 +461,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public List<Model.WellBore?>? GetAllSideTrackedWellBore()
         {
             List<Model.WellBore?> vals = [];
-            var connection = _connectionManager.GetConnection();
+            using var connection = _connectionManager.GetConnection();
             if (connection != null)
             {
                 var command = connection.CreateCommand();
@@ -440,34 +503,39 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                 if (newWellBore == null)
                 {
                     //update WellBoreTable
-                    var connection = _connectionManager.GetConnection();
+                    using var connection = _connectionManager.GetConnection();
                     if (connection != null)
                     {
                         using SqliteTransaction transaction = connection.BeginTransaction();
                         bool success = true;
                         try
                         {
+                            var validationErrors = WellBoreReferenceIntegrityValidator.ValidateWellBore(connection, transaction, wellBore);
+                            if (validationErrors.Count > 0)
+                            {
+                                _logger.LogWarning("WellBore contains invalid identity or feature assignments: {Errors}",
+                                    string.Join("; ", validationErrors.ConvertAll(error => $"{error.Property}:{error.Code}")));
+                                transaction.Rollback();
+                                return false;
+                            }
                             //add the WellBore to the WellBoreTable
                             string metaInfo = JsonSerializer.Serialize(wellBore.MetaInfo, JsonSettings.Options);
                             string data = JsonSerializer.Serialize(wellBore, JsonSettings.Options);
                             var command = connection.CreateCommand();
-                            command.CommandText = "INSERT INTO WellBoreTable (" +
-                                "ID, " +
-                                "MetaInfo, " +
-                                "WellID, " +
-                                "RigID, " +
-                                "IsSidetrack, " +
-                                "ParentWellBoreID, " +
-                                "WellBore" +
-                                ") VALUES (" +
-                                $"'{wellBore.MetaInfo.ID}', " +
-                                $"'{metaInfo}', " +
-                                $"'{wellBore.WellID}', " +
-                                $"'{wellBore.RigID}', " +
-                                $"'{(wellBore.IsSidetrack ? 1 : 0)}', " +
-                                $"'{wellBore.ParentWellBoreID}', " +
-                                $"'{data}'" +
-                                ")";
+                            command.Transaction = transaction;
+                            command.CommandText = """
+                                INSERT INTO WellBoreTable
+                                    (ID, MetaInfo, WellID, RigID, IsSidetrack, ParentWellBoreID, WellBore)
+                                VALUES
+                                    ($id, $metaInfo, $wellId, $rigId, $isSidetrack, $parentWellBoreId, $wellBore)
+                                """;
+                            command.Parameters.AddWithValue("$id", wellBore.MetaInfo.ID.ToString());
+                            command.Parameters.AddWithValue("$metaInfo", metaInfo);
+                            command.Parameters.AddWithValue("$wellId", (object?)wellBore.WellID?.ToString() ?? DBNull.Value);
+                            command.Parameters.AddWithValue("$rigId", (object?)wellBore.RigID?.ToString() ?? DBNull.Value);
+                            command.Parameters.AddWithValue("$isSidetrack", wellBore.IsSidetrack ? 1 : 0);
+                            command.Parameters.AddWithValue("$parentWellBoreId", (object?)wellBore.ParentWellBoreID?.ToString() ?? DBNull.Value);
+                            command.Parameters.AddWithValue("$wellBore", data);
                             int count = command.ExecuteNonQuery();
                             if (count != 1)
                             {
@@ -522,24 +590,42 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             if (guid != Guid.Empty && wellBore != null && wellBore.MetaInfo != null && wellBore.MetaInfo.ID == guid)
             {
                 //update WellBoreTable
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     using SqliteTransaction transaction = connection.BeginTransaction();
                     //update fields in WellBoreTable
                     try
                     {
+                        var validationErrors = WellBoreReferenceIntegrityValidator.ValidateWellBore(connection, transaction, wellBore);
+                        if (validationErrors.Count > 0)
+                        {
+                            _logger.LogWarning("WellBore contains invalid identity or feature assignments: {Errors}",
+                                string.Join("; ", validationErrors.ConvertAll(error => $"{error.Property}:{error.Code}")));
+                            transaction.Rollback();
+                            return false;
+                        }
                         string metaInfo = JsonSerializer.Serialize(wellBore.MetaInfo, JsonSettings.Options);
                         string data = JsonSerializer.Serialize(wellBore, JsonSettings.Options);
                         var command = connection.CreateCommand();
-                        command.CommandText = $"UPDATE WellBoreTable SET " +
-                            $"MetaInfo = '{metaInfo}', " +
-                            $"WellID = '{wellBore.WellID}', " +
-                            $"RigID = '{wellBore.RigID}', " +
-                            $"IsSidetrack = '{(wellBore.IsSidetrack ? 1 : 0)}', " +
-                            $"ParentWellBoreID = '{wellBore.ParentWellBoreID}', " +
-                            $"WellBore = '{data}' " +
-                            $"WHERE ID = '{guid}'";
+                        command.Transaction = transaction;
+                        command.CommandText = """
+                            UPDATE WellBoreTable
+                            SET MetaInfo = $metaInfo,
+                                WellID = $wellId,
+                                RigID = $rigId,
+                                IsSidetrack = $isSidetrack,
+                                ParentWellBoreID = $parentWellBoreId,
+                                WellBore = $wellBore
+                            WHERE ID = $id
+                            """;
+                        command.Parameters.AddWithValue("$metaInfo", metaInfo);
+                        command.Parameters.AddWithValue("$wellId", (object?)wellBore.WellID?.ToString() ?? DBNull.Value);
+                        command.Parameters.AddWithValue("$rigId", (object?)wellBore.RigID?.ToString() ?? DBNull.Value);
+                        command.Parameters.AddWithValue("$isSidetrack", wellBore.IsSidetrack ? 1 : 0);
+                        command.Parameters.AddWithValue("$parentWellBoreId", (object?)wellBore.ParentWellBoreID?.ToString() ?? DBNull.Value);
+                        command.Parameters.AddWithValue("$wellBore", data);
+                        command.Parameters.AddWithValue("$id", guid.ToString());
                         int count = command.ExecuteNonQuery();
                         if (count != 1)
                         {
@@ -586,7 +672,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         {
             if (!guid.Equals(Guid.Empty))
             {
-                var connection = _connectionManager.GetConnection();
+                using var connection = _connectionManager.GetConnection();
                 if (connection != null)
                 {
                     using var transaction = connection.BeginTransaction();

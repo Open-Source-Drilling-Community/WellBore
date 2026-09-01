@@ -48,6 +48,47 @@ public sealed class SqlConnectionManagerSafetyTests
     }
 
     [Test]
+    public void Legacy_schema_is_migrated_additively_and_preserves_existing_rows()
+    {
+        string path = TemporaryDatabasePath();
+        string connectionString = $"Data Source={path}";
+        try
+        {
+            using (var connection = new SqliteConnection(connectionString))
+            {
+                connection.Open();
+                using SqliteCommand command = connection.CreateCommand();
+                command.CommandText = "CREATE TABLE WellBoreTable (ID text primary key, MetaInfo text, WellID text, RigID text, IsSidetrack bool, ParentWellBoreID text, WellBore text); " +
+                                      "CREATE UNIQUE INDEX WellBoreTableIndex ON WellBoreTable (ID); " +
+                                      "INSERT INTO WellBoreTable (ID, MetaInfo, WellBore) VALUES ('marker', '{\"ID\":\"marker\"}', '{\"Name\":\"preserve-me\"}');";
+                command.ExecuteNonQuery();
+            }
+
+            _ = new SqlConnectionManager(connectionString, _logger);
+
+            using var verification = new SqliteConnection(connectionString);
+            verification.Open();
+            using SqliteCommand verify = verification.CreateCommand();
+            verify.CommandText = "SELECT WellBore FROM WellBoreTable WHERE ID='marker'; " +
+                                 "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('WellBoreIdentityTable','WellBoreFeatureCategoryTable');";
+            using SqliteDataReader reader = verify.ExecuteReader();
+            Assert.That(reader.Read(), Is.True);
+            Assert.That(reader.GetString(0), Does.Contain("preserve-me"));
+            Assert.That(reader.NextResult(), Is.True);
+            Assert.That(reader.Read(), Is.True);
+            Assert.That(reader.GetInt64(0), Is.EqualTo(2));
+            using SqliteCommand version = verification.CreateCommand();
+            version.CommandText = "PRAGMA user_version";
+            Assert.That(Convert.ToInt32(version.ExecuteScalar()), Is.EqualTo(SqlConnectionManager.CURRENT_SCHEMA_VERSION));
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(path)) File.Delete(path);
+        }
+    }
+
+    [Test]
     public void Reopening_expected_schema_preserves_existing_rows()
     {
         string path = TemporaryDatabasePath();

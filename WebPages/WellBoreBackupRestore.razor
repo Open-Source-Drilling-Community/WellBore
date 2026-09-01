@@ -1,0 +1,538 @@
+@page "/WellBoreBackupRestore"
+@implements IAsyncDisposable
+@inject ILogger<WellBoreBackupRestore> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IWellBoreAPIUtils Api
+@inject IJSRuntime JSRuntime
+
+<MudText Typo="Typo.h4" Class="mt-4 mb-4">WellBore backup and restore</MudText>
+@if (_busy)
+{
+    <MudProgressLinear Indeterminate="true" Class="mb-3" />
+}
+
+<MudExpansionPanels MultiExpansion="true">
+    <MudExpansionPanel Text="Backup WellBores" Expanded="true">
+        <MudText Typo="Typo.body2" Class="mb-3">
+            Export all WellBores or an ordered selection to one versioned JSON backup file.
+            Well, Rig, and parent WellBore references remain external UUID references; referenced WellBore catalogues are included.
+        </MudText>
+
+        @if (_wellBores == null)
+        {
+            <MudProgressLinear Indeterminate="true" />
+        }
+        else
+        {
+            <MudDataGrid T="WellBore" @key="_wellGridKey"
+                         Items="@_wellBores"
+                         MultiSelection="true"
+                         SelectedItems="@_selectedWellBores"
+                         SelectedItemsChanged="SelectedWellBoresChanged"
+                         QuickFilter="@WellFilter"
+                         Hover="true"
+                         SortMode="SortMode.Multiple"
+                         Filterable="false"
+                         ReadOnly="true"
+                         Elevation="0">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Available WellBores</MudText>
+                    <MudSpacer />
+                    <MudTextField @bind-Value="_wellSearch"
+                                  Placeholder="Search"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.Search"
+                                  Immediate="true"
+                                  Class="mt-0" />
+                </ToolBarContent>
+                <Columns>
+                    <SelectColumn T="WellBore" />
+                    <PropertyColumn Property="wellBore => wellBore.Name" Title="Name" Sortable="true" />
+                    <PropertyColumn Property="wellBore => wellBore.Description" Title="Description" Sortable="true" />
+                    <TemplateColumn Title="UUID" Sortable="false">
+                        <CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "-")</CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="WellBore" />
+                </PagerContent>
+            </MudDataGrid>
+
+            <MudContainer Class="d-flex flex-row align-center pa-0 mt-4">
+                <MudButton Class="me-2"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Download"
+                           Disabled="@(_busy || _wellBores.Count == 0)"
+                           OnClick="ExportAllAsync">
+                    Backup all (@_wellBores.Count)
+                </MudButton>
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Download"
+                           Disabled="@(_busy || _selectedWellBores.Count == 0)"
+                           OnClick="ExportSelectedAsync">
+                    Backup selected (@_selectedWellBores.Count)
+                </MudButton>
+            </MudContainer>
+            @if (_backupErrors.Count != 0)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                    @foreach (string error in _backupErrors)
+                    {
+                        <MudText Typo="Typo.body2">- @error</MudText>
+                    }
+                </MudAlert>
+            }
+        }
+    </MudExpansionPanel>
+
+    <MudExpansionPanel Text="Restore WellBores">
+        <MudAlert Severity="Severity.Info" Dense="true" Class="mb-3">
+            Choose a JSON file produced by the batch backup operation. The server validates
+            the complete document before changing the database, and commits all WellBores together.
+        </MudAlert>
+
+        <label class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium">
+            Choose backup file
+            <InputFile OnChange="LoadRestoreFileAsync" accept=".json,application/json" style="display:none" />
+        </label>
+        @if (!string.IsNullOrWhiteSpace(_restoreFileName))
+        {
+            <MudText Typo="Typo.body2" Class="mt-2">Selected file: @_restoreFileName</MudText>
+        }
+
+        @if (_restoreDocument != null)
+        {
+            <MudGrid Class="mt-3">
+                <MudItem xs="12" md="4">
+                    <MudText Typo="Typo.subtitle2">Format</MudText>
+                    <MudText Typo="Typo.body2">@_restoreDocument.FormatIdentifier</MudText>
+                </MudItem>
+                <MudItem xs="12" md="2">
+                    <MudText Typo="Typo.subtitle2">Schema version</MudText>
+                    <MudText Typo="Typo.body2">@_restoreDocument.SchemaVersion</MudText>
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudText Typo="Typo.subtitle2">Exported at UTC</MudText>
+                    <MudText Typo="Typo.body2">@_restoreDocument.ExportedAtUtc.ToString("u")</MudText>
+                </MudItem>
+                <MudItem xs="12" md="3">
+                    <MudText Typo="Typo.subtitle2">WellBores</MudText>
+                    <MudText Typo="Typo.body2">@(_restoreDocument.WellBores?.Count ?? 0)</MudText>
+                </MudItem>
+            </MudGrid>
+
+            @if (_restoreValidationErrors.Count != 0)
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                    <MudText Typo="Typo.subtitle2">This file cannot be restored:</MudText>
+                    @foreach (string error in _restoreValidationErrors)
+                    {
+                        <MudText Typo="Typo.body2">- @error</MudText>
+                    }
+                </MudAlert>
+            }
+            else
+            {
+                <MudDataGrid T="OSDC.Drilling.WellBore.ModelShared.WellBore"
+                             Items="@_restoreDocument.WellBores"
+                             QuickFilter="@RestoreWellFilter"
+                             Hover="true"
+                             SortMode="SortMode.Multiple"
+                             Filterable="false"
+                             ReadOnly="true"
+                             Elevation="0"
+                             Class="mt-3">
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6">Backup contents</MudText>
+                        <MudSpacer />
+                        <MudTextField @bind-Value="_restoreSearch"
+                                      Placeholder="Search"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Search"
+                                      Immediate="true"
+                                      Class="mt-0" />
+                    </ToolBarContent>
+                    <Columns>
+                        <PropertyColumn Property="wellBore => wellBore.Name" Title="Name" Sortable="true" />
+                        <PropertyColumn Property="wellBore => wellBore.Description" Title="Description" Sortable="true" />
+                        <TemplateColumn Title="UUID">
+                            <CellTemplate>@(context.Item.MetaInfo?.ID.ToString() ?? "-")</CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                    <PagerContent>
+                        <MudDataGridPager T="OSDC.Drilling.WellBore.ModelShared.WellBore" />
+                    </PagerContent>
+                </MudDataGrid>
+
+                @if (_restoreDocument.SchemaVersion >= 1)
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">Referenced definitions</MudText>
+                    <MudRadioGroup T="WellBoreBatchCatalogRestorePolicy" @bind-Value="_catalogRestorePolicy">
+                        <MudRadio T="WellBoreBatchCatalogRestorePolicy"
+                                  Value="WellBoreBatchCatalogRestorePolicy.MapExisting"
+                                  Color="Color.Primary">
+                            Map compatible definitions already present on this server
+                        </MudRadio>
+                        <MudRadio T="WellBoreBatchCatalogRestorePolicy"
+                                  Value="WellBoreBatchCatalogRestorePolicy.MapOrCreateMissing"
+                                  Color="Color.Primary">
+                            Map compatible definitions and create any missing definitions
+                        </MudRadio>
+                    </MudRadioGroup>
+                    <MudAlert Severity="Severity.Info" Dense="true" Class="mt-2">
+                        Names are matched exactly after case, whitespace and Unicode normalization. Ambiguous or
+                        incompatible definitions reject the complete restore; existing definitions are never overwritten.
+                    </MudAlert>
+                }
+
+                <MudText Typo="Typo.subtitle2" Class="mt-4 mb-1">If a WellBore UUID already exists</MudText>
+                <MudRadioGroup T="WellBoreBatchRestoreConflictPolicy" Value="_restorePolicy" ValueChanged="RestorePolicyChanged">
+                    <MudRadio T="WellBoreBatchRestoreConflictPolicy"
+                              Value="WellBoreBatchRestoreConflictPolicy.FailIfExists"
+                              Color="Color.Primary">
+                        Stop without changing any WellBore
+                    </MudRadio>
+                    <MudRadio T="WellBoreBatchRestoreConflictPolicy"
+                              Value="WellBoreBatchRestoreConflictPolicy.ReplaceExisting"
+                              Color="Color.Error">
+                        Replace existing WellBores
+                    </MudRadio>
+                </MudRadioGroup>
+
+                @if (_restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting)
+                {
+                    <MudAlert Severity="Severity.Warning" Dense="true" Class="mt-2">
+                        Existing WellBores with matching UUIDs will be replaced by the records in this backup.
+                    </MudAlert>
+                }
+
+                <MudButton Variant="Variant.Filled"
+                           Color="@(_restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting ? Color.Error : Color.Primary)"
+                           StartIcon="@Icons.Material.Filled.Restore"
+                           Disabled="@(_busy || !CanRestore)"
+                           OnClick="RestoreAsync"
+                           Class="mt-3">
+                    Restore @(_restoreDocument.WellBores?.Count ?? 0) WellBore(s)
+                </MudButton>
+            }
+        }
+
+        @if (_serverErrors.Count != 0)
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Class="mt-3">
+                @foreach (string error in _serverErrors)
+                {
+                    <MudText Typo="Typo.body2">- @error</MudText>
+                }
+            </MudAlert>
+        }
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private const long MaximumBackupFileBytes = 256L * 1024L * 1024L;
+    private const string ExpectedFormatIdentifier = "OSDC.Drilling.WellBore.BatchExport";
+    private const int CurrentSchemaVersion = 1;
+
+    private List<WellBore>? _wellBores;
+    private HashSet<WellBore> _selectedWellBores = [];
+    private string? _wellSearch;
+    private int _wellGridKey;
+    private bool _busy;
+    private readonly List<string> _backupErrors = [];
+
+    private string? _restoreFileName;
+    private WellBoreBatchExportDocument? _restoreDocument;
+    private WellBoreBatchRestoreConflictPolicy _restorePolicy = WellBoreBatchRestoreConflictPolicy.FailIfExists;
+    private WellBoreBatchCatalogRestorePolicy _catalogRestorePolicy = WellBoreBatchCatalogRestorePolicy.MapExisting;
+    private readonly List<string> _restoreValidationErrors = [];
+    private readonly List<string> _serverErrors = [];
+    private string? _restoreSearch;
+    private IJSObjectReference? _downloadModule;
+
+    private bool CanRestore => _restoreDocument?.WellBores is { Count: > 0 } && _restoreValidationErrors.Count == 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWellBoresAsync();
+    }
+
+    private async Task LoadWellBoresAsync()
+    {
+        try
+        {
+            _wellBores = ((await Api.ClientWellBore.GetAllWellBoreAsync()) ?? [])
+                .Where(wellBore => wellBore?.MetaInfo?.ID is Guid id && id != Guid.Empty)
+                .OrderBy(wellBore => wellBore.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _selectedWellBores = [];
+            _wellGridKey++;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to load WellBores for backup");
+            _wellBores = [];
+            Snackbar.Add("Unable to load WellBores for backup.", Severity.Error);
+        }
+    }
+
+    private void SelectedWellBoresChanged(HashSet<WellBore> wellBores)
+    {
+        _selectedWellBores = wellBores;
+    }
+
+    private Task ExportAllAsync() => ExportAsync(WellBoreBatchExportScope.All, null);
+
+    private Task ExportSelectedAsync()
+    {
+        List<Guid> ids = _selectedWellBores
+            .Where(wellBore => wellBore.MetaInfo?.ID is Guid id && id != Guid.Empty)
+            .OrderBy(wellBore => wellBore.Name, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(wellBore => wellBore.MetaInfo!.ID)
+            .Select(wellBore => wellBore.MetaInfo!.ID)
+            .ToList();
+        return ExportAsync(WellBoreBatchExportScope.Selected, ids);
+    }
+
+    private async Task ExportAsync(WellBoreBatchExportScope scope, List<Guid>? wellIds)
+    {
+        try
+        {
+            _busy = true;
+            _backupErrors.Clear();
+            WellBoreBatchExportDocument document = await Api.ClientWellBore.BatchExportWellBoresAsync(new WellBoreBatchExportRequest
+            {
+                Scope = scope,
+                WellBoreIDs = wellIds
+            });
+            string json = System.Text.Json.JsonSerializer.Serialize(document, CreateJsonOptions(writeIndented: true));
+            string fileName = $"wellbore-backup-{DateTime.UtcNow:yyyyMMddTHHmmssZ}.json";
+            _downloadModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/OSDC.Drilling.WellBore.WebPages/wellBoreBatchBackup.js?v=20260901");
+            await _downloadModule.InvokeVoidAsync("downloadJson", fileName, json);
+            Snackbar.Add($"Backed up {document.WellBores?.Count ?? 0} WellBore(s).", Severity.Success);
+        }
+        catch (ApiException<WellBoreBatchErrorEnvelope> ex)
+        {
+            logger.LogError(ex, "WellBore batch backup was rejected: {Error}", ex.Result?.Error);
+            ShowApiErrors(ex.Result, "WellBore backup was rejected.", _backupErrors);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to back up WellBores");
+            _backupErrors.Clear();
+            _backupErrors.Add("Unable to back up WellBores.");
+            Snackbar.Add("Unable to back up WellBores.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task LoadRestoreFileAsync(InputFileChangeEventArgs args)
+    {
+        _restoreDocument = null;
+        _restoreValidationErrors.Clear();
+        _serverErrors.Clear();
+        _restoreSearch = null;
+        _restoreFileName = args.File.Name;
+
+        try
+        {
+            await using System.IO.Stream stream = args.File.OpenReadStream(MaximumBackupFileBytes);
+            _restoreDocument = await System.Text.Json.JsonSerializer.DeserializeAsync<WellBoreBatchExportDocument>(
+                stream,
+                CreateJsonOptions(writeIndented: false));
+            ValidateRestoreDocument();
+            if (_restoreValidationErrors.Count == 0)
+            {
+                Snackbar.Add($"Loaded backup containing {_restoreDocument!.WellBores.Count} WellBore(s).", Severity.Success);
+            }
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or IOException or InvalidOperationException)
+        {
+            logger.LogWarning(ex, "Unable to read WellBore backup file {FileName}", args.File.Name);
+            _restoreDocument = null;
+            _restoreValidationErrors.Add("The selected file is not a readable WellBore batch-backup JSON document.");
+            Snackbar.Add("Unable to read the selected backup file.", Severity.Error);
+        }
+    }
+
+    private void ValidateRestoreDocument()
+    {
+        _restoreValidationErrors.Clear();
+        if (_restoreDocument == null)
+        {
+            _restoreValidationErrors.Add("The document is empty.");
+            return;
+        }
+        if (!string.Equals(_restoreDocument.FormatIdentifier, ExpectedFormatIdentifier, StringComparison.Ordinal))
+        {
+            _restoreValidationErrors.Add($"FormatIdentifier must be '{ExpectedFormatIdentifier}'.");
+        }
+        if (_restoreDocument.SchemaVersion != CurrentSchemaVersion)
+        {
+            _restoreValidationErrors.Add($"SchemaVersion must be {CurrentSchemaVersion}.");
+        }
+        if (_restoreDocument.SchemaVersion == CurrentSchemaVersion && _restoreDocument.CatalogDependencies == null)
+        {
+            _restoreValidationErrors.Add("Schema version 1 must contain catalog dependencies.");
+        }
+        if (_restoreDocument.ExportedAtUtc == default || _restoreDocument.ExportedAtUtc.Offset != TimeSpan.Zero)
+        {
+            _restoreValidationErrors.Add("ExportedAtUtc must be a valid UTC timestamp.");
+        }
+        if (_restoreDocument.WellBores == null || _restoreDocument.WellBores.Count == 0)
+        {
+            _restoreValidationErrors.Add("The backup must contain at least one WellBore.");
+            return;
+        }
+
+        var positionsById = new Dictionary<Guid, int>();
+        int index = 0;
+        foreach (OSDC.Drilling.WellBore.ModelShared.WellBore? wellBore in _restoreDocument.WellBores)
+        {
+            Guid? id = wellBore?.MetaInfo?.ID;
+            if (id == null || id == Guid.Empty)
+            {
+                _restoreValidationErrors.Add($"WellBore at position {index} has no non-empty UUID.");
+            }
+            else if (positionsById.TryGetValue(id.Value, out int firstIndex))
+            {
+                _restoreValidationErrors.Add($"WellBore at position {index} duplicates UUID {id} from position {firstIndex}.");
+            }
+            else
+            {
+                positionsById.Add(id.Value, index);
+            }
+            if (wellBore?.WellID == Guid.Empty)
+            {
+                _restoreValidationErrors.Add($"WellBore at position {index} has an empty Well UUID.");
+            }
+            if (wellBore?.RigID == Guid.Empty)
+            {
+                _restoreValidationErrors.Add($"WellBore at position {index} has an empty Rig UUID.");
+            }
+            if (wellBore?.ParentWellBoreID == Guid.Empty)
+            {
+                _restoreValidationErrors.Add($"WellBore at position {index} has an empty parent WellBore UUID.");
+            }
+            index++;
+        }
+    }
+
+    private void RestorePolicyChanged(WellBoreBatchRestoreConflictPolicy policy)
+    {
+        _restorePolicy = policy;
+        _serverErrors.Clear();
+    }
+
+    private async Task RestoreAsync()
+    {
+        if (!CanRestore || _restoreDocument == null)
+        {
+            return;
+        }
+
+        string confirmation = _restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting
+            ? $"Restore {_restoreDocument.WellBores.Count} WellBore(s)? Existing WellBores with matching UUIDs will be replaced."
+            : $"Restore {_restoreDocument.WellBores.Count} WellBore(s)? The operation will stop without changes if any UUID already exists.";
+        bool? confirmed = await DialogService.ShowMessageBox(
+            "Restore WellBores",
+            confirmation,
+            yesText: _restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore",
+            cancelText: "Cancel",
+            options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Small, FullWidth = true });
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        try
+        {
+            _busy = true;
+            _serverErrors.Clear();
+            WellBoreBatchRestoreResponse response = await Api.ClientWellBore.BatchRestoreWellBoresAsync(new WellBoreBatchRestoreRequest
+            {
+                ConflictPolicy = _restorePolicy,
+                CatalogPolicy = _catalogRestorePolicy,
+                Document = _restoreDocument
+            });
+            Snackbar.Add($"Restore completed: {response.CreatedCount} WellBore(s) created, {response.ReplacedCount} replaced; " +
+                         $"{response.CreatedCatalogDefinitionCount} definition(s) and {response.CreatedCatalogOptionCount} option(s) created.",
+                Severity.Success);
+            await LoadWellBoresAsync();
+        }
+        catch (ApiException<WellBoreBatchErrorEnvelope> ex)
+        {
+            logger.LogError(ex, "WellBore batch restore was rejected: {Error}", ex.Result?.Error);
+            ShowApiErrors(ex.Result, "WellBore restore was rejected.", _serverErrors);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to restore WellBores");
+            _serverErrors.Add("Unable to restore WellBores.");
+            Snackbar.Add("Unable to restore WellBores.", Severity.Error);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void ShowApiErrors(WellBoreBatchErrorEnvelope? envelope, string fallback, List<string> target)
+    {
+        target.Clear();
+        if (envelope?.Errors != null)
+        {
+            target.AddRange(envelope.Errors.Select(error =>
+                error.PositionIndex == null
+                    ? $"{error.Property}: {error.Message}"
+                    : $"Position {error.PositionIndex}: {error.Property}: {error.Message}"));
+        }
+        if (target.Count == 0)
+        {
+            target.Add(envelope?.Message ?? fallback);
+        }
+        Snackbar.Add(envelope?.Message ?? fallback, Severity.Error);
+    }
+
+    private static System.Text.Json.JsonSerializerOptions CreateJsonOptions(bool writeIndented)
+    {
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = writeIndented,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+        return options;
+    }
+
+    private Func<WellBore, bool> WellFilter => wellBore =>
+        string.IsNullOrWhiteSpace(_wellSearch) ||
+        $"{wellBore.Name} {wellBore.Description} {wellBore.MetaInfo?.ID}".Contains(_wellSearch, StringComparison.OrdinalIgnoreCase);
+
+    private Func<OSDC.Drilling.WellBore.ModelShared.WellBore, bool> RestoreWellFilter => wellBore =>
+        string.IsNullOrWhiteSpace(_restoreSearch) ||
+        $"{wellBore.Name} {wellBore.Description} {wellBore.MetaInfo?.ID}".Contains(_restoreSearch, StringComparison.OrdinalIgnoreCase);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_downloadModule != null)
+        {
+            try
+            {
+                await _downloadModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

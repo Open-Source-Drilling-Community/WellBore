@@ -8,7 +8,7 @@ Generated outputs:
 - `Service/wwwroot/json-schema/WellBoreMergedModel.json`
 - `ModelSharedOut/json-schemas/WellBoreFullName.json` from the Service Debug build
 
-Do not hand-edit generated outputs. From the repository root, regenerate after REST or namespace changes:
+The generated contract includes WellBore batch export/restore, identity/feature catalogues, and inline assignment collections. Do not hand-edit generated outputs. From the repository root, regenerate after REST or model changes:
 
 ```powershell
 dotnet build Service/Service.csproj --configuration Debug

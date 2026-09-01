@@ -121,6 +121,68 @@
     }
 </MudGrid>
 
+<MudExpansionPanels MultiExpansion="true" Class="mt-4">
+    <MudExpansionPanel Text="Identities">
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudSelect T="Guid?" Label="Identity" @bind-Value="_selectedIdentityId">
+                    @foreach (WellBoreIdentity identity in _wellBoreIdentities.Where(item => item.MetaInfo?.ID != null))
+                    {
+                        <MudSelectItem T="Guid?" Value="identity.MetaInfo!.ID">@identity.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="2" Class="d-flex align-center">
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="AssignIdentity">Assign</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                @foreach (WellBoreIdentityAssignment assignment in _wellBoreIdentityAssignments)
+                {
+                    <MudGrid Class="mb-2" @key="assignment.ID">
+                        <MudItem xs="12" md="4"><MudTextField Value="@GetIdentityName(assignment)" ReadOnly="true" /></MudItem>
+                        <MudItem xs="10" md="7"><MudTextField @bind-Value="assignment.Value" Label="Value" Required="true" /></MudItem>
+                        <MudItem xs="2" md="1"><MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => _wellBoreIdentityAssignments.Remove(assignment))" /></MudItem>
+                    </MudGrid>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="Features">
+        <MudGrid>
+            <MudItem xs="12" md="4">
+                <MudSelect T="Guid?" Label="Category" Value="_selectedFeatureCategoryId" ValueChanged="SelectFeatureCategory">
+                    @foreach (WellBoreFeatureCategory category in _wellBoreFeatureCategories.Where(item => item.MetaInfo?.ID != null))
+                    {
+                        <MudSelectItem T="Guid?" Value="category.MetaInfo!.ID">@category.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="4">
+                <MudSelect T="Guid?" Label="Option" @bind-Value="_selectedFeatureOptionId">
+                    @foreach (WellBoreFeatureOption option in SelectedFeatureOptions())
+                    {
+                        <MudSelectItem T="Guid?" Value="option.ID">@option.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" md="2" Class="d-flex align-center">
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="AssignFeature">Assign</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                @foreach (WellBoreFeatureAssignment assignment in _wellBoreFeatureAssignments)
+                {
+                    <MudGrid Class="mb-2" @key="assignment.ID">
+                        <MudItem xs="12" md="4"><MudTextField Value="@GetFeatureName(assignment)" ReadOnly="true" /></MudItem>
+                        <MudItem xs="5" md="3"><MudDatePicker Label="From" Date="@ToDateTime(assignment.FromDate)" DateChanged="@((DateTime? value) => assignment.FromDate = ToDateTimeOffset(value))" Disabled="@(!FeatureHasValidityPeriod(assignment))" Clearable="true" /></MudItem>
+                        <MudItem xs="5" md="3"><MudDatePicker Label="To" Date="@ToDateTime(assignment.ToDate)" DateChanged="@((DateTime? value) => assignment.ToDate = ToDateTimeOffset(value))" Disabled="@(!FeatureHasValidityPeriod(assignment))" Clearable="true" /></MudItem>
+                        <MudItem xs="2" md="1"><MudIconButton Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => _wellBoreFeatureAssignments.Remove(assignment))" /></MudItem>
+                    </MudGrid>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
 @code {
     [CascadingParameter]
     private MudUnitAndReferenceChoiceTag? Parent { get; set; }
@@ -184,6 +246,13 @@
     private double? _sidetrackDepth = null;
     private double? _sidetrackDepthAccuracy = null;
     private SidetrackType _sidetrackType = SidetrackType.Undefined;
+    private List<WellBoreIdentity> _wellBoreIdentities = [];
+    private List<WellBoreIdentityAssignment> _wellBoreIdentityAssignments = [];
+    private Guid? _selectedIdentityId;
+    private List<WellBoreFeatureCategory> _wellBoreFeatureCategories = [];
+    private List<WellBoreFeatureAssignment> _wellBoreFeatureAssignments = [];
+    private Guid? _selectedFeatureCategoryId;
+    private Guid? _selectedFeatureOptionId;
 
     private async Task ProcessSelectedClusterAsync()
     {
@@ -288,10 +357,15 @@
             Parent.Add(this);
             ManageUnits();
 
+            _wellBoreIdentities = await LoadWellBoreIdentitiesAsync();
+            _wellBoreFeatureCategories = await LoadWellBoreFeatureCategoriesAsync();
+
             if (CurrentWellBore != null && CurrentWellBore.MetaInfo != null)
             {
                 name = CurrentWellBore.Name;
                 descr = CurrentWellBore.Description;
+                _wellBoreIdentityAssignments = CloneIdentityAssignments(CurrentWellBore.WellBoreIdentityAssignments);
+                _wellBoreFeatureAssignments = CloneFeatureAssignments(CurrentWellBore.WellBoreFeatureAssignments);
                 _isSidetrack = CurrentWellBore.IsSidetrack;
                 if (_isSidetrack && WellBores != null && CurrentWellBore.ParentWellBoreID != null && CurrentWellBore.ParentWellBoreID != Guid.Empty)
                 {
@@ -373,7 +447,10 @@
 
     private async Task Update()
     {
-
+        if (!ValidateCatalogAssignments())
+        {
+            return;
+        }
         try
         {
             if (CurrentWellBore != null && CurrentWellBore.MetaInfo != null)
@@ -386,6 +463,9 @@
                     CreationDate = CurrentWellBore.CreationDate,
                     LastModificationDate = DateTimeOffset.UtcNow,
                     IsSidetrack = _isSidetrack,
+                    RigID = CurrentWellBore.RigID,
+                    WellBoreIdentityAssignments = CloneIdentityAssignments(_wellBoreIdentityAssignments),
+                    WellBoreFeatureAssignments = CloneFeatureAssignments(_wellBoreFeatureAssignments),
                 };
                 if (_selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID != Guid.Empty)
                 {
@@ -425,6 +505,111 @@
     {
         OnUpdate?.Invoke();
     }
+
+    private void AssignIdentity()
+    {
+        if (_selectedIdentityId is not Guid identityId || identityId == Guid.Empty ||
+            _wellBoreIdentityAssignments.Any(item => item.IdentityID == identityId)) return;
+        _wellBoreIdentityAssignments.Add(new WellBoreIdentityAssignment { ID = Guid.NewGuid(), IdentityID = identityId });
+    }
+
+    private async Task<List<WellBoreIdentity>> LoadWellBoreIdentitiesAsync()
+    {
+        try
+        {
+            return ((IEnumerable<WellBoreIdentity>)await Api.ClientWellBore.GetAllWellBoreIdentityAsync())
+                .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+        catch (ApiException exception) when (exception.StatusCode == 404)
+        {
+            logger.LogWarning("The WellBore service does not yet expose the identity catalog endpoint");
+            Snackbar.Add("WellBore identities will be available after the service is upgraded", Severity.Info);
+            return [];
+        }
+    }
+
+    private async Task<List<WellBoreFeatureCategory>> LoadWellBoreFeatureCategoriesAsync()
+    {
+        try
+        {
+            return ((IEnumerable<WellBoreFeatureCategory>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryAsync())
+                .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+        catch (ApiException exception) when (exception.StatusCode == 404)
+        {
+            logger.LogWarning("The WellBore service does not yet expose the feature catalog endpoint");
+            Snackbar.Add("WellBore features will be available after the service is upgraded", Severity.Info);
+            return [];
+        }
+    }
+
+    private string GetIdentityName(WellBoreIdentityAssignment assignment) =>
+        _wellBoreIdentities.FirstOrDefault(item => item.MetaInfo?.ID == assignment.IdentityID)?.Name ?? "Unknown identity";
+
+    private void SelectFeatureCategory(Guid? categoryId)
+    {
+        _selectedFeatureCategoryId = categoryId;
+        _selectedFeatureOptionId = null;
+    }
+
+    private IEnumerable<WellBoreFeatureOption> SelectedFeatureOptions() =>
+        _wellBoreFeatureCategories.FirstOrDefault(item => item.MetaInfo?.ID == _selectedFeatureCategoryId)?.Options ?? [];
+
+    private void AssignFeature()
+    {
+        if (_selectedFeatureCategoryId is not Guid categoryId || _selectedFeatureOptionId is not Guid optionId) return;
+        WellBoreFeatureCategory? category = _wellBoreFeatureCategories.FirstOrDefault(item => item.MetaInfo?.ID == categoryId);
+        if (category == null || category.Options?.Any(item => item.ID == optionId) != true) return;
+        if (category.IsExclusive && !category.HasValidityPeriod &&
+            _wellBoreFeatureAssignments.Any(item => item.FeatureCategoryID == categoryId))
+        {
+            Snackbar.Add($"Only one '{category.Name}' assignment is allowed at a time", Severity.Warning);
+            return;
+        }
+        _wellBoreFeatureAssignments.Add(new WellBoreFeatureAssignment
+        {
+            ID = Guid.NewGuid(), FeatureCategoryID = categoryId, FeatureOptionID = optionId
+        });
+    }
+
+    private string GetFeatureName(WellBoreFeatureAssignment assignment)
+    {
+        WellBoreFeatureCategory? category = _wellBoreFeatureCategories.FirstOrDefault(item => item.MetaInfo?.ID == assignment.FeatureCategoryID);
+        WellBoreFeatureOption? option = category?.Options?.FirstOrDefault(item => item.ID == assignment.FeatureOptionID);
+        return $"{category?.Name ?? "Unknown category"}: {option?.Name ?? "Unknown option"}";
+    }
+
+    private bool FeatureHasValidityPeriod(WellBoreFeatureAssignment assignment) =>
+        _wellBoreFeatureCategories.FirstOrDefault(item => item.MetaInfo?.ID == assignment.FeatureCategoryID)?.HasValidityPeriod == true;
+
+    private bool ValidateCatalogAssignments()
+    {
+        if (_wellBoreIdentityAssignments.Any(item => item.IdentityID == null || string.IsNullOrWhiteSpace(item.Value)))
+        {
+            Snackbar.Add("Every identity assignment requires an identity and value", Severity.Warning);
+            return false;
+        }
+        if (_wellBoreFeatureAssignments.Any(item => item.FeatureCategoryID == null || item.FeatureOptionID == null ||
+            (item.FromDate != null && item.ToDate != null && item.FromDate > item.ToDate)))
+        {
+            Snackbar.Add("Feature assignments require a valid category, option, and date range", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    private static List<WellBoreIdentityAssignment> CloneIdentityAssignments(IEnumerable<WellBoreIdentityAssignment>? values) =>
+        values?.Select(item => new WellBoreIdentityAssignment { ID = item.ID, IdentityID = item.IdentityID, Value = item.Value }).ToList() ?? [];
+
+    private static List<WellBoreFeatureAssignment> CloneFeatureAssignments(IEnumerable<WellBoreFeatureAssignment>? values) =>
+        values?.Select(item => new WellBoreFeatureAssignment
+        {
+            ID = item.ID, FeatureCategoryID = item.FeatureCategoryID, FeatureOptionID = item.FeatureOptionID,
+            FromDate = item.FromDate, ToDate = item.ToDate
+        }).ToList() ?? [];
+
+    private static DateTime? ToDateTime(DateTimeOffset? value) => value?.UtcDateTime;
+    private static DateTimeOffset? ToDateTimeOffset(DateTime? value) => value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));
 
     //Quick filter - filter gobally across multiple columns with the same input
     private Func<WellBore, bool> _wellBoreFilter => x =>

@@ -8,13 +8,23 @@ Domain data model for the WellBore solution. This project defines the core types
 - Nullable reference types: enabled
 
 ### Key Types
-- `WellBore`: Main entity with identity (`MetaInfo.ID`), descriptive fields, parent relationships for sidetracks, and an optional `TieInPointAlongHoleDepth` with Gaussian uncertainty and DWIS semantic annotations.
+- `WellBore`: Main entity with identity (`MetaInfo.ID`), descriptive fields, parent relationships for sidetracks, an optional `TieInPointAlongHoleDepth`, and identity/feature assignment collections.
+- `WellBoreIdentity` and `WellBoreIdentityAssignment`: User-managed identity definitions and values assigned to a wellbore.
+- `WellBoreFeatureCategory`, `WellBoreFeatureOption`, and `WellBoreFeatureAssignment`: User-managed classifications, options, exclusivity/validity rules, and assignments.
 - `SidetrackType`: Enum classifying sidetrack wells (e.g., Technical, Production, Appraisal, Lateral).
 - `UsageStatisticsWellBore`: Lightweight helper for usage telemetry (per-endpoint counters aggregated per day, persisted to `home/history.json`).
+- `WellBoreBatchExport`: Versioned logical backup/restore requests, documents, policies, errors, responses, and catalogue mappings.
 
 Source files:
 - `WellBore.cs`
+- `WellBoreIdentity.cs`, `WellBoreIdentityAssignment.cs`
+- `WellBoreFeatureCategory.cs`, `WellBoreFeatureOption.cs`, `WellBoreFeatureAssignment.cs`
 - `UsageStatisticsWellBore.cs`
+- `WellBoreBatchExport.cs`
+
+## Backup and restore contracts
+
+`WellBoreBatchExportRequest` exports `All` WellBores or a non-empty ordered `Selected` UUID list. The schema-version-1 document uses format identifier `OSDC.Drilling.WellBore.BatchExport` and contains complete WellBores plus only their referenced identity and feature-catalogue dependencies. Restore supports `FailIfExists` or `ReplaceExisting` and either maps existing compatible catalogues or creates missing definitions and options.
 
 ## Dependencies
 Project file: `Model/Model.csproj`
@@ -67,6 +77,7 @@ Basic defaults validated by tests (see `ModelTest`):
 - Most reference properties default to `null`.
 - `IsSidetrack` defaults to `false`.
 - `SidetrackType` defaults to `Undefined`.
+- Identity and feature assignment collections are optional for backward compatibility with stored pre-version-1 wellbores.
 
 ## Integration In The Solution
 This model is the contract shared across projects:

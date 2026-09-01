@@ -17,13 +17,29 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreMetaInfo"] = "well_bore_get_all_meta_info",
         ["GetWellBoreById"] = "well_bore_get_by_id",
         ["GetAllWellBore"] = "well_bore_get_all",
+        ["BatchExportWellBores"] = "well_bore_batch_export",
+        ["BatchRestoreWellBores"] = "well_bore_batch_restore",
         ["GetAllWellBoreByWellID"] = "well_bore_get_all_by_well_id",
         ["GetAllWellBoreByRigId"] = "well_bore_get_all_by_rig_id",
         ["GetAllWellBoreByParentWellBoreId"] = "well_bore_get_all_by_parent_id",
         ["GetAllSidetrackedWellBore"] = "well_bore_get_all_sidetracked",
         ["PostWellBore"] = "well_bore_create",
         ["PutWellBoreById"] = "well_bore_update_by_id",
-        ["DeleteWellBoreById"] = "well_bore_delete_by_id"
+        ["DeleteWellBoreById"] = "well_bore_delete_by_id",
+        ["GetAllWellBoreIdentityId"] = "well_bore_identity_get_all_ids",
+        ["GetAllWellBoreIdentityMetaInfo"] = "well_bore_identity_get_all_meta_info",
+        ["GetWellBoreIdentityById"] = "well_bore_identity_get_by_id",
+        ["GetAllWellBoreIdentity"] = "well_bore_identity_get_all",
+        ["PostWellBoreIdentity"] = "well_bore_identity_create",
+        ["PutWellBoreIdentityById"] = "well_bore_identity_update_by_id",
+        ["DeleteWellBoreIdentityById"] = "well_bore_identity_delete_by_id",
+        ["GetAllWellBoreFeatureCategoryId"] = "well_bore_feature_category_get_all_ids",
+        ["GetAllWellBoreFeatureCategoryMetaInfo"] = "well_bore_feature_category_get_all_meta_info",
+        ["GetWellBoreFeatureCategoryById"] = "well_bore_feature_category_get_by_id",
+        ["GetAllWellBoreFeatureCategory"] = "well_bore_feature_category_get_all",
+        ["PostWellBoreFeatureCategory"] = "well_bore_feature_category_create",
+        ["PutWellBoreFeatureCategoryById"] = "well_bore_feature_category_update_by_id",
+        ["DeleteWellBoreFeatureCategoryById"] = "well_bore_feature_category_delete_by_id"
     };
 
     private ServiceProvider _provider = null!;
@@ -46,7 +62,8 @@ public sealed class McpToolRegistrationTests
     [Test]
     public void Every_non_statistics_controller_endpoint_has_a_registered_tool()
     {
-        var endpoints = typeof(WellBoreController).GetMethods()
+        var endpoints = new[] { typeof(WellBoreController), typeof(WellBoreIdentityController), typeof(WellBoreFeatureCategoryController) }
+            .SelectMany(type => type.GetMethods())
             .Where(method => method.GetCustomAttributes(typeof(HttpMethodAttribute), true).Length > 0)
             .Select(method => method.Name);
         Assert.That(endpoints, Is.EquivalentTo(EndpointToolMap.Keys));
@@ -97,7 +114,8 @@ public sealed class McpToolRegistrationTests
         {
             "MetaInfo", "Name", "Description", "CreationDate", "LastModificationDate",
             "WellID", "RigID", "IsSidetrack", "ParentWellBoreID",
-            "TieInPointAlongHoleDepth", "SidetrackType"
+            "TieInPointAlongHoleDepth", "SidetrackType",
+            "WellBoreIdentityAssignments", "WellBoreFeatureAssignments"
         }));
         Assert.That(wellBore["additionalProperties"]?.GetValue<bool>(), Is.False);
 
@@ -149,6 +167,25 @@ public sealed class McpToolRegistrationTests
     {
         JsonObject? response = await _tools["well_bore_create"].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public void Batch_tools_publish_strict_versioned_schemas()
+    {
+        JsonObject exportRoot = RequireObject(_tools["well_bore_batch_export"].InputSchema);
+        JsonObject exportRequest = Property(exportRoot, "request");
+        Assert.That(RequiredNames(exportRequest), Is.EquivalentTo(new[] { "Scope" }));
+        Assert.That(Property(exportRequest, "WellBoreIDs")["uniqueItems"]?.GetValue<bool>(), Is.True);
+
+        JsonObject restoreRoot = RequireObject(_tools["well_bore_batch_restore"].InputSchema);
+        JsonObject restoreRequest = Property(restoreRoot, "request");
+        Assert.That(RequiredNames(restoreRequest),
+            Is.EquivalentTo(new[] { "ConflictPolicy", "CatalogPolicy", "Document" }));
+        JsonObject document = Property(restoreRequest, "Document");
+        Assert.That(Property(document, "FormatIdentifier")["const"]?.GetValue<string>(),
+            Is.EqualTo("OSDC.Drilling.WellBore.BatchExport"));
+        Assert.That(Property(document, "SchemaVersion")["const"]?.GetValue<int>(), Is.EqualTo(1));
+        Assert.That(Property(document, "WellBores")["minItems"]?.GetValue<int>(), Is.EqualTo(1));
     }
 
     private static JsonObject RequireObject(JsonNode? node)

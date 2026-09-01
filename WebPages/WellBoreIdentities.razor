@@ -1,0 +1,250 @@
+@page "/WellBoreIdentities"
+@inject ILogger<WellBoreIdentities> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IWellBoreAPIUtils Api
+
+@if (identities == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudText Class="mt-4 mb-4" Typo="Typo.h6">WellBore Identities</MudText>
+    <MudContainer Class="d-flex flex-row pa-0 mb-3">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="AddIdentity">Add</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedIdentityIds.Any())" OnClick="DeleteSelectedIdentitiesAsync">Delete</MudButton>
+    </MudContainer>
+
+    <MudGrid Class="mt-2">
+        <MudItem xs="2" md="1" Class="d-flex align-center">
+            <MudCheckBox T="bool" Value="@AreAllIdentitiesSelected()" ValueChanged="@SetAllIdentitiesSelected" />
+        </MudItem>
+        <MudItem xs="10" md="4" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Name</MudText>
+        </MudItem>
+        <MudItem xs="10" md="6" />
+        <MudItem xs="2" md="1" />
+    </MudGrid>
+
+    @foreach (WellBoreIdentity identity in identities)
+    {
+        <MudGrid Class="mt-2" @key="identity.MetaInfo?.ID">
+            <MudItem xs="2" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" Value="@IsIdentitySelected(identity)" ValueChanged="@((bool selected) => SetIdentitySelected(identity, selected))" />
+            </MudItem>
+            <MudItem xs="10" md="4">
+                <MudTextField @bind-Value="identity.Name" Required="true" />
+            </MudItem>
+            <MudItem xs="10" md="6" />
+            <MudItem xs="2" md="1" Class="d-flex align-center justify-end">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => DeleteIdentityAsync(identity))" />
+            </MudItem>
+        </MudGrid>
+    }
+
+    <MudContainer Class="d-flex flex-row pa-0 mt-4">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveAsync">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadDataAsync">Reload</MudButton>
+    </MudContainer>
+}
+
+@code {
+    private List<WellBoreIdentity>? identities;
+    private readonly HashSet<Guid> _selectedIdentityIds = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            identities = (List<WellBoreIdentity>)await Api.ClientWellBore.GetAllWellBoreIdentityAsync();
+            identities = identities
+                .Where(identity => identity?.MetaInfo?.ID != null)
+                .OrderBy(identity => identity.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _selectedIdentityIds.Clear();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load wellbore identities");
+            Snackbar.Add("Impossible to load wellbore identities", Severity.Error);
+            identities = [];
+        }
+    }
+
+    private void AddIdentity()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        identities ??= [];
+        identities.Add(new WellBoreIdentity
+        {
+            MetaInfo = new MetaInfo { ID = Guid.NewGuid(), HttpHostName = Api.HostNameWellBore, HttpHostBasePath = Api.HostBasePathWellBore, HttpEndPoint = "WellBoreIdentity/" },
+            Name = "new wellbore identity",
+            CreationDate = now,
+            LastModificationDate = now
+        });
+    }
+
+    private async Task SaveAsync()
+    {
+        if (identities == null || !TryValidateIdentities())
+        {
+            return;
+        }
+
+        try
+        {
+            List<Guid> existingIds = ((IEnumerable<Guid>)await Api.ClientWellBore.GetAllWellBoreIdentityIdAsync()).ToList();
+            foreach (WellBoreIdentity identity in identities)
+            {
+                EnsureMetaInfo(identity);
+                if (existingIds.Contains(identity.MetaInfo!.ID))
+                {
+                    await Api.ClientWellBore.PutWellBoreIdentityByIdAsync(identity.MetaInfo.ID, identity.LastModificationDate ?? throw new InvalidOperationException("The stored identity has no concurrency timestamp."), identity);
+                }
+                else
+                {
+                    await Api.ClientWellBore.PostWellBoreIdentityAsync(identity);
+                }
+            }
+
+            Snackbar.Add("Saved wellbore identities", Severity.Success);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to save wellbore identities");
+            Snackbar.Add("Impossible to save wellbore identities", Severity.Error);
+        }
+    }
+
+    private async Task DeleteSelectedIdentitiesAsync()
+    {
+        if (identities == null)
+        {
+            return;
+        }
+
+        foreach (WellBoreIdentity identity in identities.Where(IsIdentitySelected).ToList())
+        {
+            await DeleteIdentityAsync(identity);
+        }
+    }
+
+    private async Task DeleteIdentityAsync(WellBoreIdentity identity)
+    {
+        Guid? id = identity.MetaInfo?.ID;
+        if (identities == null || id == null || id == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            if (await ConfirmDeletionAsync(identity))
+            {
+                try
+                {
+                    await Api.ClientWellBore.DeleteWellBoreIdentityByIdAsync(id.Value);
+                }
+                catch (ApiException ex) when (ex.StatusCode == 404)
+                {
+                    // Locally added unsaved item.
+                }
+                identities.Remove(identity);
+                _selectedIdentityIds.Remove(id.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete wellbore identity");
+            Snackbar.Add("Impossible to delete wellbore identity", Severity.Error);
+        }
+    }
+
+    private async Task<bool> ConfirmDeletionAsync(WellBoreIdentity identity)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Delete",
+            $"Delete wellbore identity '{identity.Name ?? identity.MetaInfo?.ID.ToString()}'?",
+            yesText: "Delete",
+            cancelText: "Cancel",
+            options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall });
+        return result == true;
+    }
+
+    private bool TryValidateIdentities()
+    {
+        if (identities == null)
+        {
+            return false;
+        }
+        if (identities.Any(identity => string.IsNullOrWhiteSpace(identity.Name)))
+        {
+            Snackbar.Add("WellBore identity names cannot be empty", Severity.Warning);
+            return false;
+        }
+        if (identities.GroupBy(identity => identity.Name!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
+        {
+            Snackbar.Add("WellBore identity names must be unique", Severity.Warning);
+            return false;
+        }
+        return true;
+    }
+
+    private static void EnsureMetaInfo(WellBoreIdentity identity)
+    {
+        if (identity.MetaInfo == null || identity.MetaInfo.ID == Guid.Empty)
+        {
+            identity.MetaInfo = new MetaInfo { ID = Guid.NewGuid() };
+        }
+    }
+
+    private bool IsIdentitySelected(WellBoreIdentity identity)
+    {
+        return identity.MetaInfo?.ID is Guid id && _selectedIdentityIds.Contains(id);
+    }
+
+    private void SetIdentitySelected(WellBoreIdentity identity, bool selected)
+    {
+        if (identity.MetaInfo?.ID is not Guid id || id == Guid.Empty)
+        {
+            return;
+        }
+
+        if (selected)
+        {
+            _selectedIdentityIds.Add(id);
+        }
+        else
+        {
+            _selectedIdentityIds.Remove(id);
+        }
+    }
+
+    private bool AreAllIdentitiesSelected()
+    {
+        return identities?.Count > 0 && identities.All(IsIdentitySelected);
+    }
+
+    private void SetAllIdentitiesSelected(bool selected)
+    {
+        _selectedIdentityIds.Clear();
+        if (selected && identities != null)
+        {
+            foreach (WellBoreIdentity identity in identities)
+            {
+                if (identity.MetaInfo?.ID is Guid id && id != Guid.Empty)
+                {
+                    _selectedIdentityIds.Add(id);
+                }
+            }
+        }
+    }
+}
+

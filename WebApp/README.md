@@ -49,6 +49,9 @@ dotnet run --project WebApp/WebApp.csproj
 - Navigate to `/WellBore/webapp/WellBore` to access the main page.
 - Select unit system and depth/position references via the unit/reference selector (from OSDC UnitConversion components).
 - View, add, edit, and delete WellBores; associate with Field/Cluster/Well where applicable.
+- Assign identity values and feature options while editing a wellbore.
+- Use the **WellBore Identities** and **WellBore Features** navigation entries to manage the user-extensible catalogues.
+- Use **Backup and Restore** to download a versioned logical JSON backup of all or selected WellBores and atomically restore a validated document.
 
 ## Docker
 Build the image

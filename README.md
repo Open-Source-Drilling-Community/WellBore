@@ -4,9 +4,9 @@ End-to-end OSDC WellBore solution consisting of a backend microservice (REST API
 
 ## Projects
 - Model (`Model/`)
-  - Shared C# domain types (e.g., `WellBore`, `SidetrackType`, usage stats helper).
+  - Shared C# domain types for wellbores, identity assignments, and feature assignments/catalogues.
 - Service (`Service/`)
-  - ASP.NET Core API exposing CRUD endpoints for `WellBore`; persists to SQLite in `home/WellBore.db` and serves Swagger at `/WellBore/api/swagger`.
+  - ASP.NET Core API exposing CRUD for wellbores and their identity/feature catalogues; persists to SQLite in `home/WellBore.db` and serves Swagger at `/WellBore/api/swagger`.
 - ModelSharedOut (`ModelSharedOut/`)
   - Generates a merged OpenAPI bundle and a typed C# client for consumers of the Service.
 - WebApp (`WebApp/`)
@@ -127,6 +127,10 @@ Swagger
 
 The OSDC charts are `Service/charts/osdcdrillingwellboreservice` and `WebApp/charts/osdcdrillingwellborewebappclient`. The service chart keeps the existing `wellbore-claim`, mounts it at `/home`, and uses a `Recreate` strategy so two SQLite writers cannot overlap. Follow [deployment/identity-cutover.md](deployment/identity-cutover.md) for the staged dev, prod, and awe migration; do not replace or delete the PVC during the identity change.
 
+Schema version 1 adds identity and feature-catalogue tables without rebuilding or rewriting `WellBoreTable`. The upgrade is transactional, preserves existing rows, and refuses unknown or newer schemas without changing them. Back up the SQLite database/PVC before deploying and keep exactly one service writer during the upgrade.
+
+The **Backup and Restore** page creates portable, versioned JSON backups of all WellBores or an ordered selection. Each document contains complete WellBore records and only their referenced identity/feature definitions. Restore validates the entire document and commits catalogue mapping/creation, reference rewriting, and every WellBore insert or replacement in one transaction.
+
 ## Security/Confidentiality
 - Data persist in clear text within a single SQLite DB inside the Service container: `home/WellBore.db`.
 - No authentication/authorization is included by default. If protection is required, deploy behind an ingress with auth and secure persistence.
@@ -147,7 +151,8 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## Current implementation
 
-- The service exposes all 11 non-statistics WellBore REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded.
+- The service exposes the 13 core WellBore (including batch export/restore) and 14 identity/feature-catalogue REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded.
+- Wellbore editing includes inline identity and feature assignments. Separate navigation pages let users add, edit, and safely remove catalogue definitions; referenced definitions and options cannot be removed.
 - Root namespaces, generated clients, NuGet packaging, Docker repositories, and Helm chart identities use `OSDC.Drilling.WellBore`.
 - MCP is available over streamable HTTP at `/wellbore/api/mcp` and WebSocket at `/wellbore/api/mcp/ws`. Optional external MCP-hub registration is disabled by default.
 - The WebApp uses the current embedded WebPages packages for Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), Geodetic Datum (1.0.7), and Well (1.0.11).

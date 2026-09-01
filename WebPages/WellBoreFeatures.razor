@@ -1,0 +1,395 @@
+@page "/WellBoreFeatures"
+@inject ILogger<WellBoreFeatures> logger
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject IWellBoreAPIUtils Api
+
+@if (categories == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudText Class="mt-4 mb-4" Typo="Typo.h6">WellBore Features</MudText>
+    <MudContainer Class="d-flex flex-row pa-0 mb-3">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="AddCategory">Add Category</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="@(!_selectedCategoryIds.Any())" OnClick="DeleteSelectedCategoriesAsync">Delete</MudButton>
+    </MudContainer>
+
+    <MudGrid Class="mt-2">
+        <MudItem xs="2" md="1" Class="d-flex align-center">
+            <MudCheckBox T="bool" Value="@AreAllCategoriesSelected()" ValueChanged="@SetAllCategoriesSelected" />
+        </MudItem>
+        <MudItem xs="10" md="3" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Category</MudText>
+        </MudItem>
+        <MudItem xs="6" md="1" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Exclusive</MudText>
+        </MudItem>
+        <MudItem xs="6" md="1" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Dated</MudText>
+        </MudItem>
+        <MudItem xs="10" md="5" Class="d-flex align-center">
+            <MudText Typo="Typo.subtitle2">Options</MudText>
+        </MudItem>
+        <MudItem xs="2" md="1" />
+    </MudGrid>
+
+    @foreach (WellBoreFeatureCategory category in categories)
+    {
+        <MudGrid Class="mt-2" @key="category.MetaInfo?.ID">
+            <MudItem xs="2" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" Value="@IsCategorySelected(category)" ValueChanged="@((bool selected) => SetCategorySelected(category, selected))" />
+            </MudItem>
+            <MudItem xs="10" md="3">
+                <MudTextField @bind-Value="category.Name" Required="true" />
+            </MudItem>
+            <MudItem xs="6" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" @bind-Value="category.IsExclusive" />
+            </MudItem>
+            <MudItem xs="6" md="1" Class="d-flex align-center">
+                <MudCheckBox T="bool" @bind-Value="category.HasValidityPeriod" />
+            </MudItem>
+            <MudItem xs="10" md="5">
+                <MudContainer Class="d-flex flex-row align-center pa-0 mb-1">
+                    <MudCheckBox T="bool" Value="@AreAllOptionsSelected(category)" ValueChanged="@((bool selected) => SetAllOptionsSelected(category, selected))" />
+                    <MudButton Class="ms-1 me-1" Variant="Variant.Outlined" Color="Color.Success" Size="Size.Small" OnClick="@(() => AddOption(category))">Add Option</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" Disabled="@(!HasSelectedOptions(category))" OnClick="@(() => DeleteSelectedOptions(category))">Delete</MudButton>
+                </MudContainer>
+                @foreach (WellBoreFeatureOption option in category.Options ?? [])
+                {
+                    <MudGrid Class="mb-1" @key="option.ID">
+                        <MudItem xs="1" Class="d-flex align-center">
+                            <MudCheckBox T="bool" Value="@IsOptionSelected(option)" ValueChanged="@((bool selected) => SetOptionSelected(option, selected))" />
+                        </MudItem>
+                        <MudItem xs="11">
+                            <MudTextField @bind-Value="option.Name" Required="true" />
+                        </MudItem>
+                    </MudGrid>
+                }
+            </MudItem>
+            <MudItem xs="2" md="1" Class="d-flex align-center justify-end">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => DeleteCategoryAsync(category))" />
+            </MudItem>
+        </MudGrid>
+    }
+
+    <MudContainer Class="d-flex flex-row pa-0 mt-4">
+        <MudButton Class="me-1" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveAsync">Save</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadDataAsync">Reload</MudButton>
+    </MudContainer>
+}
+
+@code {
+    private List<WellBoreFeatureCategory>? categories;
+    private readonly HashSet<Guid> _selectedCategoryIds = [];
+    private readonly HashSet<Guid> _selectedOptionIds = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            categories = (List<WellBoreFeatureCategory>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryAsync();
+            categories = categories
+                .Where(category => category?.MetaInfo?.ID != null)
+                .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _selectedCategoryIds.Clear();
+            _selectedOptionIds.Clear();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to load wellbore feature categories");
+            Snackbar.Add("Impossible to load wellbore feature categories", Severity.Error);
+            categories = [];
+        }
+    }
+
+    private void AddCategory()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        categories ??= [];
+        categories.Add(new WellBoreFeatureCategory
+        {
+            MetaInfo = new MetaInfo { ID = Guid.NewGuid(), HttpHostName = Api.HostNameWellBore, HttpHostBasePath = Api.HostBasePathWellBore, HttpEndPoint = "WellBoreFeatureCategory/" },
+            Name = "new wellbore feature category",
+            Options = [new WellBoreFeatureOption { ID = Guid.NewGuid(), Name = "new option" }],
+            CreationDate = now,
+            LastModificationDate = now
+        });
+    }
+
+    private void AddOption(WellBoreFeatureCategory category)
+    {
+        category.Options ??= [];
+        category.Options.Add(new WellBoreFeatureOption { ID = Guid.NewGuid(), Name = "new option" });
+    }
+
+    private void DeleteSelectedOptions(WellBoreFeatureCategory category)
+    {
+        if (category.Options == null)
+        {
+            return;
+        }
+
+        category.Options = category.Options
+            .Where(option => option.ID == Guid.Empty || !_selectedOptionIds.Contains(option.ID))
+            .ToList();
+        TrimSelectedOptionIds();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (categories == null || !TryValidateCategories())
+        {
+            return;
+        }
+
+        try
+        {
+            List<Guid> existingIds = ((IEnumerable<Guid>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryIdAsync()).ToList();
+            foreach (WellBoreFeatureCategory category in categories)
+            {
+                EnsureCategory(category);
+                if (existingIds.Contains(category.MetaInfo!.ID))
+                {
+                    await Api.ClientWellBore.PutWellBoreFeatureCategoryByIdAsync(category.MetaInfo.ID, category.LastModificationDate ?? throw new InvalidOperationException("The stored category has no concurrency timestamp."), category);
+                }
+                else
+                {
+                    await Api.ClientWellBore.PostWellBoreFeatureCategoryAsync(category);
+                }
+            }
+
+            Snackbar.Add("Saved wellbore features", Severity.Success);
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to save wellbore features");
+            Snackbar.Add("Impossible to save wellbore features", Severity.Error);
+        }
+    }
+
+    private async Task DeleteSelectedCategoriesAsync()
+    {
+        if (categories == null)
+        {
+            return;
+        }
+
+        foreach (WellBoreFeatureCategory category in categories.Where(IsCategorySelected).ToList())
+        {
+            await DeleteCategoryAsync(category);
+        }
+    }
+
+    private async Task DeleteCategoryAsync(WellBoreFeatureCategory category)
+    {
+        Guid? id = category.MetaInfo?.ID;
+        if (categories == null || id == null || id == Guid.Empty)
+        {
+            return;
+        }
+
+        try
+        {
+            if (await ConfirmDeletionAsync(category))
+            {
+                try
+                {
+                    await Api.ClientWellBore.DeleteWellBoreFeatureCategoryByIdAsync(id.Value);
+                }
+                catch (ApiException ex) when (ex.StatusCode == 404)
+                {
+                    // Locally added unsaved item.
+                }
+                categories.Remove(category);
+                _selectedCategoryIds.Remove(id.Value);
+                TrimSelectedOptionIds();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Impossible to delete wellbore feature category");
+            Snackbar.Add("Impossible to delete wellbore feature category", Severity.Error);
+        }
+    }
+
+    private async Task<bool> ConfirmDeletionAsync(WellBoreFeatureCategory category)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Delete",
+            $"Delete wellbore feature category '{category.Name ?? category.MetaInfo?.ID.ToString()}'?",
+            yesText: "Delete",
+            cancelText: "Cancel",
+            options: new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.ExtraSmall });
+        return result == true;
+    }
+
+    private bool TryValidateCategories()
+    {
+        if (categories == null)
+        {
+            return false;
+        }
+        if (categories.Any(category => string.IsNullOrWhiteSpace(category.Name)))
+        {
+            Snackbar.Add("WellBore feature category names cannot be empty", Severity.Warning);
+            return false;
+        }
+        if (categories.GroupBy(category => category.Name!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
+        {
+            Snackbar.Add("WellBore feature category names must be unique", Severity.Warning);
+            return false;
+        }
+        foreach (WellBoreFeatureCategory category in categories)
+        {
+            if (category.Options == null || category.Options.Count == 0)
+            {
+                Snackbar.Add($"WellBore feature category '{category.Name}' must have at least one option", Severity.Warning);
+                return false;
+            }
+            if (category.Options.Any(option => string.IsNullOrWhiteSpace(option.Name)))
+            {
+                Snackbar.Add($"WellBore feature category '{category.Name}' has an empty option name", Severity.Warning);
+                return false;
+            }
+            if (category.Options.GroupBy(option => option.Name!.Trim(), StringComparer.OrdinalIgnoreCase).Any(group => group.Count() > 1))
+            {
+                Snackbar.Add($"WellBore feature category '{category.Name}' has duplicate option names", Severity.Warning);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void EnsureCategory(WellBoreFeatureCategory category)
+    {
+        if (category.MetaInfo == null || category.MetaInfo.ID == Guid.Empty)
+        {
+            category.MetaInfo = new MetaInfo { ID = Guid.NewGuid() };
+        }
+        category.Options ??= [];
+        foreach (WellBoreFeatureOption option in category.Options)
+        {
+            if (option.ID == Guid.Empty)
+            {
+                option.ID = Guid.NewGuid();
+            }
+        }
+    }
+
+    private bool IsCategorySelected(WellBoreFeatureCategory category)
+    {
+        return category.MetaInfo?.ID is Guid id && _selectedCategoryIds.Contains(id);
+    }
+
+    private void SetCategorySelected(WellBoreFeatureCategory category, bool selected)
+    {
+        if (category.MetaInfo?.ID is not Guid id || id == Guid.Empty)
+        {
+            return;
+        }
+
+        if (selected)
+        {
+            _selectedCategoryIds.Add(id);
+        }
+        else
+        {
+            _selectedCategoryIds.Remove(id);
+        }
+    }
+
+    private bool AreAllCategoriesSelected()
+    {
+        return categories?.Count > 0 && categories.All(IsCategorySelected);
+    }
+
+    private void SetAllCategoriesSelected(bool selected)
+    {
+        _selectedCategoryIds.Clear();
+        if (selected && categories != null)
+        {
+            foreach (WellBoreFeatureCategory category in categories)
+            {
+                if (category.MetaInfo?.ID is Guid id && id != Guid.Empty)
+                {
+                    _selectedCategoryIds.Add(id);
+                }
+            }
+        }
+    }
+
+    private static void EnsureOption(WellBoreFeatureOption option)
+    {
+        if (option.ID == Guid.Empty)
+        {
+            option.ID = Guid.NewGuid();
+        }
+    }
+
+    private bool IsOptionSelected(WellBoreFeatureOption option)
+    {
+        return option.ID != Guid.Empty && _selectedOptionIds.Contains(option.ID);
+    }
+
+    private void SetOptionSelected(WellBoreFeatureOption option, bool selected)
+    {
+        EnsureOption(option);
+        if (selected)
+        {
+            _selectedOptionIds.Add(option.ID);
+        }
+        else
+        {
+            _selectedOptionIds.Remove(option.ID);
+        }
+    }
+
+    private bool HasSelectedOptions(WellBoreFeatureCategory category)
+    {
+        return category.Options?.Any(IsOptionSelected) == true;
+    }
+
+    private bool AreAllOptionsSelected(WellBoreFeatureCategory category)
+    {
+        return category.Options?.Count > 0 && category.Options.All(IsOptionSelected);
+    }
+
+    private void SetAllOptionsSelected(WellBoreFeatureCategory category, bool selected)
+    {
+        if (category.Options == null)
+        {
+            return;
+        }
+
+        foreach (WellBoreFeatureOption option in category.Options)
+        {
+            SetOptionSelected(option, selected);
+        }
+    }
+
+    private void TrimSelectedOptionIds()
+    {
+        if (categories == null)
+        {
+            _selectedOptionIds.Clear();
+            return;
+        }
+
+        HashSet<Guid> existingOptionIds = categories
+            .SelectMany(category => category.Options ?? [])
+            .Where(option => option.ID != Guid.Empty)
+            .Select(option => option.ID)
+            .ToHashSet();
+        _selectedOptionIds.RemoveWhere(id => !existingOptionIds.Contains(id));
+    }
+}
+

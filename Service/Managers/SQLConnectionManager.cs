@@ -11,8 +11,8 @@ namespace OSDC.Drilling.WellBore.Service.Managers
 {
     /// <summary>
     /// A manager for the sql database connection, registered as a singleton through dependency injection (see Program.cs)
-    /// Prior to creating a database, existing database structure is checked for consistency with the structure defined in tableStructureDict_
-    /// If the schema is inconsistent (table count, table names, field count, or field names), startup stops and leaves the database unchanged.
+    /// Existing databases are upgraded through additive, transactional schema migrations.
+    /// Malformed or unknown schemas fail startup and are never repaired by dropping user data.
     /// </summary>
     /// <remarks>
     /// SQLite database connection strategy:
@@ -33,6 +33,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public static readonly string HOME_DIRECTORY = ".." + Path.DirectorySeparatorChar + "home" + Path.DirectorySeparatorChar;
         public static readonly string DATABASE_FILENAME = "WellBore.db";
         public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+        public const int CURRENT_SCHEMA_VERSION = 1;
 
         // dictionary describing tables format
         private readonly static Dictionary<string, string[]> _tableStructureDict = new Dictionary<string, string[]>()
@@ -45,6 +46,24 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                     "IsSidetrack bool",
                     "ParentWellBoreID text",
                     "WellBore text" }
+                },
+                { "WellBoreIdentityTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "WellBoreIdentity text" }
+                },
+                { "WellBoreFeatureCategoryTable", new string[] {
+                    "ID text primary key",
+                    "MetaInfo text",
+                    "Name text",
+                    "IsExclusive integer",
+                    "HasValidityPeriod integer",
+                    "CreationDate text",
+                    "LastModificationDate text",
+                    "WellBoreFeatureCategory text" }
                 }
             };
 
@@ -65,6 +84,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
 
         public SqliteConnection? GetConnection()
         {
+            // a new SQL connection is opened for every transaction, thus ensuring thread-safety and removing unnecessary locks
             var connection = new SqliteConnection(_connectionString);
             if (connection != null)
             {
@@ -121,42 +141,77 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         }
 
         /// <summary>
-        /// Validates an existing database without modifying it, or creates the initial schema for an empty database.
-        /// An unexpected schema aborts startup so persisted WellBore data is never dropped automatically.
+        /// Applies additive schema migrations. Existing tables and rows are never dropped.
+        /// Unexpected or malformed structures fail startup without changing the database.
         /// </summary>
         private void ManageDataBase()
         {
-            using var connection = GetConnection() ??
-                throw new InvalidOperationException("The WellBore database could not be opened.");
-            List<string> tableNames = [];
-            using (var command = new SqliteCommand(
-                       "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%';", connection))
-            using (var reader = command.ExecuteReader())
+            using var connection = GetConnection();
+            if (connection == null)
             {
+                throw new InvalidOperationException("Unable to open the WellBore database.");
+            }
+
+            List<string> tableNames = [];
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
+                using SqliteDataReader reader = command.ExecuteReader();
                 while (reader.Read()) tableNames.Add(reader.GetString(0));
             }
 
-            if (tableNames.Count == 0)
+            using SqliteCommand versionCommand = connection.CreateCommand();
+            versionCommand.CommandText = "PRAGMA user_version";
+            int schemaVersion = Convert.ToInt32(versionCommand.ExecuteScalar());
+            if (schemaVersion > CURRENT_SCHEMA_VERSION)
+                throw new InvalidOperationException($"WellBore database schema version {schemaVersion} is newer than supported version {CURRENT_SCHEMA_VERSION}.");
+
+            string[] legacyTables = ["WellBoreTable"];
+            IEnumerable<string> permittedTables = schemaVersion == 0 ? legacyTables : _tableStructureDict.Keys;
+            List<string> unexpected = tableNames.Except(permittedTables, StringComparer.Ordinal).ToList();
+            if (unexpected.Count > 0)
+                throw new InvalidOperationException($"Unexpected WellBore database tables. No data was changed: [{string.Join(',', unexpected)}].");
+
+            if (tableNames.Contains("WellBoreTable", StringComparer.Ordinal) &&
+                !CheckDatabaseStructure(new KeyValuePair<string, string[]>("WellBoreTable", _tableStructureDict["WellBoreTable"])))
+                throw new InvalidOperationException("The existing WellBoreTable is malformed. No data was changed.");
+
+            if (schemaVersion == 0)
             {
-                _logger.LogInformation("Creating the initial WellBore database schema");
-                foreach (var tableStructure in _tableStructureDict)
+                using SqliteTransaction transaction = connection.BeginTransaction();
+                try
                 {
-                    if (!CreateTable(tableStructure) || !IndexTable(tableStructure.Key))
-                        throw new InvalidOperationException("The initial WellBore database schema could not be created.");
+                    foreach (KeyValuePair<string, string[]> table in _tableStructureDict.Where(item => !tableNames.Contains(item.Key, StringComparer.Ordinal)))
+                    {
+                        using SqliteCommand create = connection.CreateCommand();
+                        create.Transaction = transaction;
+                        create.CommandText = $"CREATE TABLE {table.Key} ({string.Join(',', table.Value)})";
+                        create.ExecuteNonQuery();
+                        using SqliteCommand index = connection.CreateCommand();
+                        index.Transaction = transaction;
+                        index.CommandText = $"CREATE UNIQUE INDEX {table.Key}Index ON {table.Key} (ID)";
+                        index.ExecuteNonQuery();
+                    }
+                    using SqliteCommand setVersion = connection.CreateCommand();
+                    setVersion.Transaction = transaction;
+                    setVersion.CommandText = $"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}";
+                    setVersion.ExecuteNonQuery();
+                    transaction.Commit();
                 }
-                return;
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                tableNames = _tableStructureDict.Keys.ToList();
             }
 
-            bool schemaMatches = tableNames.Count == _tableStructureDict.Count &&
-                _tableStructureDict.All(tableStructure =>
-                    tableNames.Contains(tableStructure.Key, StringComparer.Ordinal) &&
-                    CheckDatabaseStructure(tableStructure));
-            if (!schemaMatches)
-            {
-                _logger.LogCritical("Unexpected WellBore database schema. Startup is aborted and the database is left unchanged.");
-                throw new InvalidOperationException(
-                    "Unexpected WellBore database schema. No automatic destructive repair was attempted.");
-            }
+            List<string> missing = _tableStructureDict.Keys.Except(tableNames, StringComparer.Ordinal).ToList();
+            List<string> malformed = _tableStructureDict
+                .Where(table => tableNames.Contains(table.Key, StringComparer.Ordinal) && !CheckDatabaseStructure(table))
+                .Select(table => table.Key).ToList();
+            if (missing.Count > 0 || malformed.Count > 0)
+                throw new InvalidOperationException($"Unexpected WellBore database structure. No data was changed. Missing=[{string.Join(',', missing)}], malformed=[{string.Join(',', malformed)}].");
         }
 
         /// <summary>
@@ -206,67 +261,6 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             else
             {
                 _logger.LogError("Problem opening a new connection while checking database structure");
-                return false;
-            }
-            return true;
-        }
-
-        private bool CreateTable(KeyValuePair<string, string[]> tabStruct)
-        {
-            using var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                string key = tabStruct.Key;
-                StringBuilder sb = new StringBuilder();
-                sb.Append($"CREATE TABLE {key} ()");
-                foreach (string col in tabStruct.Value)
-                {
-                    sb.Insert(sb.Length - 1, col + ",");
-                };
-                sb.Remove(sb.Length - 2, 1);
-                command.CommandText = sb.ToString();
-
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogInformation("{key} has been successfully created", key);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to create {key}", key);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
-                return false;
-            }
-            return true;
-        }
-
-        private bool IndexTable(string dbName)
-        {
-            using var connection = GetConnection();
-            if (connection != null)
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = $"CREATE UNIQUE INDEX {dbName}Index ON {dbName} (ID)";
-                try
-                {
-                    int res = command.ExecuteNonQuery();
-                    _logger.LogInformation("{dbName} has been successfully indexed", dbName);
-                }
-                catch (SqliteException ex)
-                {
-                    _logger.LogError(ex, "Impossible to index {dbName}", dbName);
-                    return false;
-                }
-            }
-            else
-            {
-                _logger.LogError("Problem opening a new connection while creating table");
                 return false;
             }
             return true;

@@ -4,6 +4,7 @@ using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.UnitConversion.Conversion;
 using OSDC.UnitConversion.Conversion.DrillingEngineering;
 using System;
+using System.Collections.Generic;
 
 namespace OSDC.Drilling.WellBore.Model
 {
@@ -77,6 +78,14 @@ namespace OSDC.Drilling.WellBore.Model
         /// the type of the sidetack, when the wellbore is a sidetrack
         /// </summary>
         public SidetrackType SidetrackType { get; set; } = SidetrackType.Undefined;
+        /// <summary>
+        /// identities assigned to this wellbore
+        /// </summary>
+        public List<WellBoreIdentityAssignment>? WellBoreIdentityAssignments { get; set; }
+        /// <summary>
+        /// features assigned to this wellbore
+        /// </summary>
+        public List<WellBoreFeatureAssignment>? WellBoreFeatureAssignments { get; set; }
         /// <summary>
         /// default constructor required for JSON serialization
         /// </summary>

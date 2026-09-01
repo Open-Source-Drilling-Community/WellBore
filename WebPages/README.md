@@ -1,13 +1,20 @@
 # OSDC.Drilling.WellBore.WebPages
 
-`OSDC.Drilling.WellBore.WebPages` is a Razor class library that packages the `WellBoreMain`, `WellBoreEdit`, and `StatisticsMain` pages together with the supporting page utilities they need.
+`OSDC.Drilling.WellBore.WebPages` is a Razor class library that packages the wellbore, identity catalogue, feature catalogue, and statistics pages together with their supporting utilities.
 
 ## Contents
 
 - `WellBoreMain`
 - `WellBoreEdit`
+- `WellBoreIdentities`
+- `WellBoreFeatures`
+- `WellBoreBackupRestore`
 - `StatisticsMain`
 - Wellbore page support classes such as API access helpers and unit/reference helper models
+
+`WellBoreEdit` manages identity and feature assignments. Catalogue pages support user-defined entries and reject removal of definitions or feature options that are still referenced by a wellbore.
+
+`WellBoreBackupRestore` downloads logical JSON backups through a packaged JavaScript helper and restores them using the service's all-or-nothing batch endpoint. The page supports all or selected exports, previews uploaded documents, and requires an explicit conflict/catalogue policy before restore.
 
 ## Dependencies
 

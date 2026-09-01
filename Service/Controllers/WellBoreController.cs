@@ -108,6 +108,42 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
             }
         }
 
+        /// <summary>Exports all WellBores or an ordered selection with referenced local catalog definitions.</summary>
+        [HttpPost("BatchExport", Name = "BatchExportWellBores")]
+        [ProducesResponseType<WellBoreBatchExportDocument>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBoreBatchExportDocument> BatchExportWellBores([FromBody] WellBoreBatchExportRequest? request)
+        {
+            WellBoreBatchExportOutcome outcome = _wellBoreManager.ExportBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Document);
+            return outcome.FailureKind switch
+            {
+                WellBoreBatchExportFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBoreBatchExportFailureKind.WellNotFound => NotFound(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
+        /// <summary>Validates and atomically restores WellBores and their local catalog dependencies.</summary>
+        [HttpPost("BatchRestore", Name = "BatchRestoreWellBores")]
+        [ProducesResponseType<WellBoreBatchRestoreResponse>(StatusCodes.Status200OK)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status409Conflict)]
+        [ProducesResponseType<WellBoreBatchErrorEnvelope>(StatusCodes.Status500InternalServerError)]
+        public ActionResult<WellBoreBatchRestoreResponse> BatchRestoreWellBores([FromBody] WellBoreBatchRestoreRequest? request)
+        {
+            WellBoreBatchRestoreOutcome outcome = _wellBoreManager.RestoreBatch(request);
+            if (outcome.IsSuccess) return Ok(outcome.Response);
+            return outcome.FailureKind switch
+            {
+                WellBoreBatchRestoreFailureKind.InvalidRequest => BadRequest(outcome.Error),
+                WellBoreBatchRestoreFailureKind.Conflict => Conflict(outcome.Error),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, outcome.Error)
+            };
+        }
+
         /// <summary>
         /// Returns the list of all WellBore with given Well ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
