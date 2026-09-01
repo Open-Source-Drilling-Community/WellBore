@@ -144,3 +144,9 @@ The current work has been funded by the [Research Council of Norway](https://www
 **Andrew Holsaeter**, *NORCE Energy Modelling and Automation*
 
 **Lucas Volpi**, *NORCE Energy Modelling and Automation*
+
+## Current implementation
+
+- The service exposes all 11 non-statistics WellBore REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded.
+- MCP is available over streamable HTTP at `/wellbore/api/mcp` and WebSocket at `/wellbore/api/mcp/ws`. Optional external MCP-hub registration is disabled by default.
+- The WebApp uses the current embedded WebPages packages for Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), Geodetic Datum (1.0.7), and Well (1.0.11).

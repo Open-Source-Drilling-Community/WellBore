@@ -94,3 +94,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 **Gilles Pelfrene**, NORCE Energy Modelling and Automation
 
 **Andrew Holsaeter**, NORCE Energy Modelling and Automation
+
+## Current shared-page dependencies
+
+The WebApp's embedded service pages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, and Well 1.0.11. Keep external Razor assembly registration synchronized when these packages are upgraded.

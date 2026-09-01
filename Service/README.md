@@ -167,3 +167,12 @@ The current work has been funded by the [Research Council of Norway](https://www
 **Andrew Holsaeter**, NORCE Energy Modelling and Automation
 
 **Lucas Volpi**, NORCE Energy Modelling and Automation
+
+## MCP server
+
+The service publishes all 11 non-statistics WellBore REST operations as MCP tools. Tool names use the underscore convention directly, and access-statistics operations are deliberately not registered. Each tool includes an explicit JSON input schema; create and update describe the complete WellBore payload, including identity, well/rig associations, sidetrack relationships, tie-in depth uncertainty, and sidetrack classification. `TieInPointAlongHoleDepth` values are always expressed in meters (SI) and referenced to the fixed WGS84 vertical datum; MCP clients must convert other units or vertical references before submitting them.
+
+- Streamable HTTP: `/wellbore/api/mcp`
+- WebSocket: `/wellbore/api/mcp/ws`
+- Utility tool: `ping`
+- Optional external MCP-hub registration: configured in `appsettings.json`, disabled by default

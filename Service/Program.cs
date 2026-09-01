@@ -32,6 +32,10 @@ builder.Services.AddSwaggerGen(config =>
     config.CustomSchemaIds(type => type.FullName);
 });
 
+builder.Services.Configure<McpHubOptions>(builder.Configuration.GetSection(McpHubOptions.SectionName));
+builder.Services.AddHttpClient(nameof(McpHubRegistrationService));
+builder.Services.AddHostedService<McpHubRegistrationService>();
+
 // MCP server registrations
 var serverVersion = typeof(SqlConnectionManager).Assembly.GetName().Version?.ToString() ?? "1.0.0";
 
@@ -49,6 +53,7 @@ builder.Services.AddMcpServer(options =>
 }).WithHttpTransport();
 
 builder.Services.AddLegacyMcpTool<PingMcpTool>();
+builder.Services.AddWellBoreRestMcpTools();
 
 // end MCP server
 
@@ -62,6 +67,23 @@ app.UsePathBase(basePath);
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedProto
+});
+
+app.Use(async (context, next) =>
+{
+    string path = context.Request.Path.Value ?? string.Empty;
+    if (path.Contains("/.well-known/oauth-protected-resource", System.StringComparison.OrdinalIgnoreCase) ||
+        path.Contains("/.well-known/oauth-authorization-server", System.StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.StatusCode = 404;
+        context.Response.ContentType = "application/json";
+        context.Response.Headers.CacheControl = "no-store";
+        string body = "{\"error\":\"oauth_not_configured\",\"error_description\":\"This MCP server does not require OAuth. Connect directly to the MCP endpoint.\",\"authentication\":\"none\"}";
+        await context.Response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes(body));
+        return;
+    }
+
+    await next();
 });
 
 if (builder.Environment.IsDevelopment())
