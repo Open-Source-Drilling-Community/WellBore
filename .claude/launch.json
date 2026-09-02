@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wellbore-webapp",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "WebApp/WebApp.csproj", "--urls", "http://localhost:5299"],
+      "port": 5299
+    }
+  ]
+}

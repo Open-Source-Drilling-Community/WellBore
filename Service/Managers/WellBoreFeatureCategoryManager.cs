@@ -13,7 +13,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         private static WellBoreFeatureCategoryManager? _instance;
         private readonly ILogger<WellBoreFeatureCategoryManager> _logger;
         private readonly SqlConnectionManager _connectionManager;
-        private static readonly DefaultWellBoreFeatureCategory[] DefaultCategories =
+        internal static readonly DefaultWellBoreFeatureCategory[] DefaultCategories =
         [
             new("WellboreRole", true, false, ["MainBore", "PilotBore", "Sidetrack", "Lateral", "MultilateralBranch", "MotherBore", "ParentBore", "ChildBore", "ReEntryBore", "ReliefInterceptBore", "BypassBore", "DrainBore", "ObservationBore", "Unknown"]),
             new("WellboreOrigin", true, false, ["OriginalBore", "PlannedSidetrack", "TechnicalSidetrack", "GeologicalSidetrack", "NaturalSidetrack", "MechanicalSidetrack", "ReDrill", "ReEntry", "WhipstockSidetrack", "OpenHoleSidetrack", "CasedHoleSidetrack", "WindowMilledSidetrack", "Unknown"]),
@@ -24,7 +24,8 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             new("WellboreSectionContext", false, false, ["TopHole", "SurfaceSection", "IntermediateSection", "ProductionSection", "ReservoirSection", "OpenHoleSection", "CasedHoleSection", "LinerSection", "BuildSection", "TangentSection", "HorizontalSection", "Unknown"]),
             new("WellboreCompletionContext", false, true, ["NotCompleted", "OpenHoleCompletion", "CasedHoleCompletion", "PerforatedCompletion", "SlottedLiner", "ScreenCompletion", "GravelPack", "FracPack", "IntelligentCompletion", "MultizoneCompletion", "SelectiveCompletion", "CommingledCompletion", "AbandonedBeforeCompletion", "Unknown"]),
             new("WellboreDataAvailability", false, false, ["HasPlannedTrajectory", "HasActualTrajectory", "HasSurveyStations", "HasSurveyUncertainty", "HasDirectionalPlan", "HasAntiCollisionData", "HasMudLog", "HasLWD", "HasMWD", "HasWirelineLogs", "HasCasingProgram", "HasCementData", "HasCompletionData", "HasDrillingEvents", "HasDailyReports", "HasRealTimeData", "HasFinalWellReport"]),
-            new("WellboreHazard", false, true, ["H2S", "CO2", "ShallowGas", "ShallowWaterFlow", "SevereLosses", "Gains", "NarrowMudWindow", "UnstableFormation", "SwellingShale", "DepletedZone", "FaultCrossing", "Salt", "Coal", "Karst", "HydrateRisk", "BallooningRisk", "CollisionRisk", "HighDoglegRisk", "StuckPipeRisk", "Unknown"])
+            new("WellboreHazard", false, true, ["H2S", "CO2", "ShallowGas", "ShallowWaterFlow", "SevereLosses", "Gains", "NarrowMudWindow", "UnstableFormation", "SwellingShale", "DepletedZone", "FaultCrossing", "Salt", "Coal", "Karst", "HydrateRisk", "BallooningRisk", "CollisionRisk", "HighDoglegRisk", "StuckPipeRisk", "Unknown"]),
+            new(WellBoreSidetrackClassification.CategoryName, true, false, ["Technical", "Production", "Appraisal", "Lateral", "Unknown"])
         ];
         private WellBoreFeatureCategoryManager(ILogger<WellBoreFeatureCategoryManager> logger, SqlConnectionManager connectionManager)
         {
@@ -325,7 +326,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             }
         }
 
-        private static Model.WellBoreFeatureCategory CreateDefaultCategory(DefaultWellBoreFeatureCategory defaultCategory) =>
+        internal static Model.WellBoreFeatureCategory CreateDefaultCategory(DefaultWellBoreFeatureCategory defaultCategory) =>
             new()
             {
                 MetaInfo = new MetaInfo { ID = Guid.NewGuid() },
@@ -349,13 +350,12 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             }
         }
 
-        private sealed record DefaultWellBoreFeatureCategory(
+        internal sealed record DefaultWellBoreFeatureCategory(
             string Name,
             bool IsExclusive,
             bool HasValidityPeriod,
             string[] Options);
     }
 }
-
 
 

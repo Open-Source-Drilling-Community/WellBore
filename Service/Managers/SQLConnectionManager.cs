@@ -33,7 +33,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
         public static readonly string HOME_DIRECTORY = ".." + Path.DirectorySeparatorChar + "home" + Path.DirectorySeparatorChar;
         public static readonly string DATABASE_FILENAME = "WellBore.db";
         public static readonly string DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-        public const int CURRENT_SCHEMA_VERSION = 1;
+        public const int CURRENT_SCHEMA_VERSION = 2;
 
         // dictionary describing tables format
         private readonly static Dictionary<string, string[]> _tableStructureDict = new Dictionary<string, string[]>()
@@ -163,6 +163,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             using SqliteCommand versionCommand = connection.CreateCommand();
             versionCommand.CommandText = "PRAGMA user_version";
             int schemaVersion = Convert.ToInt32(versionCommand.ExecuteScalar());
+            bool seedAllDefaults = schemaVersion == 0;
             if (schemaVersion > CURRENT_SCHEMA_VERSION)
                 throw new InvalidOperationException($"WellBore database schema version {schemaVersion} is newer than supported version {CURRENT_SCHEMA_VERSION}.");
 
@@ -194,7 +195,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                     }
                     using SqliteCommand setVersion = connection.CreateCommand();
                     setVersion.Transaction = transaction;
-                    setVersion.CommandText = $"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}";
+                    setVersion.CommandText = "PRAGMA user_version = 1";
                     setVersion.ExecuteNonQuery();
                     transaction.Commit();
                 }
@@ -204,6 +205,13 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                     throw;
                 }
                 tableNames = _tableStructureDict.Keys.ToList();
+                schemaVersion = 1;
+            }
+
+            if (schemaVersion == 1)
+            {
+                WellBoreSidetrackClassification.MigrateVersion1To2(connection, seedAllDefaults);
+                schemaVersion = CURRENT_SCHEMA_VERSION;
             }
 
             List<string> missing = _tableStructureDict.Keys.Except(tableNames, StringComparer.Ordinal).ToList();

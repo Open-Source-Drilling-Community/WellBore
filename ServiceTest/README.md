@@ -8,7 +8,7 @@ This project validates the WellBore service API and its MCP surface.
 - `WellBoreContractStrengtheningTests.cs` verifies optimistic concurrency, granular mutations, deterministic search, sidetrack integrity, reference-safe deletion, external audit paging, and non-destructive handling of legacy timestamp-free rows.
 - `WellBoreExternalReferenceValidatorTests.cs` verifies Well/Rig existence checks, per-batch read deduplication, no-reference behavior, and the distinction between missing and unavailable dependencies.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool discovery, and representative calls against a running service.
-- `SqlConnectionManagerSafetyTests.cs` proves that a legacy database is transactionally upgraded without changing its WellBore rows, that expected-schema startup preserves rows, and that an unexpected schema aborts without dropping data.
+- `SqlConnectionManagerSafetyTests.cs` proves that legacy schema upgrades preserve rows, that v2 transactionally maps deprecated sidetrack types to feature assignments without losing unrelated data, that expected-schema startup is idempotent, and that an unexpected schema aborts without dropping data.
 - `WellBoreCatalogTests.cs` verifies the default catalogues, assignment persistence (including punctuation in values), optimistic concurrency, and reference-safe deletion.
 - `WellBoreBatchBackupRestoreTests.cs` verifies ordered dependency-closed exports, catalogue mapping, atomic restore, rollback on conflicts or invalid assignments, and preservation of unrelated legacy rows.
 

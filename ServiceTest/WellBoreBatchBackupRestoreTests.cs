@@ -92,6 +92,7 @@ public class WellBoreBatchBackupRestoreTests
     {
         string path = TempDatabase();
         SqlConnectionManager connections = Manager(path);
+        long featureCountBefore = Count(path, "WellBoreFeatureCategoryTable");
         WellBoreManager manager = WellBoreManager.GetInstance(NullLogger<WellBoreManager>.Instance, connections);
         WellBoreModel existing = new() { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = "Existing" };
         Assert.That(manager.AddWellBore(existing), Is.True);
@@ -111,7 +112,7 @@ public class WellBoreBatchBackupRestoreTests
         Assert.That(outcome.FailureKind, Is.EqualTo(WellBoreBatchRestoreFailureKind.Conflict));
         Assert.That(ReadWellJson(path, existing.MetaInfo.ID), Is.EqualTo(before));
         Assert.That(Count(path, "WellBoreIdentityTable"), Is.Zero);
-        Assert.That(Count(path, "WellBoreFeatureCategoryTable"), Is.Zero);
+        Assert.That(Count(path, "WellBoreFeatureCategoryTable"), Is.EqualTo(featureCountBefore));
     }
 
     [Test]
@@ -179,6 +180,7 @@ public class WellBoreBatchBackupRestoreTests
     {
         string path = TempDatabase();
         SqlConnectionManager connections = Manager(path);
+        long featureCountBefore = Count(path, "WellBoreFeatureCategoryTable");
         WellBoreIdentity identity = Identity("PortableIdentity");
         WellBoreFeatureCategory category = Category("PortableCategory", "PortableOption");
         WellBoreModel incoming = WellBore("InvalidAssignment", identity, category);
@@ -195,7 +197,7 @@ public class WellBoreBatchBackupRestoreTests
         Assert.That(outcome.FailureKind, Is.EqualTo(WellBoreBatchRestoreFailureKind.InvalidRequest));
         Assert.That(Count(path, "WellBoreTable"), Is.Zero);
         Assert.That(Count(path, "WellBoreIdentityTable"), Is.Zero);
-        Assert.That(Count(path, "WellBoreFeatureCategoryTable"), Is.Zero);
+        Assert.That(Count(path, "WellBoreFeatureCategoryTable"), Is.EqualTo(featureCountBefore));
     }
 
     private static WellBoreIdentity Identity(string name) => new() { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = name };

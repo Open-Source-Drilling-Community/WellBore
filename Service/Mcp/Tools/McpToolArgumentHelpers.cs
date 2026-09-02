@@ -91,7 +91,7 @@ internal static class McpToolArgumentHelpers
     public static JsonObject CreateWellBoreTopologyMutationSchema() => CreateSubresourceSchema("topology", new JsonObject
     {
         ["type"] = "object",
-        ["description"] = "Complete replacement of Well, Rig, and sidetrack topology fields. WellID and RigID are externally owned and are not synchronously validated.",
+        ["description"] = "Complete replacement of Well, Rig, and structural sidetrack topology fields. Sidetrack classification is represented by a SidetrackClassification feature assignment; SidetrackType is retained only for compatibility. WellID and RigID are externally owned and are not synchronously validated.",
         ["properties"] = new JsonObject
         {
             ["WellID"] = NullableUuid("External Well UUID, or null."),
@@ -99,7 +99,12 @@ internal static class McpToolArgumentHelpers
             ["IsSidetrack"] = new JsonObject { ["type"] = "boolean" },
             ["ParentWellBoreID"] = NullableUuid("Local parent WellBore UUID required for a sidetrack, otherwise null."),
             ["TieInPointAlongHoleDepth"] = CreateTieInPointSchema(),
-            ["SidetrackType"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("Undefined", "Technical", "Production", "Appraisal", "Lateral") }
+            ["SidetrackType"] = new JsonObject
+            {
+                ["type"] = "string", ["enum"] = new JsonArray("Undefined", "Technical", "Production", "Appraisal", "Lateral"),
+                ["deprecated"] = true,
+                ["description"] = "Deprecated compatibility fallback. Use the exclusive SidetrackClassification feature assignment."
+            }
         },
         ["required"] = new JsonArray("WellID", "RigID", "IsSidetrack", "ParentWellBoreID", "TieInPointAlongHoleDepth", "SidetrackType"),
         ["additionalProperties"] = false
@@ -389,9 +394,10 @@ internal static class McpToolArgumentHelpers
                 ["SidetrackType"] = new JsonObject
                 {
                     ["type"] = "string",
-                    ["description"] = "Classification of the sidetrack. Use Undefined for a non-sidetrack or when the type is not known.",
+                    ["description"] = "Deprecated compatibility projection of the exclusive SidetrackClassification feature. New callers should send Undefined and manage the feature assignment.",
                     ["enum"] = new JsonArray { "Undefined", "Technical", "Production", "Appraisal", "Lateral" },
-                    ["default"] = "Undefined"
+                    ["default"] = "Undefined",
+                    ["deprecated"] = true
                 },
                 ["WellBoreIdentityAssignments"] = NullableArray(CreateIdentityAssignmentSchema()),
                 ["WellBoreFeatureAssignments"] = NullableArray(CreateFeatureAssignmentSchema())

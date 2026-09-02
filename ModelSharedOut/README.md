@@ -8,7 +8,7 @@ Generated outputs:
 - `Service/wwwroot/json-schema/WellBoreMergedModel.json`
 - `ModelSharedOut/json-schemas/WellBoreFullName.json` from the Service Debug build
 
-The generated contract includes search/pagination, optimistic-concurrency parameters, granular WellBore and assignment mutations, read-only Well/Rig reference validation and auditing, batch export/restore, identity/feature catalogues, and inline assignment collections. Date-time query parameters use the round-trip format so concurrency revisions retain their fractional precision and UTC offset. The merger gives the current `WellBoreFullName.json` paths precedence over stale route copies carried by dependency documents. Do not hand-edit generated outputs. From the repository root, regenerate after REST or model changes:
+The generated contract includes search/pagination, optimistic-concurrency parameters, granular WellBore and assignment mutations, read-only Well/Rig reference validation and auditing, batch export/restore, identity/feature catalogues, and inline assignment collections. Sidetrack classification is represented by the exclusive `SidetrackClassification` feature; the generated `SidetrackType` property remains only as a deprecated transition field for older clients. Date-time query parameters use the round-trip format so concurrency revisions retain their fractional precision and UTC offset. The merger gives the current `WellBoreFullName.json` paths precedence over stale route copies carried by dependency documents. Do not hand-edit generated outputs. From the repository root, regenerate after REST or model changes:
 
 ```powershell
 dotnet build Service/Service.csproj --configuration Debug

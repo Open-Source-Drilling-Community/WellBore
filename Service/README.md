@@ -42,9 +42,9 @@ SQLite storage
 - Database file: `home/WellBore.db`
 - Usage stats: `home/history.json`
 
-Schema version 1 retains the existing `WellBoreTable` and transactionally adds `WellBoreIdentityTable`, `WellBoreFeatureCategoryTable`, and their indexes. Existing wellbore rows are neither rewritten nor deleted. A malformed, unknown, or newer schema aborts startup and is left unchanged; the service never drops tables as an automatic repair. In Kubernetes, preserve `wellbore-claim`, keep one writer, take and verify an independent SQLite or volume snapshot, and follow [../deployment/identity-cutover.md](../deployment/identity-cutover.md).
+Schema version 1 retains the existing `WellBoreTable` and transactionally adds `WellBoreIdentityTable`, `WellBoreFeatureCategoryTable`, and their indexes. Schema version 2 transactionally adds `SidetrackClassification` and backfills feature assignments for legacy, classified sidetracks. It preserves IDs and unrelated data and advances only affected WellBore revisions; a failure rolls back the complete v2 migration. A malformed, unknown, or newer schema aborts startup and is left unchanged, and the service never drops tables as an automatic repair. In Kubernetes, preserve `wellbore-claim`, keep one writer, and take and verify an independent SQLite or volume snapshot.
 
-When their catalogues are initially empty, the service seeds the same 11 identity names used by Well: `OfficialAuthorityName`, `OperatorName`, `CompanyInternalName`, `PlanningName`, `DataManagementName`, `HistoricalName`, `ShortName`, `DisplayName`, `ReportingName`, `LegacyName`, and `ImportedName`. It also seeds feature categories for role, origin, sidetrack reason, geometry, trajectory intent, construction status, section context, completion context, data availability, and hazards. Users can add, edit, and remove catalogue entries, subject to reference-integrity and optimistic-concurrency checks.
+When their catalogues are initially empty, the service seeds the same 11 identity names used by Well: `OfficialAuthorityName`, `OperatorName`, `CompanyInternalName`, `PlanningName`, `DataManagementName`, `HistoricalName`, `ShortName`, `DisplayName`, `ReportingName`, `LegacyName`, and `ImportedName`. It also seeds feature categories for role, origin, sidetrack reason, sidetrack classification, geometry, trajectory intent, construction status, section context, completion context, data availability, and hazards. `SidetrackClassification` is exclusive, has no validity period, and provides `Technical`, `Production`, `Appraisal`, `Lateral`, and `Unknown`. Users can add, edit, and remove catalogue entries, subject to reference-integrity and optimistic-concurrency checks.
 
 ## Docker
 Build the image
@@ -84,7 +84,7 @@ All routes are relative to `/WellBore/api`.
 - `GET|POST /WellBoreFeatureCategory` and `GET|PUT|DELETE /WellBoreFeatureCategory/{id}` — Discover and manage feature categories/options.
 - `GET /WellBoreUsageStatistics` — Retrieve per-endpoint daily usage counters.
 
-All WellBore updates, assignment mutations, deletes, and catalogue updates or deletes require `expectedModifiedUtc` from the latest `LastModificationDate`. Stale writes return a conflict without changing data. Referenced catalogues, feature options, and parent WellBores cannot be deleted. Writes validate assignment rules and sidetrack topology before committing. Legacy rows without timestamps use a stable Unix-epoch revision and are upgraded only when explicitly written; no database migration or bulk row rewrite is required.
+All WellBore updates, assignment mutations, deletes, and catalogue updates or deletes require `expectedModifiedUtc` from the latest `LastModificationDate`. Stale writes return a conflict without changing data. Referenced catalogues, feature options, and parent WellBores cannot be deleted. Writes validate assignment rules and sidetrack topology before committing. Legacy rows without timestamps use a stable Unix-epoch revision. The v2 migration updates only sidetracks requiring classification backfill and never performs a destructive table rewrite.
 
 Batch restore uses one transaction for catalogue mapping/creation, assignment-reference rewriting, validation, and all WellBore writes. Invalid input, unresolved or ambiguous catalogue definitions, UUID conflicts under `FailIfExists`, and storage errors roll back the complete operation. It never clears the database and preserves unrelated rows.
 
@@ -111,8 +111,7 @@ curl -k -X POST "$BASE/WellBore" \
     "MetaInfo": { "ID": "11111111-1111-1111-1111-111111111111" },
     "Name": "WB-01",
     "Description": "Main bore for field X",
-    "IsSidetrack": false,
-    "SidetrackType": "Undefined"
+    "IsSidetrack": false
   }'
 ```
 

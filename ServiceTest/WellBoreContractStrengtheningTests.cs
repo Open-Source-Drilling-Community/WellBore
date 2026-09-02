@@ -197,6 +197,69 @@ public sealed class WellBoreContractStrengtheningTests
         });
     }
 
+    [Test]
+    public void Legacy_sidetrack_type_and_canonical_feature_stay_compatible_during_transition()
+    {
+        WellBoreModel parent = NewWellBore();
+        Assert.That(_controller.PostWellBore(parent), Is.TypeOf<OkResult>());
+        WellBoreModel child = NewWellBore();
+        child.WellID = parent.WellID;
+        child.IsSidetrack = true;
+        child.ParentWellBoreID = parent.MetaInfo!.ID;
+        child.SidetrackType = SidetrackType.Production;
+        Assert.That(_controller.PostWellBore(child), Is.TypeOf<OkResult>());
+
+        WellBoreFeatureCategory category = WellBoreFeatureCategoryManager.GetInstance(
+            _loggerFactory.CreateLogger<WellBoreFeatureCategoryManager>(), _connections)
+            .GetAllWellBoreFeatureCategory()!.Cast<WellBoreFeatureCategory>()
+            .Single(value => value.Name == "SidetrackClassification");
+        Guid categoryId = category.MetaInfo!.ID;
+        List<WellBoreFeatureOption> options = category.Options!;
+        WellBoreModel migrated = Read(child.MetaInfo!.ID);
+        WellBoreFeatureAssignment legacyAssignment = migrated.WellBoreFeatureAssignments!
+            .Single(value => value.FeatureCategoryID == categoryId);
+        Assert.That(options.Single(value => value.ID == legacyAssignment.FeatureOptionID).Name,
+            Is.EqualTo("Production"));
+
+        ActionResult removedResult = _controller.DeleteWellBoreFeatureAssignment(child.MetaInfo.ID,
+            legacyAssignment.ID, migrated.LastModificationDate!.Value);
+        WellBoreModel removed = (WellBoreModel)((OkObjectResult)removedResult).Value!;
+        Assert.That(removed.SidetrackType, Is.EqualTo(SidetrackType.Undefined));
+        Assert.That(removed.WellBoreFeatureAssignments,
+            Has.None.Matches<WellBoreFeatureAssignment>(value => value.FeatureCategoryID == categoryId));
+
+        WellBoreFeatureOption lateral = options.Single(value => value.Name == "Lateral");
+        var canonical = new WellBoreFeatureAssignment
+        {
+            ID = Guid.NewGuid(), FeatureCategoryID = categoryId, FeatureOptionID = lateral.ID
+        };
+        ActionResult addedResult = _controller.PostWellBoreFeatureAssignment(child.MetaInfo.ID,
+            removed.LastModificationDate!.Value, canonical);
+        WellBoreModel added = (WellBoreModel)((OkObjectResult)addedResult).Value!;
+        Assert.That(added.SidetrackType, Is.EqualTo(SidetrackType.Lateral));
+
+        var legacyTopology = new WellBoreTopologyUpdate
+        {
+            WellID = added.WellID,
+            RigID = added.RigID,
+            IsSidetrack = true,
+            ParentWellBoreID = added.ParentWellBoreID,
+            TieInPointAlongHoleDepth = added.TieInPointAlongHoleDepth,
+            SidetrackType = SidetrackType.Technical
+        };
+        ActionResult legacyUpdateResult = _controller.PutWellBoreTopology(child.MetaInfo.ID,
+            added.LastModificationDate!.Value, legacyTopology);
+        WellBoreModel legacyUpdated = (WellBoreModel)((OkObjectResult)legacyUpdateResult).Value!;
+        WellBoreFeatureAssignment updatedAssignment = legacyUpdated.WellBoreFeatureAssignments!
+            .Single(value => value.FeatureCategoryID == categoryId);
+        Assert.Multiple(() =>
+        {
+            Assert.That(legacyUpdated.SidetrackType, Is.EqualTo(SidetrackType.Technical));
+            Assert.That(options.Single(value => value.ID == updatedAssignment.FeatureOptionID).Name,
+                Is.EqualTo("Technical"));
+        });
+    }
+
     private WellBoreModel Read(Guid id) => (WellBoreModel)((OkObjectResult)_controller.GetWellBoreById(id).Result!).Value!;
 
     private static WellBoreModel NewWellBore(Guid? id = null) => new()

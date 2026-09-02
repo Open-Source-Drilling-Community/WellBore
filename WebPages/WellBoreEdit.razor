@@ -110,10 +110,10 @@
 
             </MudItem>
             <MudItem xs="12" sm="4" md="4" lg="4" xl="4">
-                <MudSelect T="SidetrackType" Label="Sidetrack Type" @bind-Value="@_sidetrackType" Dense="true">
-                    @foreach (var typ in Enum.GetValues<SidetrackType>())
+                <MudSelect T="Guid?" Label="Sidetrack Classification" @bind-Value="@_sidetrackClassificationOptionId" Dense="true" Clearable="true">
+                    @foreach (WellBoreFeatureOption option in SidetrackClassificationOptions())
                     {
-                        <MudSelectItem Value="@typ">@typ</MudSelectItem>
+                        <MudSelectItem T="Guid?" Value="option.ID">@option.Name</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
@@ -151,7 +151,7 @@
         <MudGrid>
             <MudItem xs="12" md="4">
                 <MudSelect T="Guid?" Label="Category" Value="_selectedFeatureCategoryId" ValueChanged="SelectFeatureCategory">
-                    @foreach (WellBoreFeatureCategory category in _wellBoreFeatureCategories.Where(item => item.MetaInfo?.ID != null))
+                    @foreach (WellBoreFeatureCategory category in _wellBoreFeatureCategories.Where(item => item.MetaInfo?.ID != null && item.Name != SidetrackClassificationCategoryName))
                     {
                         <MudSelectItem T="Guid?" Value="category.MetaInfo!.ID">@category.Name</MudSelectItem>
                     }
@@ -169,7 +169,7 @@
                 <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="AssignFeature">Assign</MudButton>
             </MudItem>
             <MudItem xs="12">
-                @foreach (WellBoreFeatureAssignment assignment in _wellBoreFeatureAssignments)
+                @foreach (WellBoreFeatureAssignment assignment in _wellBoreFeatureAssignments.Where(item => !IsSidetrackClassification(item)))
                 {
                     <MudGrid Class="mb-2" @key="assignment.ID">
                         <MudItem xs="12" md="4"><MudTextField Value="@GetFeatureName(assignment)" ReadOnly="true" /></MudItem>
@@ -245,7 +245,8 @@
     private bool _isSidetrack = false;
     private double? _sidetrackDepth = null;
     private double? _sidetrackDepthAccuracy = null;
-    private SidetrackType _sidetrackType = SidetrackType.Undefined;
+    private const string SidetrackClassificationCategoryName = "SidetrackClassification";
+    private Guid? _sidetrackClassificationOptionId;
     private List<WellBoreIdentity> _wellBoreIdentities = [];
     private List<WellBoreIdentityAssignment> _wellBoreIdentityAssignments = [];
     private Guid? _selectedIdentityId;
@@ -380,7 +381,11 @@
                 }
                 if (_isSidetrack)
                 {
-                    _sidetrackType = CurrentWellBore.SidetrackType;
+                    WellBoreFeatureCategory? classification = SidetrackClassificationCategory();
+                    WellBoreFeatureAssignment? classificationAssignment = _wellBoreFeatureAssignments
+                        .FirstOrDefault(item => item.FeatureCategoryID == classification?.MetaInfo?.ID);
+                    _sidetrackClassificationOptionId = classificationAssignment?.FeatureOptionID ?? classification?.Options?
+                        .FirstOrDefault(option => string.Equals(option.Name, CurrentWellBore.SidetrackType.ToString(), StringComparison.OrdinalIgnoreCase))?.ID;
                     if (CurrentWellBore.TieInPointAlongHoleDepth != null && CurrentWellBore.TieInPointAlongHoleDepth.GaussianValue != null)
                     {
                         _sidetrackDepth = CurrentWellBore.TieInPointAlongHoleDepth.GaussianValue.Mean;
@@ -455,6 +460,7 @@
         {
             if (CurrentWellBore != null && CurrentWellBore.MetaInfo != null)
             {
+                ApplySidetrackClassification();
                 WellBore wellBore = new()
                 {
                     MetaInfo = CurrentWellBore.MetaInfo,
@@ -477,7 +483,6 @@
                 }
                 if (_isSidetrack)
                 {
-                    wellBore.SidetrackType = _sidetrackType;
                     if (_sidetrackDepth != null)
                     {
                         wellBore.TieInPointAlongHoleDepth = new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = _sidetrackDepth, StandardDeviation = (_sidetrackDepthAccuracy == null) ? 0.01 : _sidetrackDepthAccuracy } };
@@ -586,6 +591,40 @@
 
     private bool FeatureHasValidityPeriod(WellBoreFeatureAssignment assignment) =>
         _wellBoreFeatureCategories.FirstOrDefault(item => item.MetaInfo?.ID == assignment.FeatureCategoryID)?.HasValidityPeriod == true;
+
+    private WellBoreFeatureCategory? SidetrackClassificationCategory() =>
+        _wellBoreFeatureCategories.FirstOrDefault(item => item.Name == SidetrackClassificationCategoryName);
+
+    private IEnumerable<WellBoreFeatureOption> SidetrackClassificationOptions() =>
+        SidetrackClassificationCategory()?.Options ?? [];
+
+    private bool IsSidetrackClassification(WellBoreFeatureAssignment assignment) =>
+        assignment.FeatureCategoryID == SidetrackClassificationCategory()?.MetaInfo?.ID;
+
+    private void ApplySidetrackClassification()
+    {
+        WellBoreFeatureCategory? category = SidetrackClassificationCategory();
+        if (category?.MetaInfo == null) return;
+        List<WellBoreFeatureAssignment> existing = _wellBoreFeatureAssignments
+            .Where(item => item.FeatureCategoryID == category.MetaInfo.ID).ToList();
+        if (!_isSidetrack || _sidetrackClassificationOptionId is not Guid optionId ||
+            category.Options?.Any(item => item.ID == optionId) != true)
+        {
+            _wellBoreFeatureAssignments.RemoveAll(item => item.FeatureCategoryID == category.MetaInfo.ID);
+            return;
+        }
+        WellBoreFeatureAssignment? matching = existing.FirstOrDefault(item => item.FeatureOptionID == optionId);
+        if (matching != null)
+        {
+            _wellBoreFeatureAssignments.RemoveAll(item => item.FeatureCategoryID == category.MetaInfo.ID && item.ID != matching.ID);
+            return;
+        }
+        _wellBoreFeatureAssignments.RemoveAll(item => item.FeatureCategoryID == category.MetaInfo.ID);
+        _wellBoreFeatureAssignments.Add(new WellBoreFeatureAssignment
+        {
+            ID = Guid.NewGuid(), FeatureCategoryID = category.MetaInfo.ID, FeatureOptionID = optionId
+        });
+    }
 
     private bool ValidateCatalogAssignments()
     {

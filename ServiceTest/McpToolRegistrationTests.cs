@@ -152,6 +152,7 @@ public sealed class McpToolRegistrationTests
         string[] sidetrackTypes = ((JsonArray)Property(wellBore, "SidetrackType")["enum"]!)
             .Select(node => node!.GetValue<string>()).ToArray();
         Assert.That(sidetrackTypes, Is.EquivalentTo(new[] { "Undefined", "Technical", "Production", "Appraisal", "Lateral" }));
+        Assert.That(Property(wellBore, "SidetrackType")["deprecated"]?.GetValue<bool>(), Is.True);
     }
 
     [Test]

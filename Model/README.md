@@ -11,7 +11,7 @@ Domain data model for the WellBore solution. This project defines the core types
 - `WellBore`: Main entity with identity (`MetaInfo.ID`), descriptive fields, parent relationships for sidetracks, an optional `TieInPointAlongHoleDepth`, and identity/feature assignment collections.
 - `WellBoreIdentity` and `WellBoreIdentityAssignment`: User-managed identity definitions and values assigned to a wellbore.
 - `WellBoreFeatureCategory`, `WellBoreFeatureOption`, and `WellBoreFeatureAssignment`: User-managed classifications, options, exclusivity/validity rules, and assignments.
-- `SidetrackType`: Enum classifying sidetrack wells (e.g., Technical, Production, Appraisal, Lateral).
+- `SidetrackType`: Deprecated compatibility projection; new clients use the exclusive `SidetrackClassification` feature.
 - `UsageStatisticsWellBore`: Lightweight helper for usage telemetry (per-endpoint counters aggregated per day, persisted to `home/history.json`).
 - `WellBoreBatchExport`: Versioned logical backup/restore requests, documents, policies, errors, responses, and catalogue mappings.
 - `WellBoreExternalReferenceValidation` and audit request/result types: tri-state, read-only Well/Rig reference diagnostics with bounded all/selected paging.
@@ -57,9 +57,7 @@ var wb = new WellBore
     Name = "WB-01",
     Description = "Main bore for field X",
     CreationDate = DateTimeOffset.UtcNow,
-    IsSidetrack = true,
-    SidetrackType = SidetrackType.Production,
-    ParentWellBoreID = Guid.Parse("00000000-0000-0000-0000-000000000001")
+    IsSidetrack = false
 };
 
 // Optional Gaussian drilling property for tie-in depth can be set if available.
@@ -78,7 +76,7 @@ var roundtrip = JsonSerializer.Deserialize<WellBore>(json);
 Basic defaults validated by tests (see `ModelTest`):
 - Most reference properties default to `null`.
 - `IsSidetrack` defaults to `false`.
-- `SidetrackType` defaults to `Undefined`.
+- Deprecated `SidetrackType` defaults to `Undefined`; classification belongs in a `SidetrackClassification` feature assignment.
 - Identity and feature assignment collections are optional for backward compatibility with stored pre-version-1 wellbores.
 
 ## Integration In The Solution

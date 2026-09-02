@@ -75,7 +75,8 @@ namespace OSDC.Drilling.WellBore.Model
         [DefaultStandardDeviation(0.01)] // 1 cm
         public GaussianDrillingProperty? TieInPointAlongHoleDepth { get; set; } = null;
         /// <summary>
-        /// the type of the sidetack, when the wellbore is a sidetrack
+        /// Deprecated compatibility projection of the SidetrackClassification feature assignment.
+        /// New clients should manage that exclusive feature instead.
         /// </summary>
         public SidetrackType SidetrackType { get; set; } = SidetrackType.Undefined;
         /// <summary>

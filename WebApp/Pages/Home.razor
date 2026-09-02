@@ -2,26 +2,218 @@
 
 <PageTitle>WellBore</PageTitle>
 
-<MudText Typo="Typo.h3" Class="mt-4 mb-3">WellBore</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">
-    Manage WellBores, their identity values, feature assignments, trajectories, survey runs, and portable backups.
+<MudText Class="mx-4 px-4 mt-4" Typo="Typo.h2">OSDC WellBore</MudText>
+<MudDivider Class="mb-4" />
+<MudText Class="mx-6 px-6" Typo="Typo.body1">
+    This microservice manages WellBore records: their well and rig associations, sidetrack topology, identity
+    assignments, feature assignments, trajectories, survey runs, and portable versioned backups. It persists to
+    SQLite, enforces optimistic concurrency on every mutation, and exposes the same operations through a REST API, an
+    MCP server, and a Blazor web application, so a wellbore created or edited in one interface is immediately visible
+    through the others.
 </MudText>
 
-<MudText Typo="Typo.h5" Class="mb-2">WellBore management</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">
-    Open <MudLink Href="/WellBore/webapp/WellBore">WellBore</MudLink> to browse and edit records.
-    Use <MudLink Href="/WellBore/webapp/WellBoreFeatures">WellBore Features</MudLink> and
-    <MudLink Href="/WellBore/webapp/WellBoreIdentities">WellBore Identities</MudLink> to manage the shared catalogues.
-</MudText>
+<MudGrid Class="mx-4 px-4 mt-2">
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">What is a WellBore</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A <b>WellBore</b> is the record for one physical drilled path: a name, a description, server-owned
+                creation and modification timestamps, an optional <code>WellID</code> linking it to the well it
+                belongs to, an optional <code>RigID</code> for the rig that drilled it, its sidetrack topology, and
+                the identity and feature assignments that describe it. It is where trajectory geometry, survey
+                stations, and casing ultimately attach, and it never stands in for the administrative well record
+                itself.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                WellBore UUIDs are caller-generated so that consuming systems can mint and reference an identifier
+                before the record exists on the server, which matters when a wellbore is planned before it is
+                spudded.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">WellBores versus wells</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A WellBore is not the same thing as a <b>Well</b>. One Well record covers the entire well — its
+                location, identity, and feature record as a planning and administrative unit — while a WellBore is
+                one physical drilled path belonging to it, with its own geometry, survey stations, and casing. A well
+                is rarely a single hole: it is more often realized as an original bore plus any number of sidetracks,
+                each a separate WellBore.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                This is why the two are different microservices: <b>Well</b> owns the location, identity, and feature
+                record for the well as a whole, while this <b>WellBore</b> service owns the individual drilled-path
+                definitions — the original hole and any sidetracks — each linking back to its Well through the
+                optional <code>WellID</code>, an external reference this service validates but never blocks a write
+                on.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Types of wellbores: original hole and sidetracks</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                A wellbore that starts fresh from surface — from a <b>Slot</b> at a Cluster, or as a standalone hole —
+                carries <code>IsSidetrack = false</code> and no parent. A wellbore that branches off an existing one
+                instead carries <code>IsSidetrack = true</code>, a <code>ParentWellBoreID</code> pointing at the
+                wellbore it departs from, and a <code>TieInPointAlongHoleDepth</code> — the along-hole depth in the
+                parent where the sidetrack begins, always expressed in SI metres referenced to the WGS84 vertical
+                datum.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Sidetracks are further classified by <code>SidetrackType</code> — <b>Technical</b> (drilled to bypass
+                an obstruction or fish), <b>Production</b>, <b>Appraisal</b>, or <b>Lateral</b> — so the reason a bore
+                exists is recorded alongside where it begins. A parent-child chain of sidetracks can run arbitrarily
+                deep; the service rejects cycles and parent links that cross into a different Well when the topology
+                is written.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            <MudText Typo="Typo.h5" Class="mb-3">Identities and features</MudText>
+            <MudText Typo="Typo.body1" Class="mb-2">
+                Every wellbore can carry any number of user-defined <b>identities</b> — symbolic references such as a
+                UWI, an operator wellbore name, or a regulatory ID — each with a wellbore-specific value, and any
+                number of <b>feature</b> assignments drawn from user-defined categories and options, optionally
+                exclusive within a category and optionally time-bounded.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                The identity and feature <i>catalogs</i> are managed on the
+                <MudLink Href="/WellBore/webapp/WellBoreIdentities">WellBore Identities</MudLink> and
+                <MudLink Href="/WellBore/webapp/WellBoreFeatures">WellBore Features</MudLink> pages, while a specific
+                wellbore's assignments are added, replaced, or removed one at a time from the
+                <MudLink Href="/WellBore/webapp/WellBore">WellBore</MudLink> page — a definition or option cannot be
+                deleted while a wellbore still references it.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-<MudText Typo="Typo.h5" Class="mb-2">Backup and restore</MudText>
-<MudText Typo="Typo.body1" Class="mb-4">
-    The <MudLink Href="/WellBore/webapp/WellBoreBackupRestore">Backup and Restore</MudLink> page exports all or selected
-    WellBores with their referenced catalogue definitions and restores validated documents atomically.
-</MudText>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Contextual data and calculators</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        The web application's <b>Contextual Data</b> menu gives read access to the records a wellbore's topology
+        relies on: <MudLink Href="/WellBore/webapp/Well">Well</MudLink>,
+        <MudLink Href="/WellBore/webapp/Cluster">Cluster</MudLink>, <MudLink Href="/WellBore/webapp/Field">Field</MudLink>,
+        and <MudLink Href="/WellBore/webapp/Rig">Rig</MudLink> — each backed by its own microservice and shown here
+        through reusable Razor components, so a wellbore can be understood in its well, field, and drilling-program
+        context without leaving this application.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Calculators</b> menu exposes the same synchronous, stateless evaluations used elsewhere in OSDC —
+        <MudLink Href="/WellBore/webapp/FieldCartographicConverter">Cartographic Conversion</MudLink>,
+        <MudLink Href="/WellBore/webapp/EarthVerticalDatumCalculation">Vertical Datum Conversion</MudLink>,
+        <MudLink Href="/WellBore/webapp/EarthGravityCalculation">Earth Gravity Evaluation</MudLink>, and
+        <MudLink Href="/WellBore/webapp/EarthMagneticFieldCalculation">Earth Magnetic Field Evaluation</MudLink> —
+        for one-off conversions and lookups while working a wellbore, without switching to another site.
+    </MudText>
+</MudPaper>
 
-<MudText Typo="Typo.h5" Class="mb-2">Survey display and contextual data</MudText>
-<MudText Typo="Typo.body1">
-    Survey displays provide trajectory and survey-run views. Contextual pages provide access to related Well, Cluster,
-    and Field information.
-</MudText>
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Backup and restore</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Backups are logical, portable JSON, not a raw database copy. From the
+        <MudLink Href="/WellBore/webapp/WellBoreBackupRestore">Backup and Restore</MudLink> page, export <b>all</b>
+        wellbores or an ordered <b>selection</b> into one versioned document that carries the complete wellbores
+        together with only the identity and feature catalog entries they actually reference — enough to reproduce
+        the wellbores on another installation without pulling in unrelated catalog clutter. Well, Rig, and
+        parent-wellbore UUIDs travel as external references and are not resolved during export.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Restoring the same document back offers a <b>conflict policy</b> — fail if any wellbore UUID already exists,
+        or replace matching wellbores while creating the rest — and a <b>catalog policy</b> — map onto existing local
+        identity/feature definitions by UUID or name, or create the missing ones locally. Validation, catalog
+        mapping, and every wellbore write happen inside one SQLite transaction, so a restore of many wellbores either
+        commits completely or leaves the database untouched.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Data integrity and monitoring</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        WellBore updates, deletes, and individual identity/feature assignment changes use <b>optimistic
+        concurrency</b>: every mutation must echo back the <code>LastModificationDate</code> from the caller's latest
+        read, and a stale request is rejected rather than silently overwriting a concurrent change. Deleting a
+        catalog definition or option still in use by a wellbore is likewise rejected, and a wellbore cannot be
+        deleted while it still has sidetrack children — the child must be removed or re-parented first.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        Because <code>WellID</code> and <code>RigID</code> point at other services, WellBore also offers read-only
+        <b>external-reference validation</b> for one wellbore and a bounded <b>audit</b> across all or selected
+        wellbores, each reference reported as <code>Valid</code>, <code>Invalid</code>, or <code>Unavailable</code>
+        so a dependency outage is never confused with a genuinely broken reference. The
+        <MudLink Href="/WellBore/webapp/StatisticsWellBore">Usage Statistics</MudLink> page reports per-endpoint
+        request counts for this service replica.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Using this web application</MudText>
+    <MudText Typo="Typo.body1" Class="mb-2">
+        Open <MudLink Href="/WellBore/webapp/WellBore">WellBore</MudLink> to browse, search, create, edit, and remove
+        wellbores, set their well/rig/sidetrack topology, and manage their identity and feature assignments. Manage
+        the shared catalogs on <MudLink Href="/WellBore/webapp/WellBoreIdentities">WellBore Identities</MudLink> and
+        <MudLink Href="/WellBore/webapp/WellBoreFeatures">WellBore Features</MudLink>, and move data between
+        installations on <MudLink Href="/WellBore/webapp/WellBoreBackupRestore">Backup and Restore</MudLink>.
+    </MudText>
+    <MudText Typo="Typo.body1">
+        The <b>Survey Display</b> menu shows <MudLink Href="/WellBore/webapp/WellBoreTrajectories">WellBore
+        Trajectories</MudLink> and <MudLink Href="/WellBore/webapp/WellBoreSurveyRuns">WellBore Survey Runs</MudLink>
+        with Rig and mean-sea-level depth-reference integration, and the <b>Contextual Data</b> and
+        <b>Calculators</b> menus give access to the related records and evaluations described above. All numeric
+        fields follow the unit system selected for the page through the OSDC unit-reference system.
+    </MudText>
+</MudPaper>
+
+<MudPaper Class="mx-4 px-4 pa-6 mt-4 mb-6" Elevation="2">
+    <MudText Typo="Typo.h5" Class="mb-3">Access methods</MudText>
+    <MudText Typo="Typo.body1" Class="mb-3">
+        The same wellbore data is reachable through several interfaces built on the same underlying store, so it can
+        be managed interactively, scripted, embedded in other Blazor applications, or wired into AI agents.
+    </MudText>
+    <MudSimpleTable>
+        <thead>
+            <tr><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><b>Web page</b></td>
+                <td>
+                    This site — a server-side Blazor application (this page) for browsing, editing, backing up, and
+                    restoring wellbores, inspecting contextual data, running calculators, and reviewing usage
+                    statistics.
+                </td>
+            </tr>
+            <tr>
+                <td><b>REST API</b></td>
+                <td>
+                    JSON endpoints under <code>/WellBore/api</code> for wellbore CRUD, topology and details updates,
+                    bounded search, identity and feature catalog management, targeted assignment mutations,
+                    external-reference validation and audit, and batch export/restore, documented and explorable
+                    through the Swagger UI at <code>/WellBore/api/swagger</code>. Suited to scripts, backend
+                    integration, and any HTTP client.
+                </td>
+            </tr>
+            <tr>
+                <td><b>MCP</b></td>
+                <td>
+                    A Model Context Protocol server exposed as Streamable HTTP at <code>/WellBore/api/mcp</code> (and
+                    WebSocket at <code>/WellBore/api/mcp/ws</code>), publishing 39 tools — every non-statistics REST
+                    operation plus connectivity <code>ping</code> — with strict, closed input/output JSON Schemas, so
+                    AI agents and MCP-aware tooling can query, create, update, and back up wellbores directly.
+                </td>
+            </tr>
+            <tr>
+                <td><b>Reusable web pages</b></td>
+                <td>
+                    The Razor components behind the WellBore, catalog, backup/restore, and survey-display pages are
+                    published as the <code>OSDC.Drilling.WellBore.WebPages</code> NuGet package, so other Blazor
+                    applications — such as the Well web app — can embed the same unit-aware controls instead of
+                    re-implementing this UI.
+                </td>
+            </tr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>

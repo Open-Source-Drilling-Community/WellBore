@@ -28,6 +28,7 @@ internal static class WellBoreDocumentMutationManager
                 transaction.Rollback();
                 return WellBoreMutationResult.AlreadyExists($"A WellBore with UUID '{wellBore.MetaInfo.ID}' already exists.");
             }
+            WellBoreSidetrackClassification.Synchronize(connection, transaction, wellBore, featureIsCanonical: false);
             var errors = WellBoreReferenceIntegrityValidator.ValidateWellBore(connection, transaction, wellBore);
             if (errors.Count != 0)
             {
@@ -88,7 +89,8 @@ internal static class WellBoreDocumentMutationManager
             stored.TieInPointAlongHoleDepth = topology.TieInPointAlongHoleDepth;
             stored.SidetrackType = topology.SidetrackType;
             return stored;
-        }, topology == null ? WellBoreMutationResult.Invalid("topology", "required", "The WellBore topology is required.") : null);
+        }, topology == null ? WellBoreMutationResult.Invalid("topology", "required", "The WellBore topology is required.") : null,
+        legacyTypeIsExplicit: true);
 
     public static WellBoreMutationResult AddIdentityAssignment(SqlConnectionManager manager, ILogger logger, Guid id,
         DateTimeOffset expectedModifiedUtc, WellBoreIdentityAssignment? assignment) =>
@@ -130,17 +132,18 @@ internal static class WellBoreDocumentMutationManager
                 ? WellBoreMutationResult.Invalid("assignment.ID", "invalid_id", "A caller-generated non-empty assignment UUID is required.")
                 : null,
         stored => AssignmentIdExists(stored, assignment!.ID)
-            ? WellBoreMutationResult.AlreadyExists($"Assignment UUID '{assignment.ID}' already exists on this WellBore.") : null);
+            ? WellBoreMutationResult.AlreadyExists($"Assignment UUID '{assignment.ID}' already exists on this WellBore.") : null,
+        isFeatureMutation: true);
 
     public static WellBoreMutationResult UpdateFeatureAssignment(SqlConnectionManager manager, ILogger logger, Guid id,
         Guid assignmentId, DateTimeOffset expectedModifiedUtc, WellBoreFeatureAssignment? assignment) =>
         MutateAssignment(manager, logger, id, assignmentId, expectedModifiedUtc, assignment,
-            well => well.WellBoreFeatureAssignments ??= [], "feature");
+            well => well.WellBoreFeatureAssignments ??= [], "feature", isFeatureMutation: true);
 
     public static WellBoreMutationResult DeleteFeatureAssignment(SqlConnectionManager manager, ILogger logger, Guid id,
         Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
         DeleteAssignment(manager, logger, id, assignmentId, expectedModifiedUtc,
-            well => well.WellBoreFeatureAssignments ??= [], "feature");
+            well => well.WellBoreFeatureAssignments ??= [], "feature", isFeatureMutation: true);
 
     public static WellBoreMutationResult Delete(SqlConnectionManager manager, ILogger logger, Guid id,
         DateTimeOffset expectedModifiedUtc)
@@ -200,7 +203,8 @@ internal static class WellBoreDocumentMutationManager
 
     private static WellBoreMutationResult MutateAssignment<T>(SqlConnectionManager manager, ILogger logger, Guid id,
         Guid assignmentId, DateTimeOffset expectedModifiedUtc, T? assignment,
-        Func<WellBoreModel, System.Collections.Generic.List<T>> select, string kind) where T : class
+        Func<WellBoreModel, System.Collections.Generic.List<T>> select, string kind,
+        bool isFeatureMutation = false) where T : class
     {
         if (assignmentId == Guid.Empty || assignment == null || AssignmentId(assignment) != assignmentId)
             return WellBoreMutationResult.Invalid("assignment.ID", "id_mismatch", "The route assignment UUID must be non-empty and equal assignment.ID.");
@@ -212,12 +216,12 @@ internal static class WellBoreDocumentMutationManager
             values[index] = assignment;
             return stored;
         }, null, stored => select(stored).Any(value => AssignmentId(value) == assignmentId)
-            ? null : WellBoreMutationResult.NotFound($"The WellBore {kind} assignment does not exist."));
+            ? null : WellBoreMutationResult.NotFound($"The WellBore {kind} assignment does not exist."), isFeatureMutation);
     }
 
     private static WellBoreMutationResult DeleteAssignment<T>(SqlConnectionManager manager, ILogger logger, Guid id,
         Guid assignmentId, DateTimeOffset expectedModifiedUtc, Func<WellBoreModel, System.Collections.Generic.List<T>> select,
-        string kind) where T : class
+        string kind, bool isFeatureMutation = false) where T : class
     {
         if (assignmentId == Guid.Empty)
             return WellBoreMutationResult.Invalid("assignmentId", "invalid_id", "A non-empty assignment UUID is required.");
@@ -229,12 +233,13 @@ internal static class WellBoreDocumentMutationManager
             values.RemoveAt(index);
             return stored;
         }, null, stored => select(stored).Any(value => AssignmentId(value) == assignmentId)
-            ? null : WellBoreMutationResult.NotFound($"The WellBore {kind} assignment does not exist."));
+            ? null : WellBoreMutationResult.NotFound($"The WellBore {kind} assignment does not exist."), isFeatureMutation);
     }
 
     private static WellBoreMutationResult Mutate(SqlConnectionManager manager, ILogger logger, Guid id,
         DateTimeOffset expectedModifiedUtc, Func<WellBoreModel, WellBoreModel?> mutation,
-        WellBoreMutationResult? precondition = null, Func<WellBoreModel, WellBoreMutationResult?>? storedPrecondition = null)
+        WellBoreMutationResult? precondition = null, Func<WellBoreModel, WellBoreMutationResult?>? storedPrecondition = null,
+        bool isFeatureMutation = false, bool legacyTypeIsExplicit = false)
     {
         if (precondition != null) return precondition;
         if (id == Guid.Empty) return WellBoreMutationResult.Invalid("wellBoreId", "invalid_id", "A non-empty WellBore UUID is required.");
@@ -250,8 +255,13 @@ internal static class WellBoreDocumentMutationManager
             if (conflict != null) { transaction.Rollback(); return conflict; }
             WellBoreMutationResult? storedError = storedPrecondition?.Invoke(stored);
             if (storedError != null) { transaction.Rollback(); return storedError; }
+            bool hadClassification = isFeatureMutation &&
+                                     WellBoreSidetrackClassification.HasAssignment(connection, transaction, stored);
             WellBoreModel? updated = mutation(stored);
             if (updated == null) { transaction.Rollback(); return WellBoreMutationResult.Invalid("mutation", "invalid", "The requested mutation is invalid."); }
+            bool classificationIsCanonical = isFeatureMutation && (hadClassification ||
+                WellBoreSidetrackClassification.HasAssignment(connection, transaction, updated));
+            WellBoreSidetrackClassification.Synchronize(connection, transaction, updated, classificationIsCanonical, legacyTypeIsExplicit);
             var errors = WellBoreReferenceIntegrityValidator.ValidateWellBore(connection, transaction, updated);
             if (errors.Count != 0) { transaction.Rollback(); return WellBoreMutationResult.InvalidWellBore(errors); }
             updated.CreationDate = stored.CreationDate;

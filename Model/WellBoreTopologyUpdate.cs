@@ -22,6 +22,7 @@ public sealed class WellBoreTopologyUpdate
     [JsonRequired]
     public GaussianDrillingProperty? TieInPointAlongHoleDepth { get; set; }
 
+    /// <summary>Deprecated compatibility fallback; use a SidetrackClassification feature assignment.</summary>
     [JsonRequired]
     public SidetrackType SidetrackType { get; set; }
 }

@@ -72,8 +72,7 @@ curl -k -X POST "$BASE/WellBore" \
     "MetaInfo": { "ID": "11111111-1111-1111-1111-111111111111" },
     "Name": "WB-01",
     "Description": "Main bore for field X",
-    "IsSidetrack": true,
-    "SidetrackType": "Production"
+    "IsSidetrack": false
   }'
 ```
 
@@ -127,7 +126,7 @@ Swagger
 
 The OSDC charts are `Service/charts/osdcdrillingwellboreservice` and `WebApp/charts/osdcdrillingwellborewebappclient`. The service chart keeps the existing `wellbore-claim`, mounts it at `/home`, and uses a `Recreate` strategy so two SQLite writers cannot overlap. Follow [deployment/identity-cutover.md](deployment/identity-cutover.md) for the staged dev, prod, and awe migration; do not replace or delete the PVC during the identity change.
 
-Schema version 1 adds identity and feature-catalogue tables without rebuilding or rewriting `WellBoreTable`. The upgrade is transactional, preserves existing rows, and refuses unknown or newer schemas without changing them. Back up the SQLite database/PVC before deploying and keep exactly one service writer during the upgrade.
+Schema version 1 adds identity and feature-catalogue tables without rebuilding `WellBoreTable`. Schema version 2 transactionally adds the `SidetrackClassification` default feature and backfills only legacy WellBores whose deprecated `SidetrackType` has a value. Existing identifiers and unrelated fields are preserved, affected revisions are advanced to prevent stale overwrites, and any failure rolls back the category, assignments, document updates, and version marker together. Back up the SQLite database/PVC before deploying and keep exactly one service writer during the upgrade.
 
 The **Backup and Restore** page creates portable, versioned JSON backups of all WellBores or an ordered selection. Each document contains complete WellBore records and only their referenced identity/feature definitions. Restore validates the entire document and commits catalogue mapping/creation, reference rewriting, and every WellBore insert or replacement in one transaction.
 

@@ -36,10 +36,15 @@ public sealed class WellBoreCatalogTests
             {
                 "WellboreRole", "WellboreOrigin", "SidetrackReason", "WellboreGeometryClass",
                 "WellboreTrajectoryIntent", "WellboreConstructionStatus", "WellboreSectionContext",
-                "WellboreCompletionContext", "WellboreDataAvailability", "WellboreHazard"
+                "WellboreCompletionContext", "WellboreDataAvailability", "WellboreHazard", "SidetrackClassification"
             }));
             Assert.That(categories.Single(value => value.Name == "SidetrackReason").IsExclusive, Is.False);
             Assert.That(categories.Single(value => value.Name == "WellboreConstructionStatus").HasValidityPeriod, Is.True);
+            WellBoreFeatureCategory classification = categories.Single(value => value.Name == "SidetrackClassification");
+            Assert.That(classification.IsExclusive, Is.True);
+            Assert.That(classification.HasValidityPeriod, Is.False);
+            Assert.That(classification.Options!.Select(value => value.Name),
+                Is.EquivalentTo(new[] { "Technical", "Production", "Appraisal", "Lateral", "Unknown" }));
 
             WellBoreIdentity identity = identities.Single(value => value.Name == "OfficialAuthorityName");
             WellBoreFeatureCategory category = categories.Single(value => value.Name == "WellboreRole");
