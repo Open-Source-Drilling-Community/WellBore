@@ -293,7 +293,13 @@
     {
         try
         {
-            await Api.ClientWellBore.DeleteWellBoreByIdAsync(id);
+            WellBore? wellBore = wellBoreList.FirstOrDefault(value => value.MetaInfo?.ID == id);
+            if (wellBore?.LastModificationDate is not DateTimeOffset expectedModifiedUtc)
+            {
+                Snackbar.Add("Reload the WellBore before deleting it because its revision is unavailable.", Severity.Warning);
+                return;
+            }
+            await Api.ClientWellBore.DeleteWellBoreByIdAsync(id, expectedModifiedUtc);
             await OnInitializedAsync();
         }
         catch (Exception ex)
@@ -308,7 +314,12 @@
         {
             foreach (WellBore wellBore in selectedWellBoreList)
             {
-                await Api.ClientWellBore.DeleteWellBoreByIdAsync(wellBore.MetaInfo.ID);
+                if (wellBore.LastModificationDate is not DateTimeOffset expectedModifiedUtc)
+                {
+                    Snackbar.Add($"Skipped '{wellBore.Name}' because its revision is unavailable.", Severity.Warning);
+                    continue;
+                }
+                await Api.ClientWellBore.DeleteWellBoreByIdAsync(wellBore.MetaInfo.ID, expectedModifiedUtc);
             }
             await OnInitializedAsync();
         }

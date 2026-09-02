@@ -91,11 +91,10 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         }
 
         [HttpDelete("{id}", Name = "DeleteWellBoreIdentityById")]
-        public ActionResult DeleteWellBoreIdentityById(Guid id)
+        public ActionResult DeleteWellBoreIdentityById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
         {
-            return this.ToActionResult(WellBoreCatalogMutationManager.DeleteIdentity(_connectionManager, _logger, id));
+            return this.ToActionResult(WellBoreCatalogMutationManager.DeleteIdentity(_connectionManager, _logger, id, expectedModifiedUtc));
         }
     }
 }
-
 

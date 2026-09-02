@@ -38,12 +38,14 @@ internal static class WellBoreCatalogMutationManager
                 command.Parameters.AddWithValue("$name", identity.Name ?? (object)DBNull.Value);
             });
 
-    public static WellBoreMutationResult DeleteFeatureCategory(SqlConnectionManager manager, ILogger logger, Guid id) =>
-        Delete(manager, logger, id, "WellBoreFeatureCategoryTable",
+    public static WellBoreMutationResult DeleteFeatureCategory(SqlConnectionManager manager, ILogger logger, Guid id,
+        DateTimeOffset expectedModifiedUtc) =>
+        Delete(manager, logger, id, expectedModifiedUtc, "WellBoreFeatureCategoryTable", "WellBoreFeatureCategory",
             (connection, transaction) => WellBoreReferenceIntegrityValidator.FindFeatureCategoryReferences(connection, transaction, id));
 
-    public static WellBoreMutationResult DeleteIdentity(SqlConnectionManager manager, ILogger logger, Guid id) =>
-        Delete(manager, logger, id, "WellBoreIdentityTable",
+    public static WellBoreMutationResult DeleteIdentity(SqlConnectionManager manager, ILogger logger, Guid id,
+        DateTimeOffset expectedModifiedUtc) =>
+        Delete(manager, logger, id, expectedModifiedUtc, "WellBoreIdentityTable", "WellBoreIdentity",
             (connection, transaction) => WellBoreReferenceIntegrityValidator.FindIdentityReferences(connection, transaction, id));
 
     private static WellBoreMutationResult UpdateCategory<TCategory, TOption>(SqlConnectionManager manager, ILogger logger,
@@ -151,13 +153,16 @@ internal static class WellBoreCatalogMutationManager
         }
     }
 
-    private static WellBoreMutationResult Delete(SqlConnectionManager manager, ILogger logger, Guid id, string table,
+    private static WellBoreMutationResult Delete(SqlConnectionManager manager, ILogger logger, Guid id,
+        DateTimeOffset expectedModifiedUtc, string table, string documentColumn,
         Func<SqliteConnection, SqliteTransaction, WellBoreMutationError?> referenceCheck)
     {
         if (id == Guid.Empty)
         {
             return WellBoreMutationResult.Invalid("id", "invalid_id", "A non-empty UUID is required.");
         }
+        if (expectedModifiedUtc == default)
+            return WellBoreMutationResult.Invalid("expectedModifiedUtc", "required", "A non-default optimistic-concurrency timestamp is required.");
         using SqliteConnection? connection = manager.GetConnection();
         if (connection == null)
         {
@@ -166,15 +171,23 @@ internal static class WellBoreCatalogMutationManager
         using SqliteTransaction transaction = connection.BeginTransaction();
         try
         {
-            using (SqliteCommand exists = connection.CreateCommand())
+            using (SqliteCommand read = connection.CreateCommand())
             {
-                exists.Transaction = transaction;
-                exists.CommandText = $"SELECT COUNT(*) FROM {table} WHERE ID=$id";
-                exists.Parameters.AddWithValue("$id", id.ToString());
-                if (Convert.ToInt64(exists.ExecuteScalar()) == 0)
+                read.Transaction = transaction;
+                read.CommandText = $"SELECT {documentColumn} FROM {table} WHERE ID=$id";
+                read.Parameters.AddWithValue("$id", id.ToString());
+                if (read.ExecuteScalar() is not string json)
                 {
                     transaction.Rollback();
                     return WellBoreMutationResult.NotFound("The catalog definition does not exist.");
+                }
+                using JsonDocument document = JsonDocument.Parse(json);
+                DateTimeOffset storedRevision = ReadRevision(document.RootElement);
+                if (!SameInstant(storedRevision, expectedModifiedUtc))
+                {
+                    transaction.Rollback();
+                    return WellBoreMutationResult.ConcurrencyConflict("expectedModifiedUtc",
+                        $"Expected {expectedModifiedUtc:O}, but the stored definition was modified at {storedRevision:O}.");
                 }
             }
             WellBoreMutationError? referenceError = referenceCheck(connection, transaction);
@@ -213,6 +226,13 @@ internal static class WellBoreCatalogMutationManager
     }
 
     private static bool SameInstant(DateTimeOffset left, DateTimeOffset right) => left.UtcTicks == right.UtcTicks;
-}
 
+    private static DateTimeOffset ReadRevision(JsonElement element)
+    {
+        foreach (string property in new[] { "LastModificationDate", "CreationDate" })
+            if (element.TryGetProperty(property, out JsonElement value) && value.ValueKind == JsonValueKind.String &&
+                DateTimeOffset.TryParse(value.GetString(), out DateTimeOffset parsed)) return parsed;
+        return DateTimeOffset.UnixEpoch;
+    }
+}
 

@@ -82,8 +82,10 @@ public sealed class WellBoreCatalogTests
             };
             Assert.That(featureController.PutWellBoreFeatureCategoryById(category.MetaInfo.ID,
                 category.LastModificationDate!.Value, categoryWithoutReferencedOption), Is.TypeOf<ConflictObjectResult>());
-            Assert.That(identityController.DeleteWellBoreIdentityById(identity.MetaInfo.ID), Is.TypeOf<ConflictObjectResult>());
-            Assert.That(featureController.DeleteWellBoreFeatureCategoryById(category.MetaInfo.ID), Is.TypeOf<ConflictObjectResult>());
+            Assert.That(identityController.DeleteWellBoreIdentityById(identity.MetaInfo.ID,
+                identity.LastModificationDate.Value), Is.TypeOf<ConflictObjectResult>());
+            Assert.That(featureController.DeleteWellBoreFeatureCategoryById(category.MetaInfo.ID,
+                category.LastModificationDate.Value), Is.TypeOf<ConflictObjectResult>());
         }
         finally
         {

@@ -14,11 +14,14 @@ WebPagesHostConfiguration webPagesConfiguration = new()
     ClusterHostURL = builder.Configuration["ClusterHostURL"] ?? string.Empty,
     WellHostURL = builder.Configuration["WellHostURL"] ?? string.Empty,
     TrajectoryHostURL = builder.Configuration["TrajectoryHostURL"] ?? string.Empty,
-    CartographicProjectionHostURL = builder.Configuration["CartographicProjectionHostURL"] ?? string.Empty,
-    GeodeticDatumHostURL = builder.Configuration["GeodeticDatumHostURL"] ?? string.Empty,
-    VerticalDatumHostURL = builder.Configuration["VerticalDatumHostURL"] ?? string.Empty,
+    EarthCartographicProjectionHostURL = builder.Configuration["EarthCartographicProjectionHostURL"] ?? string.Empty,
+    EarthGeodesyHostURL = builder.Configuration["EarthGeodesyHostURL"] ?? string.Empty,
+    EarthGravityHostURL = builder.Configuration["EarthGravityHostURL"] ?? string.Empty,
+    EarthMagneticFieldHostURL = builder.Configuration["EarthMagneticFieldHostURL"] ?? string.Empty,
+    EarthVerticalDatumHostURL = builder.Configuration["EarthVerticalDatumHostURL"] ?? string.Empty,
 };
 
+builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices(config =>

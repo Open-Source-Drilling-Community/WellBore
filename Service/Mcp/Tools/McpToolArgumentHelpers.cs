@@ -49,6 +49,12 @@ internal static class McpToolArgumentHelpers
                 ["description"] = "Identifier of the stored wellbore to update. It must equal wellBore.MetaInfo.ID."
             };
             required.Add("id");
+            properties["expectedModifiedUtc"] = new JsonObject
+            {
+                ["type"] = "string", ["format"] = "date-time",
+                ["description"] = "Optimistic-concurrency token exactly matching the latest LastModificationDate."
+            };
+            required.Add("expectedModifiedUtc");
         }
         return new JsonObject
         {
@@ -58,6 +64,152 @@ internal static class McpToolArgumentHelpers
             ["additionalProperties"] = false
         };
     }
+
+    public static JsonObject CreateWellBoreDeleteSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["id"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["expectedModifiedUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" }
+        },
+        ["required"] = new JsonArray("id", "expectedModifiedUtc"),
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateWellBoreDetailsMutationSchema() => CreateSubresourceSchema("details", new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Name"] = new JsonObject { ["type"] = new JsonArray("string", "null") },
+            ["Description"] = new JsonObject { ["type"] = new JsonArray("string", "null") }
+        },
+        ["required"] = new JsonArray("Name", "Description"), ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellBoreTopologyMutationSchema() => CreateSubresourceSchema("topology", new JsonObject
+    {
+        ["type"] = "object",
+        ["description"] = "Complete replacement of Well, Rig, and sidetrack topology fields. WellID and RigID are externally owned and are not synchronously validated.",
+        ["properties"] = new JsonObject
+        {
+            ["WellID"] = NullableUuid("External Well UUID, or null."),
+            ["RigID"] = NullableUuid("External Rig UUID, or null."),
+            ["IsSidetrack"] = new JsonObject { ["type"] = "boolean" },
+            ["ParentWellBoreID"] = NullableUuid("Local parent WellBore UUID required for a sidetrack, otherwise null."),
+            ["TieInPointAlongHoleDepth"] = CreateTieInPointSchema(),
+            ["SidetrackType"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("Undefined", "Technical", "Production", "Appraisal", "Lateral") }
+        },
+        ["required"] = new JsonArray("WellID", "RigID", "IsSidetrack", "ParentWellBoreID", "TieInPointAlongHoleDepth", "SidetrackType"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellBoreSearchSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+            ["limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200, ["default"] = 50 },
+            ["name"] = new JsonObject { ["type"] = "string", ["maxLength"] = 200 },
+            ["wellId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["rigId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["parentWellBoreId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["isSidetrack"] = new JsonObject { ["type"] = "boolean" },
+            ["identityId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["identityValue"] = new JsonObject { ["type"] = "string", ["maxLength"] = 500 },
+            ["featureCategoryId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["featureOptionId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["modifiedFromUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["modifiedToUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" }
+        },
+        ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateIdentityAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema(CreateIdentityAssignmentSchema(), includeAssignmentId, includeBody);
+
+    public static JsonObject CreateFeatureAssignmentMutationSchema(bool includeAssignmentId, bool includeBody) =>
+        CreateAssignmentMutationSchema(CreateFeatureAssignmentSchema(), includeAssignmentId, includeBody);
+
+    public static JsonObject CreateStatusOnlyOutputSchema() => new()
+    {
+        ["type"] = "object", ["properties"] = new JsonObject { ["status"] = SuccessStatus() },
+        ["required"] = new JsonArray("status"), ["additionalProperties"] = false
+    };
+
+    public static JsonObject CreateIdsOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }
+    });
+
+    public static JsonObject CreateMetaInfoListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = CreateMetaInfoSchema("resource")
+    });
+
+    public static JsonObject CreateWellBoreOutputSchema() => SuccessEnvelope(CreateWellBoreObjectSchema());
+    public static JsonObject CreateWellBoreListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = CreateWellBoreObjectSchema()
+    });
+    public static JsonObject CreateIdentityOutputSchema() => SuccessEnvelope(CreateIdentityDefinitionSchema());
+    public static JsonObject CreateIdentityListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = CreateIdentityDefinitionSchema()
+    });
+    public static JsonObject CreateFeatureCategoryOutputSchema() => SuccessEnvelope(CreateFeatureCategoryDefinitionSchema());
+    public static JsonObject CreateFeatureCategoryListOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "array", ["items"] = CreateFeatureCategoryDefinitionSchema()
+    });
+    public static JsonObject CreateWellBoreSearchOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellBoreObjectSchema() },
+            ["Total"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0 },
+            ["Offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0 },
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 200 }
+        },
+        ["required"] = new JsonArray("Items", "Total", "Offset", "Limit"), ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateSubresourceSchema(string bodyName, JsonObject body)
+    {
+        JsonObject schema = CreateWellBoreDeleteSchema();
+        JsonObject properties = (JsonObject)schema["properties"]!;
+        properties[bodyName] = body;
+        ((JsonArray)schema["required"]!).Add(bodyName);
+        return schema;
+    }
+
+    private static JsonObject CreateAssignmentMutationSchema(JsonObject assignment, bool includeAssignmentId, bool includeBody)
+    {
+        JsonObject properties = new()
+        {
+            ["wellBoreId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["expectedModifiedUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" }
+        };
+        JsonArray required = new("wellBoreId", "expectedModifiedUtc");
+        if (includeAssignmentId) { properties["assignmentId"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }; required.Add("assignmentId"); }
+        if (includeBody) { properties["assignment"] = assignment; required.Add("assignment"); }
+        return new JsonObject { ["type"] = "object", ["properties"] = properties, ["required"] = required, ["additionalProperties"] = false };
+    }
+
+    private static JsonObject SuccessEnvelope(JsonObject data) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject { ["status"] = SuccessStatus(), ["data"] = data },
+        ["required"] = new JsonArray("status", "data"), ["additionalProperties"] = false
+    };
+
+    private static JsonObject SuccessStatus() => new()
+    {
+        ["type"] = "integer", ["minimum"] = 200, ["maximum"] = 299
+    };
 
     public static JsonObject CreateWellBoreIdentitySchema(bool includeId = false) =>
         WrapCatalogBody("wellBoreIdentity", CreateIdentityDefinitionSchema(), includeId, "wellBoreIdentity.MetaInfo.ID");

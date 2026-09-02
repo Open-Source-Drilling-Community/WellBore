@@ -483,7 +483,12 @@
                         wellBore.TieInPointAlongHoleDepth = new GaussianDrillingProperty() { GaussianValue = new GaussianDistribution() { Mean = _sidetrackDepth, StandardDeviation = (_sidetrackDepthAccuracy == null) ? 0.01 : _sidetrackDepthAccuracy } };
                     }
                 }
-                await Api.ClientWellBore.PutWellBoreByIdAsync(CurrentWellBore.MetaInfo.ID, wellBore);
+                if (CurrentWellBore.LastModificationDate is not DateTimeOffset expectedModifiedUtc)
+                {
+                    Snackbar.Add("Reload the WellBore before updating it because its revision is unavailable.", Severity.Warning);
+                    return;
+                }
+                await Api.ClientWellBore.PutWellBoreByIdAsync(CurrentWellBore.MetaInfo.ID, expectedModifiedUtc, wellBore);
                 logger.LogInformation("Updated the WellBore successfully");
                 Snackbar.Add("Updated the WellBore successfully", Severity.Success);
             }

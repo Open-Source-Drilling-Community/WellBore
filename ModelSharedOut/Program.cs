@@ -160,11 +160,18 @@ class Program
                             PrettyPrint(file, "Processing Open Api doc into API client...");
                             var stream = File.OpenRead(file);
                             var doc = new OpenApiStreamReader().Read(stream, out var diagnostic);
+                            bool isCurrentServiceContract = string.Equals(Path.GetFileName(file),
+                                "WellBoreFullName.json", StringComparison.OrdinalIgnoreCase);
 
                             // Merge paths
                             foreach (var p in doc.Paths)
                             {
-                                document.Paths.TryAdd(p.Key, p.Value);
+                                // Dependency documents may carry stale copies of WellBore routes. The schema
+                                // generated from this service is authoritative and must replace those copies.
+                                if (isCurrentServiceContract)
+                                    document.Paths[p.Key] = p.Value;
+                                else
+                                    document.Paths.TryAdd(p.Key, p.Value);
                             }
 
                             // Merge and normalize schemas (centralized in updater)
@@ -201,7 +208,8 @@ class Program
                             },
                             GenerateClientClasses = true,
                             GenerateDtoTypes = true,
-                            GenerateOptionalParameters = true
+                            GenerateOptionalParameters = true,
+                            ParameterDateTimeFormat = "O"
                         };
                         var generator = new CSharpClientGenerator(nswDocument, settings);
                         var code = generator.GenerateFile();

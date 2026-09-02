@@ -34,6 +34,13 @@ Base path and configuration
   - `FieldHostURL`
   - `ClusterHostURL`
   - `WellHostURL`
+  - `RigHostURL`
+  - `TrajectoryHostURL`
+  - `EarthCartographicProjectionHostURL`
+  - `EarthGeodesyHostURL`
+  - `EarthGravityHostURL`
+  - `EarthMagneticFieldHostURL`
+  - `EarthVerticalDatumHostURL`
 - Defaults:
   - Development: `WebApp/appsettings.Development.json` contains localhost for WellBore and digiWells dev endpoints for others.
   - Production: `WebApp/appsettings.Production.json` targets in-cluster DNS names.
@@ -52,6 +59,8 @@ dotnet run --project WebApp/WebApp.csproj
 - Assign identity values and feature options while editing a wellbore.
 - Use the **WellBore Identities** and **WellBore Features** navigation entries to manage the user-extensible catalogues.
 - Use **Backup and Restore** to download a versioned logical JSON backup of all or selected WellBores and atomically restore a validated document.
+
+The left navigation follows the Well application layout: a dedicated `/WellBore/webapp/Home` entry, an expanded **WellBore Management** group, and collapsed **Survey Display**, **Contextual Data**, **Calculators**, and **Monitoring** groups. Contextual Well, Cluster, Field, and Rig pages are embedded under the WellBore path. The calculators provide cartographic conversion, vertical-datum conversion, gravity evaluation, and magnetic-field evaluation.
 
 ## Docker
 Build the image
@@ -72,7 +81,9 @@ Open: `http://localhost:8080/WellBore/webapp/WellBore`
 ## Dependencies
 From `WebApp/WebApp.csproj`:
 - `OSDC.DotnetLibraries.General.DataManagement` — common data primitives used in UI.
-- `OSDC.UnitConversion.DrillingRazorMudComponents` — unit/reference selection UI components and services.
+- `OSDC.Drilling.Well.WebPages` 1.1.0 — embedded Well pages.
+- `OSDC.Drilling.Cluster.WebPages` 1.1.0, `OSDC.Drilling.Field.WebPages` 2.0.0, and `OSDC.Drilling.Rig.WebPages` 1.1.0 — contextual-data pages.
+- `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.1, `OSDC.Drilling.EarthGravity.WebPages` 1.0.2, `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.2, and `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.2 — calculator pages and clients.
 
 Transitive/runtime:
 - MudBlazor — UI toolkit used via `AddMudServices` in `WebApp/Program.cs`.
@@ -100,6 +111,6 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## Current shared-page dependencies
 
-The WebApp's embedded service pages are aligned to Field 1.0.19, Cluster 1.0.12, Cartographic Projection 1.0.8, Geodetic Datum 1.0.7, and Well 1.0.11. Keep external Razor assembly registration synchronized when these packages are upgraded.
+The external Razor assembly registration in `ExternalRazorAssemblies.cs` must remain synchronized with the OSDC shared-page package references when they are upgraded. Earth Vertical Datum, Earth Gravity, and Earth Magnetic Field calculators are exposed through local wrapper pages so the packages' unrelated routes, including their Home pages, are not imported into the WellBore router.
 
-The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses the migrated OSDC DNS names for WellBore, Well, Field, Cluster, and Rig while retaining legacy DNS names for services that have not yet migrated.
+The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses OSDC DNS names for WellBore, Well, Field, Cluster, Rig, and all calculator services. The trajectory service retains its existing DNS name until that separate microservice is migrated.

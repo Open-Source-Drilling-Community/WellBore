@@ -17,6 +17,7 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreMetaInfo"] = "well_bore_get_all_meta_info",
         ["GetWellBoreById"] = "well_bore_get_by_id",
         ["GetAllWellBore"] = "well_bore_get_all",
+        ["SearchWellBores"] = "well_bore_search",
         ["BatchExportWellBores"] = "well_bore_batch_export",
         ["BatchRestoreWellBores"] = "well_bore_batch_restore",
         ["GetAllWellBoreByWellID"] = "well_bore_get_all_by_well_id",
@@ -25,6 +26,14 @@ public sealed class McpToolRegistrationTests
         ["GetAllSidetrackedWellBore"] = "well_bore_get_all_sidetracked",
         ["PostWellBore"] = "well_bore_create",
         ["PutWellBoreById"] = "well_bore_update_by_id",
+        ["PutWellBoreDetails"] = "well_bore_details_update",
+        ["PutWellBoreTopology"] = "well_bore_topology_update",
+        ["PostWellBoreIdentityAssignment"] = "well_bore_identity_assignment_add",
+        ["PutWellBoreIdentityAssignment"] = "well_bore_identity_assignment_update_by_id",
+        ["DeleteWellBoreIdentityAssignment"] = "well_bore_identity_assignment_delete_by_id",
+        ["PostWellBoreFeatureAssignment"] = "well_bore_feature_assignment_add",
+        ["PutWellBoreFeatureAssignment"] = "well_bore_feature_assignment_update_by_id",
+        ["DeleteWellBoreFeatureAssignment"] = "well_bore_feature_assignment_delete_by_id",
         ["DeleteWellBoreById"] = "well_bore_delete_by_id",
         ["GetAllWellBoreIdentityId"] = "well_bore_identity_get_all_ids",
         ["GetAllWellBoreIdentityMetaInfo"] = "well_bore_identity_get_all_meta_info",
@@ -147,9 +156,57 @@ public sealed class McpToolRegistrationTests
     public void Update_tool_schema_requires_matching_id_and_wellbore_arguments()
     {
         JsonObject root = RequireObject(_tools["well_bore_update_by_id"].InputSchema);
-        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "wellBore", "id" }));
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "wellBore", "id", "expectedModifiedUtc" }));
         Assert.That(Property(root, "id")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
         Assert.That(Property(root, "id")["description"]?.GetValue<string>(), Does.Contain("wellBore.MetaInfo.ID"));
+    }
+
+    [Test]
+    public void Every_tool_publishes_strict_input_output_and_behavior_metadata()
+    {
+        foreach (IMcpTool tool in _tools.Values)
+        {
+            JsonObject input = RequireObject(tool.InputSchema);
+            JsonObject output = RequireObject(tool.OutputSchema);
+            Assert.Multiple(() =>
+            {
+                Assert.That(input["type"]?.GetValue<string>(), Is.EqualTo("object"), tool.Name);
+                Assert.That(input["additionalProperties"]?.GetValue<bool>(), Is.False, tool.Name);
+                Assert.That(output["type"]?.GetValue<string>(), Is.EqualTo("object"), tool.Name);
+                Assert.That(output["additionalProperties"]?.GetValue<bool>(), Is.False, tool.Name);
+                Assert.That(tool.Behavior.Title, Is.Not.Empty, tool.Name);
+            });
+        }
+    }
+
+    [Test]
+    public void Destructive_and_read_only_hints_match_tool_semantics()
+    {
+        Assert.That(_tools["well_bore_get_by_id"].Behavior.ReadOnlyHint, Is.True);
+        Assert.That(_tools["well_bore_search"].Behavior.ReadOnlyHint, Is.True);
+        Assert.That(_tools["well_bore_delete_by_id"].Behavior.DestructiveHint, Is.True);
+        Assert.That(_tools["well_bore_batch_restore"].Behavior.DestructiveHint, Is.True);
+        Assert.That(_tools["well_bore_details_update"].Behavior.ReadOnlyHint, Is.False);
+    }
+
+    [TestCase("well_bore_delete_by_id")]
+    [TestCase("well_bore_identity_delete_by_id")]
+    [TestCase("well_bore_feature_category_delete_by_id")]
+    public void Delete_tools_require_a_concurrency_revision(string toolName)
+    {
+        JsonObject root = RequireObject(_tools[toolName].InputSchema);
+        Assert.That(RequiredNames(root), Is.EquivalentTo(new[] { "id", "expectedModifiedUtc" }));
+        Assert.That(Property(root, "expectedModifiedUtc")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
+    }
+
+    [TestCase("wellId", "not-a-uuid")]
+    [TestCase("modifiedFromUtc", "not-a-timestamp")]
+    public async Task Search_rejects_malformed_optional_filters(string key, string value)
+    {
+        JsonObject? response = await _tools["well_bore_search"]
+            .InvokeAsync(new JsonObject { [key] = value }, CancellationToken.None) as JsonObject;
+        Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
     }
 
     [TestCase("well_bore_get_by_id")]

@@ -91,11 +91,10 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         }
 
         [HttpDelete("{id}", Name = "DeleteWellBoreFeatureCategoryById")]
-        public ActionResult DeleteWellBoreFeatureCategoryById(Guid id)
+        public ActionResult DeleteWellBoreFeatureCategoryById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
         {
-            return this.ToActionResult(WellBoreCatalogMutationManager.DeleteFeatureCategory(_connectionManager, _logger, id));
+            return this.ToActionResult(WellBoreCatalogMutationManager.DeleteFeatureCategory(_connectionManager, _logger, id, expectedModifiedUtc));
         }
     }
 }
-
 

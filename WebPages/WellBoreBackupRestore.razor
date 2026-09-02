@@ -442,7 +442,7 @@
         string confirmation = _restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting
             ? $"Restore {_restoreDocument.WellBores.Count} WellBore(s)? Existing WellBores with matching UUIDs will be replaced."
             : $"Restore {_restoreDocument.WellBores.Count} WellBore(s)? The operation will stop without changes if any UUID already exists.";
-        bool? confirmed = await DialogService.ShowMessageBox(
+        bool? confirmed = await DialogService.ShowMessageBoxAsync(
             "Restore WellBores",
             confirmation,
             yesText: _restorePolicy == WellBoreBatchRestoreConflictPolicy.ReplaceExisting ? "Restore and replace" : "Restore",

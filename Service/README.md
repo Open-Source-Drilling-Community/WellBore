@@ -68,16 +68,21 @@ All routes are relative to `/WellBore/api`.
 - `GET /WellBore/MetaInfo` — List `MetaInfo` of all WellBore.
 - `GET /WellBore/{id}` — Get a WellBore by ID.
 - `GET /WellBore/HeavyData` — Get all WellBore entities.
+- `GET /WellBore/Search` — Search and page WellBores by name, topology, assignments, or modification time.
 - `POST /WellBore` — Create a WellBore (requires non-empty `MetaInfo.ID`).
-- `PUT /WellBore/{id}` — Update an existing WellBore by ID.
-- `DELETE /WellBore/{id}` — Delete a WellBore by ID.
+- `PUT /WellBore/{id}?expectedModifiedUtc=...` — Full replacement protected by optimistic concurrency.
+- `PUT /WellBore/{id}/Details?expectedModifiedUtc=...` — Replace only name and description.
+- `PUT /WellBore/{id}/Topology?expectedModifiedUtc=...` — Replace Well/Rig and sidetrack topology fields.
+- `POST|PUT|DELETE /WellBore/{wellBoreId}/IdentityAssignments/...` — Mutate one identity assignment.
+- `POST|PUT|DELETE /WellBore/{wellBoreId}/FeatureAssignments/...` — Mutate one feature assignment.
+- `DELETE /WellBore/{id}?expectedModifiedUtc=...` — Delete a current revision; parent WellBores with children are protected.
 - `POST /WellBore/BatchExport` — Export all or selected WellBores with referenced catalogue dependencies.
 - `POST /WellBore/BatchRestore` — Validate and atomically restore a versioned backup document.
 - `GET|POST /WellBoreIdentity` and `GET|PUT|DELETE /WellBoreIdentity/{id}` — Discover and manage identity definitions.
 - `GET|POST /WellBoreFeatureCategory` and `GET|PUT|DELETE /WellBoreFeatureCategory/{id}` — Discover and manage feature categories/options.
 - `GET /WellBoreUsageStatistics` — Retrieve per-endpoint daily usage counters.
 
-Catalogue update endpoints require `expectedModifiedUtc`. Stale writes return a conflict. Deleting a referenced identity/category, or removing a feature option that is in use, also returns a conflict rather than cascading or corrupting assignments. WellBore create/update validates assignment IDs, catalogue references, option membership, date ranges, validity rules, and overlapping exclusive assignments before committing.
+All WellBore updates, assignment mutations, deletes, and catalogue updates or deletes require `expectedModifiedUtc` from the latest `LastModificationDate`. Stale writes return a conflict without changing data. Referenced catalogues, feature options, and parent WellBores cannot be deleted. Writes validate assignment rules and sidetrack topology before committing. Legacy rows without timestamps use a stable Unix-epoch revision and are upgraded only when explicitly written; no database migration or bulk row rewrite is required.
 
 Batch restore uses one transaction for catalogue mapping/creation, assignment-reference rewriting, validation, and all WellBore writes. Invalid input, unresolved or ambiguous catalogue definitions, UUID conflicts under `FailIfExists`, and storage errors roll back the complete operation. It never clears the database and preserves unrelated rows.
 
@@ -102,8 +107,8 @@ curl -k -X POST "$BASE/WellBore" \
     "MetaInfo": { "ID": "11111111-1111-1111-1111-111111111111" },
     "Name": "WB-01",
     "Description": "Main bore for field X",
-    "IsSidetrack": true,
-    "SidetrackType": "Production"
+    "IsSidetrack": false,
+    "SidetrackType": "Undefined"
   }'
 ```
 
@@ -114,7 +119,7 @@ curl -k "$BASE/WellBore/11111111-1111-1111-1111-111111111111"
 
 Update by ID
 ```
-curl -k -X PUT "$BASE/WellBore/11111111-1111-1111-1111-111111111111" \
+curl -k -X PUT "$BASE/WellBore/11111111-1111-1111-1111-111111111111?expectedModifiedUtc=2026-09-01T08:00:00Z" \
   -H "Content-Type: application/json" \
   -d '{
     "MetaInfo": { "ID": "11111111-1111-1111-1111-111111111111" },
@@ -124,7 +129,7 @@ curl -k -X PUT "$BASE/WellBore/11111111-1111-1111-1111-111111111111" \
 
 Delete by ID
 ```
-curl -k -X DELETE "$BASE/WellBore/11111111-1111-1111-1111-111111111111"
+curl -k -X DELETE "$BASE/WellBore/11111111-1111-1111-1111-111111111111?expectedModifiedUtc=2026-09-01T08:05:00Z"
 ```
 
 Get usage statistics
@@ -182,7 +187,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## MCP server
 
-The service publishes all 13 core WellBore and 14 identity/feature-catalogue REST operations as MCP tools. This includes `well_bore_batch_export` and `well_bore_batch_restore`. Tool names use the underscore convention directly, and access-statistics operations are deliberately not registered. Each tool includes an explicit JSON input schema; create and update describe the complete WellBore payload, including identity/feature assignments, well/rig associations, sidetrack relationships, tie-in depth uncertainty, and sidetrack classification. `TieInPointAlongHoleDepth` values are always expressed in meters (SI) and referenced to the fixed WGS84 vertical datum; MCP clients must convert other units or vertical references before submitting them.
+The service publishes 36 REST-backed MCP tools plus `ping`: 22 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
 
 - Streamable HTTP: `/wellbore/api/mcp`
 - WebSocket: `/wellbore/api/mcp/ws`

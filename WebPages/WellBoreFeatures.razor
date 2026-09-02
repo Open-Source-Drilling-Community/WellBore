@@ -203,7 +203,8 @@ else
             {
                 try
                 {
-                    await Api.ClientWellBore.DeleteWellBoreFeatureCategoryByIdAsync(id.Value);
+                    await Api.ClientWellBore.DeleteWellBoreFeatureCategoryByIdAsync(id.Value,
+                        category.LastModificationDate ?? throw new InvalidOperationException("The stored category has no concurrency timestamp."));
                 }
                 catch (ApiException ex) when (ex.StatusCode == 404)
                 {
@@ -223,7 +224,7 @@ else
 
     private async Task<bool> ConfirmDeletionAsync(WellBoreFeatureCategory category)
     {
-        bool? result = await DialogService.ShowMessageBox(
+        bool? result = await DialogService.ShowMessageBoxAsync(
             "Delete",
             $"Delete wellbore feature category '{category.Name ?? category.MetaInfo?.ID.ToString()}'?",
             yesText: "Delete",
@@ -392,4 +393,3 @@ else
         _selectedOptionIds.RemoveWhere(id => !existingOptionIds.Contains(id));
     }
 }
-

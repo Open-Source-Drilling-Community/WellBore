@@ -66,6 +66,63 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             }
         }
 
+        internal WellBoreMutationResult CreateWellBore(Model.WellBore? value) =>
+            WellBoreDocumentMutationManager.Create(_connectionManager, _logger, value);
+
+        internal WellBoreMutationResult UpdateWellBore(Guid id, DateTimeOffset expectedModifiedUtc, Model.WellBore? value) =>
+            WellBoreDocumentMutationManager.Update(_connectionManager, _logger, id, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult UpdateWellBoreDetails(Guid id, DateTimeOffset expectedModifiedUtc, WellBoreDetailsUpdate? value) =>
+            WellBoreDocumentMutationManager.UpdateDetails(_connectionManager, _logger, id, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult UpdateWellBoreTopology(Guid id, DateTimeOffset expectedModifiedUtc, WellBoreTopologyUpdate? value) =>
+            WellBoreDocumentMutationManager.UpdateTopology(_connectionManager, _logger, id, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult AddIdentityAssignment(Guid id, DateTimeOffset expectedModifiedUtc, WellBoreIdentityAssignment? value) =>
+            WellBoreDocumentMutationManager.AddIdentityAssignment(_connectionManager, _logger, id, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult UpdateIdentityAssignment(Guid id, Guid assignmentId, DateTimeOffset expectedModifiedUtc, WellBoreIdentityAssignment? value) =>
+            WellBoreDocumentMutationManager.UpdateIdentityAssignment(_connectionManager, _logger, id, assignmentId, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult DeleteIdentityAssignment(Guid id, Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
+            WellBoreDocumentMutationManager.DeleteIdentityAssignment(_connectionManager, _logger, id, assignmentId, expectedModifiedUtc);
+
+        internal WellBoreMutationResult AddFeatureAssignment(Guid id, DateTimeOffset expectedModifiedUtc, WellBoreFeatureAssignment? value) =>
+            WellBoreDocumentMutationManager.AddFeatureAssignment(_connectionManager, _logger, id, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult UpdateFeatureAssignment(Guid id, Guid assignmentId, DateTimeOffset expectedModifiedUtc, WellBoreFeatureAssignment? value) =>
+            WellBoreDocumentMutationManager.UpdateFeatureAssignment(_connectionManager, _logger, id, assignmentId, expectedModifiedUtc, value);
+
+        internal WellBoreMutationResult DeleteFeatureAssignment(Guid id, Guid assignmentId, DateTimeOffset expectedModifiedUtc) =>
+            WellBoreDocumentMutationManager.DeleteFeatureAssignment(_connectionManager, _logger, id, assignmentId, expectedModifiedUtc);
+
+        internal WellBoreMutationResult DeleteWellBore(Guid id, DateTimeOffset expectedModifiedUtc) =>
+            WellBoreDocumentMutationManager.Delete(_connectionManager, _logger, id, expectedModifiedUtc);
+
+        public WellBoreSearchResult? SearchWellBores(int offset, int limit, string? name, Guid? wellId, Guid? rigId,
+            Guid? parentWellBoreId, bool? isSidetrack, Guid? identityId, string? identityValue,
+            Guid? featureCategoryId, Guid? featureOptionId, DateTimeOffset? modifiedFromUtc, DateTimeOffset? modifiedToUtc)
+        {
+            List<Model.WellBore?>? stored = GetAllWellBore();
+            if (stored == null) return null;
+            IEnumerable<Model.WellBore> query = stored.Where(value => value?.MetaInfo != null).Cast<Model.WellBore>();
+            foreach (Model.WellBore value in query) WellBoreDocumentMutationManager.EnsureRevision(value);
+            if (!string.IsNullOrWhiteSpace(name)) query = query.Where(value => value.Name?.Contains(name, StringComparison.OrdinalIgnoreCase) == true);
+            if (wellId.HasValue) query = query.Where(value => value.WellID == wellId);
+            if (rigId.HasValue) query = query.Where(value => value.RigID == rigId);
+            if (parentWellBoreId.HasValue) query = query.Where(value => value.ParentWellBoreID == parentWellBoreId);
+            if (isSidetrack.HasValue) query = query.Where(value => value.IsSidetrack == isSidetrack);
+            if (identityId.HasValue) query = query.Where(value => (value.WellBoreIdentityAssignments ?? []).Any(item => item?.IdentityID == identityId));
+            if (!string.IsNullOrWhiteSpace(identityValue)) query = query.Where(value => (value.WellBoreIdentityAssignments ?? [])
+                .Any(item => item?.Value?.Contains(identityValue, StringComparison.OrdinalIgnoreCase) == true));
+            if (featureCategoryId.HasValue) query = query.Where(value => (value.WellBoreFeatureAssignments ?? []).Any(item => item?.FeatureCategoryID == featureCategoryId));
+            if (featureOptionId.HasValue) query = query.Where(value => (value.WellBoreFeatureAssignments ?? []).Any(item => item?.FeatureOptionID == featureOptionId));
+            if (modifiedFromUtc.HasValue) query = query.Where(value => value.LastModificationDate >= modifiedFromUtc);
+            if (modifiedToUtc.HasValue) query = query.Where(value => value.LastModificationDate <= modifiedToUtc);
+            List<Model.WellBore> matches = query.OrderBy(value => value.MetaInfo!.ID).ToList();
+            return new WellBoreSearchResult { Total = matches.Count, Offset = offset, Limit = limit, Items = matches.Skip(offset).Take(limit).ToList() };
+        }
+
         /// <summary>Creates a dependency-closed WellBore backup from one SQLite snapshot.</summary>
         public WellBoreBatchExportOutcome ExportBatch(WellBoreBatchExportRequest? request)
         {
@@ -281,6 +338,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                         {
                             string data = reader.GetString(0);
                             wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                            WellBoreDocumentMutationManager.EnsureRevision(wellBore);
                             if (wellBore != null && wellBore.MetaInfo != null && !wellBore.MetaInfo.ID.Equals(guid))
                                 throw new SqliteException("SQLite database corrupted: returned WellBore is null or has been jsonified with the wrong ID.", 1);
                         }
@@ -329,6 +387,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
+                        WellBoreDocumentMutationManager.EnsureRevision(wellBore);
                         vals.Add(wellBore);
                     }
                     _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");

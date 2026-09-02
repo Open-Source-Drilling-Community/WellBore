@@ -12,7 +12,11 @@ public sealed class PingMcpTool : IMcpTool
 
     public string Description => "Returns a pong response so clients can verify MCP connectivity.";
 
-    public JsonNode? InputSchema => null;
+    public McpToolBehavior Behavior => new("Ping WellBore MCP", true, false, true, false);
+
+    public JsonNode InputSchema => JsonNode.Parse("""{"type":"object","additionalProperties":false}""")!;
+
+    public JsonNode OutputSchema => JsonNode.Parse("""{"type":"object","properties":{"message":{"type":"string"},"timestamp":{"type":"string","format":"date-time"}},"required":["message","timestamp"],"additionalProperties":false}""")!;
 
     public Task<JsonNode?> InvokeAsync(JsonObject? arguments, CancellationToken cancellationToken)
     {

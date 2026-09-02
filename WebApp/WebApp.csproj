@@ -24,13 +24,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="8.14.0" />
-    <PackageReference Include="NORCE.Drilling.CartographicProjection.WebPages" Version="1.0.8" />
-    <PackageReference Include="NORCE.Drilling.Cluster.WebPages" Version="1.0.12" />
-    <PackageReference Include="NORCE.Drilling.Field.WebPages" Version="1.0.19" />
-    <PackageReference Include="NORCE.Drilling.GeodeticDatum.WebPages" Version="1.0.7" />
-    <PackageReference Include="NORCE.Drilling.Well.WebPages" Version="1.0.11" />
-    <PackageReference Include="OSDC.DotnetLibraries.General.DataManagement" Version="2.1.0" />
+    <PackageReference Include="MudBlazor" Version="9.6.0" />
+    <PackageReference Include="OSDC.Drilling.Cluster.WebPages" Version="1.1.0" />
+    <PackageReference Include="OSDC.Drilling.EarthCartographicProjection.WebPages" Version="1.1.0" />
+    <PackageReference Include="OSDC.Drilling.EarthGeodesy.WebPages" Version="1.1.1" />
+    <PackageReference Include="OSDC.Drilling.EarthGravity.WebPages" Version="1.0.2" />
+    <PackageReference Include="OSDC.Drilling.EarthMagneticField.WebPages" Version="1.0.2" />
+    <PackageReference Include="OSDC.Drilling.EarthVerticalDatum.WebPages" Version="1.1.2" />
+    <PackageReference Include="OSDC.Drilling.Field.WebPages" Version="2.0.0" />
+    <PackageReference Include="OSDC.Drilling.Rig.WebPages" Version="1.1.0" />
+    <PackageReference Include="OSDC.Drilling.Well.WebPages" Version="1.1.0" />
+    <PackageReference Include="OSDC.DotnetLibraries.General.DataManagement" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

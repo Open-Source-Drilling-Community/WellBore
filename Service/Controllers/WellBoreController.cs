@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using OSDC.DotnetLibraries.General.DataManagement;
 using OSDC.Drilling.WellBore.Service.Managers;
@@ -106,6 +108,34 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        /// <summary>Returns one deterministic, bounded page of WellBores matching optional filters.</summary>
+        [HttpGet("Search", Name = "SearchWellBores")]
+        [ProducesResponseType<WellBoreSearchResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellBoreMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        public ActionResult<WellBoreSearchResult> SearchWellBores(
+            [FromQuery] int offset = 0, [FromQuery] int limit = 50,
+            [FromQuery] string? name = null, [FromQuery] Guid? wellId = null,
+            [FromQuery] Guid? rigId = null, [FromQuery] Guid? parentWellBoreId = null,
+            [FromQuery] bool? isSidetrack = null, [FromQuery] Guid? identityId = null,
+            [FromQuery] string? identityValue = null, [FromQuery] Guid? featureCategoryId = null,
+            [FromQuery] Guid? featureOptionId = null, [FromQuery] DateTimeOffset? modifiedFromUtc = null,
+            [FromQuery] DateTimeOffset? modifiedToUtc = null)
+        {
+            if (offset < 0 || limit is < 1 or > 200)
+                return BadRequest(WellBoreMutationResult.Invalid("pagination", "invalid_range", "Offset must be non-negative and limit must be between 1 and 200.").Error);
+            if (name?.Length > 200 || identityValue?.Length > 500)
+                return BadRequest(WellBoreMutationResult.Invalid("filters", "value_too_long", "Name is limited to 200 characters and identityValue to 500 characters.").Error);
+            if (new[] { wellId, rigId, parentWellBoreId, identityId, featureCategoryId, featureOptionId }.Any(value => value == Guid.Empty))
+                return BadRequest(WellBoreMutationResult.Invalid("filters", "empty_uuid", "Optional UUID filters must be omitted or non-empty.").Error);
+            if (modifiedFromUtc > modifiedToUtc)
+                return BadRequest(WellBoreMutationResult.Invalid("modifiedFromUtc", "invalid_date_range", "modifiedFromUtc must be earlier than or equal to modifiedToUtc.").Error);
+            WellBoreSearchResult? result = _wellBoreManager.SearchWellBores(offset, limit, name, wellId, rigId,
+                parentWellBoreId, isSidetrack, identityId, identityValue, featureCategoryId, featureOptionId,
+                modifiedFromUtc, modifiedToUtc);
+            return result != null ? Ok(result) : StatusCode(StatusCodes.Status500InternalServerError,
+                WellBoreMutationResult.StorageFailure().Error);
         }
 
         /// <summary>Exports all WellBores or an ordered selection with referenced local catalog definitions.</summary>
@@ -228,34 +258,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         public ActionResult PostWellBore([FromBody] Model.WellBore? data)
         {
             UsageStatisticsWellBore.Instance.IncrementPostWellBorePerDay();
-            // Check if wellBore exists in the database through ID
-            if (data != null && data.MetaInfo != null && data.MetaInfo.ID != Guid.Empty)
-            {
-                var existingData = _wellBoreManager.GetWellBoreById(data.MetaInfo.ID);
-                if (existingData == null)
-                {   
-                    //  If wellBore was not found, call AddWellBore, where the wellBore.Calculate()
-                    // method is called. 
-                    if (_wellBoreManager.AddWellBore(data))
-                    {
-                        return Ok(); // status=OK is used rather than status=Created because NSwag auto-generated controllers use 200 (OK) rather than 201 (Created) as return codes
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("The given WellBore already exists and will not be added");
-                    return StatusCode(StatusCodes.Status409Conflict);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The given WellBore is null, badly formed, or its ID is empty");
-                return BadRequest();
-            }
+            return this.ToActionResult(_wellBoreManager.CreateWellBore(data));
         }
 
         /// <summary>
@@ -264,35 +267,75 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// <param name="wellBore"></param>
         /// <returns>true if the given WellBore has been updated successfully to the microservice database, at the endpoint WellBore/api/WellBore/id</returns>
         [HttpPut("{id}", Name = "PutWellBoreById")]
-        public ActionResult PutWellBoreById(Guid id, [FromBody] Model.WellBore? data)
+        public ActionResult PutWellBoreById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] Model.WellBore? data)
         {
             UsageStatisticsWellBore.Instance.IncrementPutWellBoreByIdPerDay();
-            // Check if WellBore is in the data base
-            if (data != null && data.MetaInfo != null && data.MetaInfo.ID.Equals(id))
-            {
-                var existingData = _wellBoreManager.GetWellBoreById(id);
-                if (existingData != null)
-                {
-                    if (_wellBoreManager.UpdateWellBoreById(id, data))
-                    {
-                        return Ok();
-                    }
-                    else
-                    {
-                        return StatusCode(StatusCodes.Status500InternalServerError);
-                    }
-                }
-                else
-                {
-                    _logger.LogWarning("The given WellBore has not been found in the database");
-                    return NotFound();
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The given WellBore is null, badly formed, or its does not match the ID to update");
-                return BadRequest();
-            }
+            return this.ToActionResult(_wellBoreManager.UpdateWellBore(id, expectedModifiedUtc, data));
+        }
+
+        [HttpPut("{id}/Details", Name = "PutWellBoreDetails")]
+        public ActionResult PutWellBoreDetails(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] WellBoreDetailsUpdate? details)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.UpdateWellBoreDetails(id, expectedModifiedUtc, details);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{id}/Topology", Name = "PutWellBoreTopology")]
+        public ActionResult PutWellBoreTopology(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc,
+            [FromBody] WellBoreTopologyUpdate? topology)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.UpdateWellBoreTopology(id, expectedModifiedUtc, topology);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPost("{wellBoreId}/IdentityAssignments", Name = "PostWellBoreIdentityAssignment")]
+        public ActionResult PostWellBoreIdentityAssignment(Guid wellBoreId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellBoreIdentityAssignment? assignment)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.AddIdentityAssignment(wellBoreId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{wellBoreId}/IdentityAssignments/{assignmentId}", Name = "PutWellBoreIdentityAssignment")]
+        public ActionResult PutWellBoreIdentityAssignment(Guid wellBoreId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellBoreIdentityAssignment? assignment)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.UpdateIdentityAssignment(wellBoreId, assignmentId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpDelete("{wellBoreId}/IdentityAssignments/{assignmentId}", Name = "DeleteWellBoreIdentityAssignment")]
+        public ActionResult DeleteWellBoreIdentityAssignment(Guid wellBoreId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.DeleteIdentityAssignment(wellBoreId, assignmentId, expectedModifiedUtc);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPost("{wellBoreId}/FeatureAssignments", Name = "PostWellBoreFeatureAssignment")]
+        public ActionResult PostWellBoreFeatureAssignment(Guid wellBoreId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellBoreFeatureAssignment? assignment)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.AddFeatureAssignment(wellBoreId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpPut("{wellBoreId}/FeatureAssignments/{assignmentId}", Name = "PutWellBoreFeatureAssignment")]
+        public ActionResult PutWellBoreFeatureAssignment(Guid wellBoreId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc, [FromBody] WellBoreFeatureAssignment? assignment)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.UpdateFeatureAssignment(wellBoreId, assignmentId, expectedModifiedUtc, assignment);
+            return this.ToActionResult(outcome, outcome.Resource);
+        }
+
+        [HttpDelete("{wellBoreId}/FeatureAssignments/{assignmentId}", Name = "DeleteWellBoreFeatureAssignment")]
+        public ActionResult DeleteWellBoreFeatureAssignment(Guid wellBoreId, Guid assignmentId,
+            [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
+        {
+            WellBoreMutationResult outcome = _wellBoreManager.DeleteFeatureAssignment(wellBoreId, assignmentId, expectedModifiedUtc);
+            return this.ToActionResult(outcome, outcome.Resource);
         }
 
         /// <summary>
@@ -301,25 +344,10 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// <param name="guid"></param>
         /// <returns>true if the WellBore was deleted from the microservice database, at the endpoint WellBore/api/WellBore/id</returns>
         [HttpDelete("{id}", Name = "DeleteWellBoreById")]
-        public ActionResult DeleteWellBoreById(Guid id)
+        public ActionResult DeleteWellBoreById(Guid id, [FromQuery, BindRequired] DateTimeOffset expectedModifiedUtc)
         {
             UsageStatisticsWellBore.Instance.IncrementDeleteWellBoreByIdPerDay();
-            if (_wellBoreManager.GetWellBoreById(id) != null)
-            {
-                if (_wellBoreManager.DeleteWellBoreById(id))
-                {
-                    return Ok();
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-            }
-            else
-            {
-                _logger.LogWarning("The WellBore of given ID does not exist");
-                return NotFound();
-            }
+            return this.ToActionResult(_wellBoreManager.DeleteWellBore(id, expectedModifiedUtc));
         }
     }
 }

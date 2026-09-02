@@ -27,6 +27,8 @@ internal static class WellBoreReferenceIntegrityValidator
         if (well.ParentWellBoreID == Guid.Empty)
             errors.Add(Error("ParentWellBoreID", "empty_uuid", "ParentWellBoreID must be null or a non-empty UUID."));
 
+        ValidateTopology(connection, transaction, well, errors);
+
         HashSet<Guid> assignmentIds = [];
         for (int index = 0; index < (well.WellBoreFeatureAssignments?.Count ?? 0); index++)
         {
@@ -57,6 +59,55 @@ internal static class WellBoreReferenceIntegrityValidator
 
         ValidateExclusiveCategoryPeriods(well.WellBoreFeatureAssignments ?? [], categories, errors);
         return errors;
+    }
+
+    private static void ValidateTopology(SqliteConnection connection, SqliteTransaction transaction,
+        Model.WellBore well, List<WellBoreMutationError> errors)
+    {
+        if (!well.IsSidetrack)
+        {
+            if (well.ParentWellBoreID is not null)
+                errors.Add(Error("ParentWellBoreID", "not_sidetrack", "A non-sidetrack WellBore cannot have a parent."));
+            if (well.TieInPointAlongHoleDepth is not null)
+                errors.Add(Error("TieInPointAlongHoleDepth", "not_sidetrack", "A non-sidetrack WellBore cannot have a tie-in depth."));
+            if (well.SidetrackType != SidetrackType.Undefined)
+                errors.Add(Error("SidetrackType", "not_sidetrack", "A non-sidetrack WellBore must use SidetrackType.Undefined."));
+            return;
+        }
+
+        if (well.ParentWellBoreID is not Guid parentId || parentId == Guid.Empty)
+        {
+            errors.Add(Error("ParentWellBoreID", "parent_required", "A sidetrack requires a non-empty parent WellBore UUID."));
+            return;
+        }
+        Guid ownId = well.MetaInfo?.ID ?? Guid.Empty;
+        if (parentId == ownId)
+        {
+            errors.Add(Error("ParentWellBoreID", "self_reference", "A WellBore cannot be its own parent."));
+            return;
+        }
+
+        Dictionary<Guid, Model.WellBore> stored = ReadWellBores(connection, transaction);
+        if (!stored.TryGetValue(parentId, out Model.WellBore? parent))
+        {
+            errors.Add(Error("ParentWellBoreID", "parent_not_found", $"Parent WellBore UUID {parentId} does not exist."));
+            return;
+        }
+        if (well.WellID is Guid wellId && parent.WellID is Guid parentWellId && wellId != parentWellId)
+            errors.Add(Error("ParentWellBoreID", "parent_well_mismatch", "A sidetrack and its parent must belong to the same Well."));
+
+        HashSet<Guid> visited = [ownId];
+        Model.WellBore? cursor = parent;
+        while (cursor?.MetaInfo?.ID is Guid cursorId && cursorId != Guid.Empty)
+        {
+            if (!visited.Add(cursorId))
+            {
+                errors.Add(Error("ParentWellBoreID", "sidetrack_cycle", "The parent relationship would create a WellBore cycle."));
+                break;
+            }
+            cursor = cursor.ParentWellBoreID is Guid next && stored.TryGetValue(next, out Model.WellBore? ancestor)
+                ? ancestor : null;
+        }
     }
 
     public static WellBoreMutationError? FindFeatureCategoryReferences(SqliteConnection connection, SqliteTransaction transaction,
@@ -236,4 +287,3 @@ internal static class WellBoreReferenceIntegrityValidator
     private static WellBoreMutationError Error(string property, string code, string message) =>
         new() { Property = property, Code = code, Message = message };
 }
-

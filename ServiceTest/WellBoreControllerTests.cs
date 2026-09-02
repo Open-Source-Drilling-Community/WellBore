@@ -93,7 +93,7 @@ namespace OSDC.Drilling.WellBore.ServiceTest
             var bodyId = Guid.NewGuid();
             var wb = new ModelShared.WellBore { MetaInfo = new MetaInfo { ID = bodyId } };
             var ex = Assert.ThrowsAsync<ApiException>(async () =>
-                await _client.PutWellBoreByIdAsync(idUrl, wb));
+                await _client.PutWellBoreByIdAsync(idUrl, DateTimeOffset.UtcNow, wb));
             Assert.That(ex!.StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
         }
 
@@ -101,7 +101,7 @@ namespace OSDC.Drilling.WellBore.ServiceTest
         public void Delete_Unknown_Throws404()
         {
             var ex = Assert.ThrowsAsync<ApiException>(async () =>
-                await _client.DeleteWellBoreByIdAsync(Guid.NewGuid()));
+                await _client.DeleteWellBoreByIdAsync(Guid.NewGuid(), DateTimeOffset.UtcNow));
             Assert.That(ex!.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound));
         }
 
@@ -127,11 +127,12 @@ namespace OSDC.Drilling.WellBore.ServiceTest
                 MetaInfo = new MetaInfo { ID = id },
                 Name = "UpdatedWB",
                 Description = "Updated",
-                IsSidetrack = true
+                IsSidetrack = false
             };
-            await _client.PutWellBoreByIdAsync(id, update);
+            await _client.PutWellBoreByIdAsync(id, got.LastModificationDate!.Value, update);
 
-            await _client.DeleteWellBoreByIdAsync(id);
+            var updated = await _client.GetWellBoreByIdAsync(id);
+            await _client.DeleteWellBoreByIdAsync(id, updated.LastModificationDate!.Value);
 
             var ex = Assert.ThrowsAsync<ApiException>(async () => await _client.GetWellBoreByIdAsync(id));
             Assert.That(ex!.StatusCode, Is.EqualTo((int)HttpStatusCode.NotFound));

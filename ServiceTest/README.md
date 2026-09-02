@@ -4,7 +4,8 @@ This project validates the WellBore service API and its MCP surface.
 
 ## MCP coverage
 
-- `McpToolRegistrationTests.cs` verifies the 13 core WellBore and 14 identity/feature-catalogue REST tools plus `ping`, including strict batch schemas and exclusion of usage-statistics operations.
+- `McpToolRegistrationTests.cs` verifies the 22 core WellBore and 14 identity/feature-catalogue REST tools plus `ping`, including schemas, behavior annotations, strict batch contracts, and exclusion of usage-statistics operations.
+- `WellBoreContractStrengtheningTests.cs` verifies optimistic concurrency, granular mutations, deterministic search, sidetrack integrity, reference-safe deletion, and non-destructive handling of legacy timestamp-free rows.
 - `McpServerHttpTests.cs` exercises MCP initialization, tool discovery, and representative calls against a running service.
 - `SqlConnectionManagerSafetyTests.cs` proves that a legacy database is transactionally upgraded without changing its WellBore rows, that expected-schema startup preserves rows, and that an unexpected schema aborts without dropping data.
 - `WellBoreCatalogTests.cs` verifies the default catalogues, assignment persistence (including punctuation in values), optimistic concurrency, and reference-safe deletion.

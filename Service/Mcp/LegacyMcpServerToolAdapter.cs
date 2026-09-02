@@ -10,13 +10,10 @@ using ModelContextProtocol.Server;
 
 namespace OSDC.Drilling.WellBore.Service.Mcp;
 
-/// <summary>
-/// Adapts the legacy <see cref="IMcpTool"/> abstraction to the ModelContextProtocol server tool contract.
-/// </summary>
+/// <summary>Adapts the local tool abstraction to the MCP protocol contract.</summary>
 internal sealed class LegacyMcpServerToolAdapter : McpServerTool
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
-
     private readonly IMcpTool _tool;
     private readonly ILogger _logger;
     private readonly Tool _protocolTool;
@@ -26,87 +23,112 @@ internal sealed class LegacyMcpServerToolAdapter : McpServerTool
     {
         ArgumentNullException.ThrowIfNull(tool);
         ArgumentNullException.ThrowIfNull(loggerFactory);
-
         _tool = tool;
         _logger = loggerFactory.CreateLogger(tool.GetType());
-
         _protocolTool = new Tool
         {
             Name = tool.Name,
-            Description = tool.Description
+            Title = tool.Behavior.Title,
+            Description = tool.Description,
+            InputSchema = JsonSerializer.SerializeToElement(tool.InputSchema, SerializerOptions),
+            OutputSchema = JsonSerializer.SerializeToElement(tool.OutputSchema, SerializerOptions),
+            Annotations = new()
+            {
+                Title = tool.Behavior.Title,
+                ReadOnlyHint = tool.Behavior.ReadOnlyHint,
+                DestructiveHint = tool.Behavior.DestructiveHint,
+                IdempotentHint = tool.Behavior.IdempotentHint,
+                OpenWorldHint = tool.Behavior.OpenWorldHint
+            }
         };
-
-        if (tool.InputSchema is JsonNode schemaNode)
-        {
-            _protocolTool.InputSchema = JsonSerializer.SerializeToElement(schemaNode, SerializerOptions);
-        }
     }
 
     public override Tool ProtocolTool => _protocolTool;
-
     public override IReadOnlyList<object> Metadata => _metadata;
 
-    public override async ValueTask<CallToolResult> InvokeAsync(
-        RequestContext<CallToolRequestParams> request,
+    public override async ValueTask<CallToolResult> InvokeAsync(RequestContext<CallToolRequestParams> request,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-
-        var arguments = ConvertArguments(request.Params?.Arguments);
-
+        JsonObject? arguments = ConvertArguments(request.Params?.Arguments);
         try
         {
-            var result = await _tool.InvokeAsync(arguments, cancellationToken).ConfigureAwait(false);
-
+            JsonNode? result = await _tool.InvokeAsync(arguments, cancellationToken).ConfigureAwait(false);
+            if (TryGetFailure(result, out JsonNode failure)) return Error(failure);
+            string? fallback = result?.ToJsonString(SerializerOptions);
             return new CallToolResult
             {
-                StructuredContent = result
+                StructuredContent = result?.DeepClone(),
+                Content = fallback is null ? [] : [new TextContentBlock { Text = fallback }]
             };
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            throw;
-        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             _logger.LogError(ex, "MCP tool {ToolName} failed while handling request.", _tool.Name);
-
-            return new CallToolResult
-            {
-                IsError = true,
-                Content =
-                {
-                    new TextContentBlock
-                    {
-                        Text = $"Tool '{_tool.Name}' failed: {ex.Message}"
-                    }
-                }
-            };
+            return Error(new JsonObject { ["error"] = "internal_error", ["message"] = "An unexpected server error occurred while executing the tool.", ["errors"] = new JsonArray() });
         }
     }
 
+    private static bool TryGetFailure(JsonNode? result, out JsonNode failure)
+    {
+        failure = null!;
+        if (result is not JsonObject response || response["status"]?.GetValue<int>() is not int status || status < 400) return false;
+        if (response["data"] is JsonNode payload) { failure = NormalizeFailure(payload, status); return true; }
+        failure = new JsonObject
+        {
+            ["error"] = ErrorCodeForStatus(status),
+            ["message"] = response["error"]?.GetValue<string>() ?? "The tool request failed.",
+            ["errors"] = new JsonArray()
+        };
+        return true;
+    }
+
+    private static JsonNode NormalizeFailure(JsonNode payload, int status)
+    {
+        if (payload is not JsonObject source)
+            return new JsonObject { ["error"] = ErrorCodeForStatus(status), ["message"] = payload.ToJsonString(SerializerOptions), ["errors"] = new JsonArray() };
+        JsonNode? sourceErrors = source["errors"] ?? source["Errors"];
+        JsonArray normalized = [];
+        if (sourceErrors is JsonArray errors)
+            foreach (JsonNode? item in errors)
+                if (item is JsonObject detail)
+                    normalized.Add(new JsonObject
+                    {
+                        ["property"] = (detail["property"] ?? detail["Property"])?.DeepClone(),
+                        ["code"] = (detail["code"] ?? detail["Code"])?.DeepClone(),
+                        ["message"] = (detail["message"] ?? detail["Message"])?.DeepClone()
+                    });
+        return new JsonObject
+        {
+            ["error"] = (source["error"] ?? source["Error"])?.DeepClone() ?? JsonValue.Create(ErrorCodeForStatus(status)),
+            ["message"] = (source["message"] ?? source["Message"])?.DeepClone() ?? JsonValue.Create("The tool request failed."),
+            ["errors"] = normalized
+        };
+    }
+
+    private static string ErrorCodeForStatus(int status) => status switch
+    { 400 => "validation_failed", 404 => "not_found", 409 => "conflict", 502 => "dependency_unavailable", _ => "request_failed" };
+
+    private static CallToolResult Error(JsonNode problem) => new()
+    {
+        IsError = true,
+        Content = { new TextContentBlock { Text = problem.ToJsonString(SerializerOptions) } }
+    };
+
     private JsonObject? ConvertArguments(IReadOnlyDictionary<string, JsonElement>? arguments)
     {
-        if (arguments is null || arguments.Count == 0)
+        if (arguments is null || arguments.Count == 0) return null;
+        JsonObject result = new();
+        foreach ((string key, JsonElement element) in arguments)
         {
-            return null;
-        }
-
-        var result = new JsonObject();
-
-        foreach (var (key, element) in arguments)
-        {
-            try
+            try { result[key] = JsonNode.Parse(element.GetRawText()); }
+            catch (JsonException exception)
             {
-                result[key] = JsonNode.Parse(element.GetRawText());
-            }
-            catch (JsonException jsonEx)
-            {
-                _logger.LogWarning(jsonEx, "Failed to parse argument '{ArgumentKey}' for tool {ToolName}. Passing raw JSON text.", key, _tool.Name);
+                _logger.LogWarning(exception, "Failed to parse argument '{ArgumentKey}' for tool {ToolName}.", key, _tool.Name);
                 result[key] = JsonValue.Create(element.GetRawText());
             }
         }
-
         return result;
     }
 }

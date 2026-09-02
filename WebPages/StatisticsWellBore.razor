@@ -1,140 +1,216 @@
-﻿@page "/StatisticsWellBore"
+@page "/StatisticsWellBore"
+@using System.Reflection
 @inject ILogger<StatisticsWellBore> logger
 @inject ISnackbar Snackbar
 @inject IWellBoreAPIUtils Api
 
-@if (statistics_ == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div hidden="@isHiddenMainPanel">
-        <MudText Class="mt-4 mb-4" Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
-        <div style="width: 90%; margin: auto">
-            <MudGrid>
-                <MudItem xs="6">
-                    <MudText Typo="Typo.h6">Total count:</MudText>
-                </MudItem>
-                <MudItem xs="6">
-                    <MudText Typo="Typo.body1">@totalCount_</MudText>
-                </MudItem>
-                <MudItem xs="6">
-                    <MudText Typo="Typo.h6">Well-bore Count:</MudText>
-                </MudItem>
-                <MudItem xs="6">
-                    <MudText Typo="Typo.body1">@WellBoreCount_</MudText>
-                </MudItem>
-            </MudGrid>
+<MudStack Spacing="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mt-4">
+        <div>
+            <MudText Typo="Typo.h5"><strong>Usage Statistics</strong></MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">WellBore service requests recorded by endpoint.</MudText>
         </div>
-    </div>
-}
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh"
+                   Disabled="@isLoading_" OnClick="RefreshAsync">Refresh</MudButton>
+    </MudStack>
+
+    @if (isLoading_)
+    {
+        <MudProgressLinear Indeterminate="true" />
+    }
+    else if (statistics_ == null)
+    {
+        <MudAlert Severity="Severity.Warning">Unable to load WellBore usage statistics.</MudAlert>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudText Typo="Typo.subtitle2">Total requests</MudText>
+                <MudText Typo="Typo.h6">@totalCount_</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudText Typo="Typo.subtitle2">Today (UTC)</MudText>
+                <MudText Typo="Typo.h6">@todayCount_</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudText Typo="Typo.subtitle2">Tracked endpoints</MudText>
+                <MudText Typo="Typo.h6">@rows_.Count</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudText Typo="Typo.subtitle2">Last saved</MudText>
+                <MudText Typo="Typo.h6">@FormatDate(statistics_.LastSaved)</MudText>
+            </MudItem>
+        </MudGrid>
+
+        <MudTable Items="rows_" Dense="true" Hover="true" Bordered="true" Striped="true" SortLabel="Sort by">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Method)">Method</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, string>(row => row.Endpoint)">Endpoint</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Today)">Today</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.Total)">Total</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<UsageRow, object>(row => row.LastUsed ?? DateTimeOffset.MinValue)">Last used</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Method">
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="@MethodColor(context.Method)">@context.Method</MudChip>
+                </MudTd>
+                <MudTd DataLabel="Endpoint">@context.Endpoint</MudTd>
+                <MudTd DataLabel="Today">@context.Today</MudTd>
+                <MudTd DataLabel="Total">@context.Total</MudTd>
+                <MudTd DataLabel="Last used">@FormatDate(context.LastUsed)</MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No usage counters were returned by the WellBore service.</MudText>
+            </NoRecordsContent>
+        </MudTable>
+    }
+</MudStack>
 
 @code {
-    private UsageStatisticsWellBore statistics_ = null!;
-    private long totalCount_ = 0;
-    private long WellBoreCount_ = 0;
-    private long WellBoreConversionSetCount_ = 0;
+    private UsageStatisticsWellBore? statistics_;
+    private readonly List<UsageRow> rows_ = [];
+    private long totalCount_;
+    private long todayCount_;
+    private bool isLoading_ = true;
 
-    private bool isHiddenMainPanel = true;
+    protected override async Task OnInitializedAsync() => await RefreshAsync();
 
-    protected override async Task OnInitializedAsync()
+    private async Task RefreshAsync()
     {
+        isLoading_ = true;
         try
         {
             statistics_ = await Api.ClientWellBore.GetWellBoreUsageStatisticsAsync();
-            if (statistics_ != null)
-            {
-                totalCount_ = 0;
-                WellBoreCount_ = 0;
-                WellBoreConversionSetCount_ = 0;
-
-                if (statistics_.GetAllWellBoreIdPerDay != null && statistics_.GetAllWellBoreIdPerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.GetAllWellBoreIdPerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.GetAllWellBoreMetaInfoPerDay != null && statistics_.GetAllWellBoreMetaInfoPerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.GetAllWellBoreMetaInfoPerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.GetWellBoreByIdPerDay != null && statistics_.GetWellBoreByIdPerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.GetWellBoreByIdPerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.GetAllWellBorePerDay != null && statistics_.GetAllWellBorePerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.GetAllWellBorePerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.PostWellBorePerDay != null && statistics_.PostWellBorePerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.PostWellBorePerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.PutWellBoreByIdPerDay != null && statistics_.PutWellBoreByIdPerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.PutWellBoreByIdPerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-                if (statistics_.DeleteWellBoreByIdPerDay != null && statistics_.DeleteWellBoreByIdPerDay.Data != null)
-                {
-                    foreach (CountPerDay count in statistics_.DeleteWellBoreByIdPerDay.Data)
-                    {
-                        if (count != null)
-                        {
-                            totalCount_ += count.Count;
-                            WellBoreCount_ += count.Count;
-                        }
-                    }
-                }
-            }
-            // Show main panel
-            isHiddenMainPanel = false;
+            BuildRows();
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Problem UsageStatistics initialization");
+            statistics_ = null;
+            rows_.Clear();
+            totalCount_ = 0;
+            todayCount_ = 0;
+            Snackbar.Add("Unable to load WellBore usage statistics.", Severity.Error);
         }
-        await InvokeAsync(() => { StateHasChanged(); });
+        finally
+        {
+            isLoading_ = false;
+        }
     }
 
+    private void BuildRows()
+    {
+        rows_.Clear();
+        totalCount_ = 0;
+        todayCount_ = 0;
+
+        if (statistics_ == null)
+        {
+            return;
+        }
+
+        foreach (PropertyInfo property in typeof(UsageStatisticsWellBore)
+                     .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                     .Where(property => property.PropertyType == typeof(History) &&
+                                        property.Name.EndsWith("PerDay", StringComparison.Ordinal))
+                     .OrderBy(property => MethodSortOrder(ToEndpointDescriptor(property.Name).Method))
+                     .ThenBy(property => ToEndpointDescriptor(property.Name).Endpoint, StringComparer.Ordinal))
+        {
+            if (property.GetValue(statistics_) is not History history)
+            {
+                continue;
+            }
+
+            EndpointDescriptor descriptor = ToEndpointDescriptor(property.Name);
+            long total = Total(history);
+            long today = Today(history);
+            DateTimeOffset? lastUsed = LastUsed(history);
+
+            totalCount_ += total;
+            todayCount_ += today;
+            rows_.Add(new UsageRow(descriptor.Endpoint, descriptor.Method, today, total, lastUsed));
+        }
+    }
+
+    private static long Total(History history) =>
+        history.Data?.Where(entry => entry != null).Sum(entry => entry.Count) ?? 0;
+
+    private static long Today(History history)
+    {
+        DateTime utcToday = DateTime.UtcNow.Date;
+        return history.Data?
+            .Where(entry => entry != null && entry.Date.UtcDateTime.Date == utcToday)
+            .Sum(entry => entry.Count) ?? 0;
+    }
+
+    private static DateTimeOffset? LastUsed(History history) =>
+        history.Data?
+            .Where(entry => entry != null && entry.Count > 0)
+            .Select(entry => (DateTimeOffset?)entry.Date)
+            .OrderByDescending(date => date)
+            .FirstOrDefault();
+
+    private static EndpointDescriptor ToEndpointDescriptor(string propertyName)
+    {
+        string name = propertyName.EndsWith("PerDay", StringComparison.Ordinal)
+            ? propertyName[..^"PerDay".Length]
+            : propertyName;
+
+        string method = name switch
+        {
+            string value when value.StartsWith("Get", StringComparison.Ordinal) => "GET",
+            string value when value.StartsWith("Post", StringComparison.Ordinal) => "POST",
+            string value when value.StartsWith("Put", StringComparison.Ordinal) => "PUT",
+            string value when value.StartsWith("Delete", StringComparison.Ordinal) => "DELETE",
+            _ => "-"
+        };
+
+        return new EndpointDescriptor(SplitWords(RemoveMethodPrefix(name)), method);
+    }
+
+    private static string RemoveMethodPrefix(string name)
+    {
+        foreach (string prefix in new[] { "GetAll", "Get", "Post", "Put", "Delete" })
+        {
+            if (name.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                return name[prefix.Length..];
+            }
+        }
+
+        return name;
+    }
+
+    private static string SplitWords(string value) =>
+        string.Concat(value.Select((ch, index) =>
+            index > 0 && char.IsUpper(ch) && !char.IsUpper(value[index - 1])
+                ? " " + ch
+                : ch.ToString()));
+
+    private static int MethodSortOrder(string method) => method switch
+    {
+        "GET" => 0,
+        "POST" => 1,
+        "PUT" => 2,
+        "DELETE" => 3,
+        _ => 4
+    };
+
+    private static Color MethodColor(string method) => method switch
+    {
+        "GET" => Color.Info,
+        "POST" => Color.Success,
+        "PUT" => Color.Warning,
+        "DELETE" => Color.Error,
+        _ => Color.Default
+    };
+
+    private static string FormatDate(DateTimeOffset? value) =>
+        value.HasValue && value.Value != default
+            ? value.Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm")
+            : "-";
+
+    private sealed record EndpointDescriptor(string Endpoint, string Method);
+    private sealed record UsageRow(string Endpoint, string Method, long Today, long Total, DateTimeOffset? LastUsed);
 }

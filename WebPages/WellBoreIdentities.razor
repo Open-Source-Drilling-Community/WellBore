@@ -150,7 +150,8 @@ else
             {
                 try
                 {
-                    await Api.ClientWellBore.DeleteWellBoreIdentityByIdAsync(id.Value);
+                    await Api.ClientWellBore.DeleteWellBoreIdentityByIdAsync(id.Value,
+                        identity.LastModificationDate ?? throw new InvalidOperationException("The stored identity has no concurrency timestamp."));
                 }
                 catch (ApiException ex) when (ex.StatusCode == 404)
                 {
@@ -169,7 +170,7 @@ else
 
     private async Task<bool> ConfirmDeletionAsync(WellBoreIdentity identity)
     {
-        bool? result = await DialogService.ShowMessageBox(
+        bool? result = await DialogService.ShowMessageBoxAsync(
             "Delete",
             $"Delete wellbore identity '{identity.Name ?? identity.MetaInfo?.ID.ToString()}'?",
             yesText: "Delete",
@@ -247,4 +248,3 @@ else
         }
     }
 }
-
