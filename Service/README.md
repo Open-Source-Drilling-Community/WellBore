@@ -69,6 +69,8 @@ All routes are relative to `/WellBore/api`.
 - `GET /WellBore/{id}` — Get a WellBore by ID.
 - `GET /WellBore/HeavyData` — Get all WellBore entities.
 - `GET /WellBore/Search` — Search and page WellBores by name, topology, assignments, or modification time.
+- `GET /WellBore/{id}/ExternalReferences` — Validate one stored WellBore's Well and Rig references without modifying it.
+- `POST /WellBore/ExternalReferenceAudit` — Audit a bounded page of all or selected WellBores with `Valid`, `Invalid`, and `Unavailable` outcomes.
 - `POST /WellBore` — Create a WellBore (requires non-empty `MetaInfo.ID`).
 - `PUT /WellBore/{id}?expectedModifiedUtc=...` — Full replacement protected by optimistic concurrency.
 - `PUT /WellBore/{id}/Details?expectedModifiedUtc=...` — Replace only name and description.
@@ -85,6 +87,8 @@ All routes are relative to `/WellBore/api`.
 All WellBore updates, assignment mutations, deletes, and catalogue updates or deletes require `expectedModifiedUtc` from the latest `LastModificationDate`. Stale writes return a conflict without changing data. Referenced catalogues, feature options, and parent WellBores cannot be deleted. Writes validate assignment rules and sidetrack topology before committing. Legacy rows without timestamps use a stable Unix-epoch revision and are upgraded only when explicitly written; no database migration or bulk row rewrite is required.
 
 Batch restore uses one transaction for catalogue mapping/creation, assignment-reference rewriting, validation, and all WellBore writes. Invalid input, unresolved or ambiguous catalogue definitions, UUID conflicts under `FailIfExists`, and storage errors roll back the complete operation. It never clears the database and preserves unrelated rows.
+
+`WellID` and `RigID` remain externally owned references, so mutations do not call another service while holding a SQLite transaction. The read-only validation endpoints use `WellHostURL` and `RigHostURL`; confirmed 404 responses are `Invalid`, while missing configuration, transport failures, timeouts, non-success dependency responses, and malformed responses are `Unavailable`. Helm defaults these URLs to `http://osdcwellservice/` and `http://osdcrigservice/`. Diagnostic checks never block or alter WellBore writes.
 
 Swagger is served at `/WellBore/api/swagger` and is generated from a merged OpenAPI document: `Service/wwwroot/json-schema/WellBoreMergedModel.json`.
 
@@ -187,7 +191,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## MCP server
 
-The service publishes 36 REST-backed MCP tools plus `ping`: 22 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
+The service publishes 38 REST-backed MCP tools plus `ping`: 24 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, single and paged external-reference diagnostics, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
 
 - Streamable HTTP: `/wellbore/api/mcp`
 - WebSocket: `/wellbore/api/mcp/ws`
@@ -201,5 +205,6 @@ The service publishes 36 REST-backed MCP tools plus `ping`: 22 WellBore operatio
 - Deployment/Service name: `osdcwellboreservice`
 - Persistent claim: `wellbore-claim` (unchanged from the legacy deployment)
 - Strategy: `Recreate`, because SQLite must not have overlapping writer pods
+- External diagnostics: `wellHostURL` and `rigHostURL` chart values, defaulting to the in-cluster OSDC services
 
 Use `persistence.existingClaim=wellbore-claim` while the new release references the old release's PVC. Never uninstall the PVC-owning legacy release until the claim has the Helm keep annotation and an independent backup has been verified.

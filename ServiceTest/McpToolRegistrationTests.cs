@@ -18,6 +18,8 @@ public sealed class McpToolRegistrationTests
         ["GetWellBoreById"] = "well_bore_get_by_id",
         ["GetAllWellBore"] = "well_bore_get_all",
         ["SearchWellBores"] = "well_bore_search",
+        ["ValidateWellBoreExternalReferences"] = "well_bore_validate_external_references",
+        ["AuditWellBoreExternalReferences"] = "well_bore_audit_external_references",
         ["BatchExportWellBores"] = "well_bore_batch_export",
         ["BatchRestoreWellBores"] = "well_bore_batch_restore",
         ["GetAllWellBoreByWellID"] = "well_bore_get_all_by_well_id",
@@ -185,6 +187,8 @@ public sealed class McpToolRegistrationTests
     {
         Assert.That(_tools["well_bore_get_by_id"].Behavior.ReadOnlyHint, Is.True);
         Assert.That(_tools["well_bore_search"].Behavior.ReadOnlyHint, Is.True);
+        Assert.That(_tools["well_bore_validate_external_references"].Behavior.ReadOnlyHint, Is.True);
+        Assert.That(_tools["well_bore_audit_external_references"].Behavior.ReadOnlyHint, Is.True);
         Assert.That(_tools["well_bore_delete_by_id"].Behavior.DestructiveHint, Is.True);
         Assert.That(_tools["well_bore_batch_restore"].Behavior.DestructiveHint, Is.True);
         Assert.That(_tools["well_bore_details_update"].Behavior.ReadOnlyHint, Is.False);
@@ -207,6 +211,24 @@ public sealed class McpToolRegistrationTests
         JsonObject? response = await _tools["well_bore_search"]
             .InvokeAsync(new JsonObject { [key] = value }, CancellationToken.None) as JsonObject;
         Assert.That(response?["status"]?.GetValue<int>(), Is.EqualTo(400));
+    }
+
+    [Test]
+    public void External_reference_tools_publish_bounded_strict_contracts()
+    {
+        JsonObject validateInput = RequireObject(_tools["well_bore_validate_external_references"].InputSchema);
+        Assert.That(RequiredNames(validateInput), Is.EquivalentTo(new[] { "wellBoreId" }));
+
+        JsonObject auditInput = RequireObject(_tools["well_bore_audit_external_references"].InputSchema);
+        JsonObject request = Property(auditInput, "request");
+        Assert.That(RequiredNames(request), Is.EquivalentTo(new[] { "Scope" }));
+        Assert.That(Property(request, "WellBoreIDs")["uniqueItems"]?.GetValue<bool>(), Is.True);
+        Assert.That(Property(request, "Limit")["maximum"]?.GetValue<int>(), Is.EqualTo(100));
+
+        JsonObject validateOutput = RequireObject(_tools["well_bore_validate_external_references"].OutputSchema);
+        JsonObject validation = Property(validateOutput, "data");
+        Assert.That(PropertyNames(validation), Does.Contain("WellExists"));
+        Assert.That(PropertyNames(validation), Does.Contain("RigExists"));
     }
 
     [TestCase("well_bore_get_by_id")]

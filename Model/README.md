@@ -14,6 +14,7 @@ Domain data model for the WellBore solution. This project defines the core types
 - `SidetrackType`: Enum classifying sidetrack wells (e.g., Technical, Production, Appraisal, Lateral).
 - `UsageStatisticsWellBore`: Lightweight helper for usage telemetry (per-endpoint counters aggregated per day, persisted to `home/history.json`).
 - `WellBoreBatchExport`: Versioned logical backup/restore requests, documents, policies, errors, responses, and catalogue mappings.
+- `WellBoreExternalReferenceValidation` and audit request/result types: tri-state, read-only Well/Rig reference diagnostics with bounded all/selected paging.
 
 Source files:
 - `WellBore.cs`
@@ -21,6 +22,7 @@ Source files:
 - `WellBoreFeatureCategory.cs`, `WellBoreFeatureOption.cs`, `WellBoreFeatureAssignment.cs`
 - `UsageStatisticsWellBore.cs`
 - `WellBoreBatchExport.cs`
+- `WellBoreExternalReferenceValidation.cs`
 
 ## Backup and restore contracts
 

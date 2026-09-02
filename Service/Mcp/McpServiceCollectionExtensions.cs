@@ -68,7 +68,8 @@ public static class McpServiceCollectionExtensions
     private static McpToolBehavior InferBehavior(string name)
     {
         bool readOnly = name.Contains("_get_", StringComparison.Ordinal) || name.EndsWith("_get_all", StringComparison.Ordinal) ||
-                        name.EndsWith("_search", StringComparison.Ordinal) || name.EndsWith("_batch_export", StringComparison.Ordinal);
+                        name.EndsWith("_search", StringComparison.Ordinal) || name.EndsWith("_batch_export", StringComparison.Ordinal) ||
+                        name.EndsWith("_external_references", StringComparison.Ordinal);
         bool destructive = name.Contains("_delete_", StringComparison.Ordinal) || name.EndsWith("_batch_restore", StringComparison.Ordinal);
         bool idempotent = readOnly || name.Contains("_update", StringComparison.Ordinal) || name.Contains("_delete_", StringComparison.Ordinal);
         string title = string.Join(' ', name.Split('_').Select(word => char.ToUpperInvariant(word[0]) + word[1..]));
@@ -82,6 +83,10 @@ public static class McpServiceCollectionExtensions
         if (name.EndsWith("_get_all_meta_info", StringComparison.Ordinal))
             return Tools.McpToolArgumentHelpers.CreateMetaInfoListOutputSchema();
         if (name == "well_bore_search") return Tools.McpToolArgumentHelpers.CreateWellBoreSearchOutputSchema();
+        if (name == "well_bore_validate_external_references")
+            return Tools.McpToolArgumentHelpers.CreateWellBoreExternalReferenceValidationOutputSchema();
+        if (name == "well_bore_audit_external_references")
+            return Tools.McpToolArgumentHelpers.CreateWellBoreExternalReferenceAuditOutputSchema();
         if (name is "well_bore_get_all" or "well_bore_get_all_by_well_id" or "well_bore_get_all_by_rig_id" or
             "well_bore_get_all_by_parent_id" or "well_bore_get_all_sidetracked")
             return Tools.McpToolArgumentHelpers.CreateWellBoreListOutputSchema();

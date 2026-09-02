@@ -17,6 +17,8 @@ using WellBoreDetailsUpdateModel = OSDC.Drilling.WellBore.Model.WellBoreDetailsU
 using WellBoreTopologyUpdateModel = OSDC.Drilling.WellBore.Model.WellBoreTopologyUpdate;
 using WellBoreIdentityAssignmentModel = OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment;
 using WellBoreFeatureAssignmentModel = OSDC.Drilling.WellBore.Model.WellBoreFeatureAssignment;
+using WellBoreExternalReferenceAuditRequestModel = OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditRequest;
+using WellBoreExternalReferenceAuditResultModel = OSDC.Drilling.WellBore.Model.WellBoreExternalReferenceAuditResult;
 
 namespace OSDC.Drilling.WellBore.Service.Mcp.Tools;
 
@@ -46,6 +48,12 @@ public static class WellBoreRestMcpToolRegistrations
             (sp, _, ct) => Invoke(ct, () => Controller(sp).GetAllSidetrackedWellBore(Guid.Empty)));
         services.AddLegacyMcpTool("well_bore_search", "Return one deterministic page of complete WellBores with a total match count. Optional filters support case-insensitive name and identity-value matching, exact Well, Rig, parent, sidetrack state, identity, feature-category and feature-option values, and inclusive modification timestamps. Limit is capped at 200.", McpToolArgumentHelpers.CreateWellBoreSearchSchema(),
             (sp, args, ct) => InvokeSearch(sp, args, ct));
+        services.AddLegacyMcpTool("well_bore_validate_external_references", "Check one stored WellBore's Well and Rig UUIDs against the configured external services without changing data. Valid confirms all supplied references exist; Invalid identifies missing resources; Unavailable distinguishes configuration, transport, malformed-response, timeout, and dependency failures.", McpToolArgumentHelpers.CreateGuidSchema("wellBoreId", "UUID of the stored WellBore whose external references should be checked."),
+            (sp, args, ct) => InvokeByGuidAsync(args, "wellBoreId", ct,
+                (id, token) => Controller(sp).ValidateWellBoreExternalReferences(id, token)));
+        services.AddLegacyMcpTool("well_bore_audit_external_references", "Check a deterministic, bounded page of all or selected stored WellBores against the configured Well and Rig services without changing data. Each result and the page counts distinguish valid references, invalid references, and checks that could not complete because a dependency was unavailable.", McpToolArgumentHelpers.CreateWellBoreExternalReferenceAuditSchema(),
+            (sp, args, ct) => InvokeWithBodyResultAsync<WellBoreExternalReferenceAuditRequestModel, WellBoreExternalReferenceAuditResultModel>(
+                args, "request", ct, (request, token) => Controller(sp).AuditWellBoreExternalReferences(request, token)));
         services.AddLegacyMcpTool("well_bore_create", "Create and persist a new wellbore. Supply the complete WellBore object using the documented PascalCase fields; wellBore.MetaInfo.ID must be a caller-generated, non-empty UUID and must not already exist. For sidetracks, set IsSidetrack and provide the applicable parent, tie-in depth, and sidetrack type fields. TieInPointAlongHoleDepth is always expressed in meters (SI) and referenced to the fixed WGS84 vertical datum. Returns status 200 on success, 400 for malformed data, and 409 when the ID already exists.", McpToolArgumentHelpers.CreateWellBoreSchema(),
             (sp, args, ct) => InvokeWithBody<WellBoreModel>(args, "wellBore", ct, data => Controller(sp).PostWellBore(data)));
         services.AddLegacyMcpTool("well_bore_update_by_id", "Replace the stored data for an existing wellbore. The top-level id and wellBore.MetaInfo.ID must be the same non-empty UUID, and expectedModifiedUtc must exactly match the LastModificationDate from the latest read. Include the complete desired WellBore object because this is a full replacement. A stale revision returns 409 without changing data.", McpToolArgumentHelpers.CreateWellBoreSchema(includeId: true),
@@ -128,6 +136,14 @@ public static class WellBoreRestMcpToolRegistrations
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(id))) : Task.FromResult(error);
     }
 
+    private static async Task<JsonNode?> InvokeByGuidAsync<T>(JsonObject? args, string key, CancellationToken ct,
+        Func<Guid, CancellationToken, Task<ActionResult<T>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!McpToolArgumentHelpers.TryParseGuid(args, key, out Guid id, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(id, ct));
+    }
+
     private static Task<JsonNode?> InvokeDelete(JsonObject? args, CancellationToken ct, Func<Guid, ActionResult> action)
     {
         ct.ThrowIfCancellationRequested();
@@ -162,6 +178,14 @@ public static class WellBoreRestMcpToolRegistrations
         return TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
             : Task.FromResult(error);
+    }
+
+    private static async Task<JsonNode?> InvokeWithBodyResultAsync<TBody, TResult>(JsonObject? args, string bodyName,
+        CancellationToken ct, Func<TBody?, CancellationToken, Task<ActionResult<TResult>>> action)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)) return error;
+        return McpActionResultConverter.FromActionResult(await action(data, ct));
     }
 
     private static Task<JsonNode?> InvokeWithIdAndBody<T>(JsonObject? args, string bodyName, CancellationToken ct, Func<Guid, T?, ActionResult> action)
@@ -292,7 +316,8 @@ public static class WellBoreRestMcpToolRegistrations
     }
 
     private static WellBoreController Controller(IServiceProvider sp) => new(
-        sp.GetRequiredService<ILogger<WellBoreManager>>(), sp.GetRequiredService<SqlConnectionManager>());
+        sp.GetRequiredService<ILogger<WellBoreManager>>(), sp.GetRequiredService<SqlConnectionManager>(),
+        sp.GetRequiredService<IWellBoreExternalReferenceValidator>());
 
     private static WellBoreIdentityController IdentityController(IServiceProvider sp) => new(
         sp.GetRequiredService<ILogger<WellBoreIdentityManager>>(), sp.GetRequiredService<SqlConnectionManager>());

@@ -39,6 +39,11 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          env:
+            - name: WellHostURL
+              value: {{ .Values.wellHostURL | quote }}
+            - name: RigHostURL
+              value: {{ .Values.rigHostURL | quote }}
           {{- if .Values.probes.enabled}}
           livenessProbe:
             httpGet:

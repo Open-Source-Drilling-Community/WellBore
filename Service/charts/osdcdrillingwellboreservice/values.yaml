@@ -13,6 +13,8 @@ image:
 imagePullSecrets: []
 nameOverride: "osdcdrillingwellboreservice"
 fullnameOverride: "osdcwellboreservice"
+wellHostURL: "http://osdcwellservice/"
+rigHostURL: "http://osdcrigservice/"
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

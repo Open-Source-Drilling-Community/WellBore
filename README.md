@@ -151,7 +151,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## Current implementation
 
-- The service exposes 22 core WellBore and 14 identity/feature-catalogue REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded. Mutations use optimistic concurrency, assignment and detail/topology sub-resources avoid full-document replacement, and `well_bore_search` provides bounded server-side filtering.
+- The service exposes 24 core WellBore and 14 identity/feature-catalogue REST operations as MCP tools, together with `ping`; usage-statistics endpoints are excluded. Mutations use optimistic concurrency, assignment and detail/topology sub-resources avoid full-document replacement, `well_bore_search` provides bounded server-side filtering, and read-only diagnostics validate Well/Rig references without coupling writes to external availability.
 - Wellbore editing includes inline identity and feature assignments. Separate navigation pages let users add, edit, and safely remove catalogue definitions; referenced definitions and options cannot be removed.
 - Root namespaces, generated clients, NuGet packaging, Docker repositories, and Helm chart identities use `OSDC.Drilling.WellBore`.
 - MCP is available over streamable HTTP at `/wellbore/api/mcp` and WebSocket at `/wellbore/api/mcp/ws`. Optional external MCP-hub registration is disabled by default.

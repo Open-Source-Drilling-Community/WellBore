@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -18,11 +20,14 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
     {
         private readonly ILogger<WellBoreManager> _logger;
         private readonly WellBoreManager _wellBoreManager;
+        private readonly IWellBoreExternalReferenceValidator _externalReferenceValidator;
 
-        public WellBoreController(ILogger<WellBoreManager> logger, SqlConnectionManager connectionManager)
+        public WellBoreController(ILogger<WellBoreManager> logger, SqlConnectionManager connectionManager,
+            IWellBoreExternalReferenceValidator? externalReferenceValidator = null)
         {
             _logger = logger;
             _wellBoreManager = WellBoreManager.GetInstance(_logger, connectionManager);
+            _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellBoreExternalReferenceValidator();
         }
 
         /// <summary>
@@ -136,6 +141,79 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
                 modifiedFromUtc, modifiedToUtc);
             return result != null ? Ok(result) : StatusCode(StatusCodes.Status500InternalServerError,
                 WellBoreMutationResult.StorageFailure().Error);
+        }
+
+        /// <summary>Checks one stored WellBore's external Well and Rig references without modifying data.</summary>
+        [HttpGet("{id}/ExternalReferences", Name = "ValidateWellBoreExternalReferences")]
+        [ProducesResponseType<WellBoreExternalReferenceValidation>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellBoreMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellBoreMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WellBoreExternalReferenceValidation>> ValidateWellBoreExternalReferences(
+            Guid id, CancellationToken cancellationToken)
+        {
+            if (id == Guid.Empty)
+                return BadRequest(WellBoreMutationResult.Invalid("id", "invalid_id", "A non-empty WellBore UUID is required.").Error);
+            Model.WellBore? wellBore = _wellBoreManager.GetWellBoreById(id);
+            if (wellBore == null)
+                return NotFound(WellBoreMutationResult.NotFound("The WellBore does not exist.").Error);
+            IReadOnlyList<WellBoreExternalReferenceValidation> results =
+                await _externalReferenceValidator.ValidateAsync([wellBore], cancellationToken);
+            return Ok(results.Single());
+        }
+
+        /// <summary>Checks a bounded page of stored WellBores for external Well and Rig consistency.</summary>
+        [HttpPost("ExternalReferenceAudit", Name = "AuditWellBoreExternalReferences")]
+        [ProducesResponseType<WellBoreExternalReferenceAuditResult>(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(WellBoreMutationErrorEnvelope), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(WellBoreMutationErrorEnvelope), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<WellBoreExternalReferenceAuditResult>> AuditWellBoreExternalReferences(
+            [FromBody] WellBoreExternalReferenceAuditRequest? request, CancellationToken cancellationToken)
+        {
+            if (request == null)
+                return BadRequest(WellBoreMutationResult.Invalid("request", "required", "An audit request is required.").Error);
+            if (!Enum.IsDefined(request.Scope))
+                return BadRequest(WellBoreMutationResult.Invalid("Scope", "invalid_value", "Scope must be All or Selected.").Error);
+            if (request.Offset < 0 || request.Limit is < 1 or > 100)
+                return BadRequest(WellBoreMutationResult.Invalid("pagination", "invalid_range",
+                    "Offset must be non-negative and limit must be between 1 and 100.").Error);
+            if (request.Scope == WellBoreExternalReferenceAuditScope.Selected &&
+                (request.WellBoreIDs == null || request.WellBoreIDs.Count == 0))
+                return BadRequest(WellBoreMutationResult.Invalid("WellBoreIDs", "required",
+                    "Selected scope requires at least one WellBore UUID.").Error);
+            if (request.WellBoreIDs?.Any(value => value == Guid.Empty) == true ||
+                request.WellBoreIDs?.Distinct().Count() != request.WellBoreIDs?.Count)
+                return BadRequest(WellBoreMutationResult.Invalid("WellBoreIDs", "invalid_ids",
+                    "WellBore UUIDs must be non-empty and unique.").Error);
+
+            List<Model.WellBore?>? stored = _wellBoreManager.GetAllWellBore();
+            if (stored == null)
+                return StatusCode(StatusCodes.Status500InternalServerError, WellBoreMutationResult.StorageFailure().Error);
+            Dictionary<Guid, Model.WellBore> byId = stored.Where(value => value?.MetaInfo != null)
+                .Cast<Model.WellBore>().ToDictionary(value => value.MetaInfo!.ID);
+            IEnumerable<Model.WellBore> selected = byId.Values;
+            if (request.Scope == WellBoreExternalReferenceAuditScope.Selected)
+            {
+                List<Guid> missing = request.WellBoreIDs!.Where(id => !byId.ContainsKey(id)).ToList();
+                if (missing.Count != 0)
+                    return NotFound(WellBoreMutationResult.NotFound(
+                        $"Selected WellBore UUID '{missing[0]}' does not exist.").Error);
+                selected = request.WellBoreIDs!.Select(id => byId[id]);
+            }
+            List<Model.WellBore> matches = selected.OrderBy(value => value.MetaInfo!.ID).ToList();
+            List<Model.WellBore> page = matches.Skip(request.Offset).Take(request.Limit).ToList();
+            IReadOnlyList<WellBoreExternalReferenceValidation> items =
+                await _externalReferenceValidator.ValidateAsync(page, cancellationToken);
+            return Ok(new WellBoreExternalReferenceAuditResult
+            {
+                CheckedAtUtc = items.FirstOrDefault()?.CheckedAtUtc ?? DateTimeOffset.UtcNow,
+                Total = matches.Count,
+                Offset = request.Offset,
+                Limit = request.Limit,
+                ValidCount = items.Count(value => value.Status == WellBoreExternalReferenceValidationStatus.Valid),
+                InvalidCount = items.Count(value => value.Status == WellBoreExternalReferenceValidationStatus.Invalid),
+                UnavailableCount = items.Count(value => value.Status == WellBoreExternalReferenceValidationStatus.Unavailable),
+                Items = items.ToList()
+            });
         }
 
         /// <summary>Exports all WellBores or an ordered selection with referenced local catalog definitions.</summary>

@@ -177,6 +177,74 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("Items", "Total", "Offset", "Limit"), ["additionalProperties"] = false
     });
 
+    public static JsonObject CreateWellBoreExternalReferenceValidationOutputSchema() =>
+        SuccessEnvelope(CreateWellBoreExternalReferenceValidationSchema());
+
+    public static JsonObject CreateWellBoreExternalReferenceAuditSchema() => WrapRequest(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["Scope"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("All", "Selected") },
+            ["WellBoreIDs"] = new JsonObject
+            {
+                ["type"] = new JsonArray("array", "null"), ["uniqueItems"] = true,
+                ["items"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" }
+            },
+            ["Offset"] = new JsonObject { ["type"] = "integer", ["minimum"] = 0, ["default"] = 0 },
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100, ["default"] = 100 }
+        },
+        ["required"] = new JsonArray("Scope"),
+        ["additionalProperties"] = false
+    });
+
+    public static JsonObject CreateWellBoreExternalReferenceAuditOutputSchema() => SuccessEnvelope(new JsonObject
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["CheckedAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["Total"] = NonNegativeInteger(), ["Offset"] = NonNegativeInteger(),
+            ["Limit"] = new JsonObject { ["type"] = "integer", ["minimum"] = 1, ["maximum"] = 100 },
+            ["ValidCount"] = NonNegativeInteger(), ["InvalidCount"] = NonNegativeInteger(),
+            ["UnavailableCount"] = NonNegativeInteger(),
+            ["Items"] = new JsonObject { ["type"] = "array", ["items"] = CreateWellBoreExternalReferenceValidationSchema() }
+        },
+        ["required"] = new JsonArray("CheckedAtUtc", "Total", "Offset", "Limit", "ValidCount", "InvalidCount", "UnavailableCount", "Items"),
+        ["additionalProperties"] = false
+    });
+
+    private static JsonObject CreateWellBoreExternalReferenceValidationSchema() => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["WellBoreID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["WellID"] = NullableUuid("External Well UUID recorded by the WellBore, or null."),
+            ["RigID"] = NullableUuid("External Rig UUID recorded by the WellBore, or null."),
+            ["WellExists"] = new JsonObject { ["type"] = new JsonArray("boolean", "null") },
+            ["RigExists"] = new JsonObject { ["type"] = new JsonArray("boolean", "null") },
+            ["Status"] = new JsonObject { ["type"] = "string", ["enum"] = new JsonArray("Valid", "Invalid", "Unavailable") },
+            ["CheckedAtUtc"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["Issues"] = new JsonObject
+            {
+                ["type"] = "array", ["items"] = new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = new JsonObject
+                    {
+                        ["Property"] = new JsonObject { ["type"] = "string" },
+                        ["Code"] = new JsonObject { ["type"] = "string" },
+                        ["Message"] = new JsonObject { ["type"] = "string" }
+                    },
+                    ["required"] = new JsonArray("Property", "Code", "Message"), ["additionalProperties"] = false
+                }
+            }
+        },
+        ["required"] = new JsonArray("WellBoreID", "WellID", "RigID", "WellExists", "RigExists", "Status", "CheckedAtUtc", "Issues"),
+        ["additionalProperties"] = false
+    };
+
     private static JsonObject CreateSubresourceSchema(string bodyName, JsonObject body)
     {
         JsonObject schema = CreateWellBoreDeleteSchema();
@@ -210,6 +278,8 @@ internal static class McpToolArgumentHelpers
     {
         ["type"] = "integer", ["minimum"] = 200, ["maximum"] = 299
     };
+
+    private static JsonObject NonNegativeInteger() => new() { ["type"] = "integer", ["minimum"] = 0 };
 
     public static JsonObject CreateWellBoreIdentitySchema(bool includeId = false) =>
         WrapCatalogBody("wellBoreIdentity", CreateIdentityDefinitionSchema(), includeId, "wellBoreIdentity.MetaInfo.ID");
