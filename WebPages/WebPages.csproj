@@ -18,7 +18,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/Open-Source-Drilling-Community/WellBore</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
