@@ -62,11 +62,14 @@
                 datum.
             </MudText>
             <MudText Typo="Typo.body1">
-                Sidetracks are further classified by <code>SidetrackType</code> — <b>Technical</b> (drilled to bypass
-                an obstruction or fish), <b>Production</b>, <b>Appraisal</b>, or <b>Lateral</b> — so the reason a bore
-                exists is recorded alongside where it begins. A parent-child chain of sidetracks can run arbitrarily
-                deep; the service rejects cycles and parent links that cross into a different Well when the topology
-                is written.
+                Sidetracks are classified — <b>Technical</b> (drilled to bypass an obstruction or fish),
+                <b>Production</b>, <b>Appraisal</b>, or <b>Lateral</b> — through an exclusive
+                <code>SidetrackClassification</code> feature assignment rather than a dedicated property, so the same
+                identity/feature mechanism described below also drives this classification. The legacy
+                <code>SidetrackType</code> field is deprecated: the service still accepts it and keeps it
+                synchronized with the feature assignment for compatibility, but new clients should read and write the
+                feature assignment directly. A parent-child chain of sidetracks can run arbitrarily deep; the service
+                rejects cycles and parent links that cross into a different Well when the topology is written.
             </MudText>
         </MudPaper>
     </MudItem>
