@@ -1,1189 +1,10 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.4",
   "info": {
-    "title": "ModelShared (Service)",
-    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "title": "Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
     "version": "1.0"
   },
   "paths": {
-    "/CartographicConversionSet": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PostCartographicConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "PutCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "DeleteCartographicConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicConversionSet"
-        ],
-        "operationId": "GetAllCartographicConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PostCartographicProjection",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/MetaInfo": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "PutCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CartographicProjection"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "DeleteCartographicProjectionById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/CartographicProjection/LightData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjectionLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjection/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjection"
-        ],
-        "operationId": "GetAllCartographicProjection",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjection"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionTypeId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/{id}": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetCartographicProjectionTypeById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CartographicProjectionType"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionType/HeavyData": {
-      "get": {
-        "tags": [
-          "CartographicProjectionType"
-        ],
-        "operationId": "GetAllCartographicProjectionType",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CartographicProjectionType"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/CartographicProjectionUsageStatistics": {
-      "get": {
-        "tags": [
-          "CartographicProjectionUsageStatistics"
-        ],
-        "operationId": "GetCartographicProjectionUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsCartographicProjection"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PostGeodeticConversionSet",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticConversionSet"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "PutGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticConversionSet"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "DeleteGeodeticConversionSetById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSetLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSetLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticConversionSet/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticConversionSet"
-        ],
-        "operationId": "GetAllGeodeticConversionSet",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticConversionSet"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PostGeodeticDatum",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/{id}": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "PutGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeodeticDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "DeleteGeodeticDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/LightData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatumLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatumLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "GeodeticDatum"
-        ],
-        "operationId": "GetAllGeodeticDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GeodeticDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GeodeticDatumUsageStatistics": {
-      "get": {
-        "tags": [
-          "GeodeticDatumUsageStatistics"
-        ],
-        "operationId": "GetGeodeticDatumUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsGeodeticDatum"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PostSpheroid",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/MetaInfo": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroidMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Spheroid/{id}": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Spheroid"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "PutSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Spheroid"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "DeleteSpheroidById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Spheroid/HeavyData": {
-      "get": {
-        "tags": [
-          "Spheroid"
-        ],
-        "operationId": "GetAllSpheroid",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Spheroid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/Field": {
       "get": {
         "tags": [
@@ -1216,24 +37,61 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -1252,7 +110,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -1284,7 +142,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Field"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
                 }
               }
             }
@@ -1305,30 +163,86 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Field"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
@@ -1369,7 +283,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Field"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
                   }
                 }
               }
@@ -1378,12 +292,331 @@
         }
       }
     },
-    "/FieldCartographicConversionSet": {
+    "/Field/BatchExport": {
+      "post": {
+        "tags": [
+          "Field"
+        ],
+        "operationId": "BatchExportFields",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Field/BatchRestore": {
+      "post": {
+        "tags": [
+          "Field"
+        ],
+        "operationId": "BatchRestoreFields",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Field/LightData": {
       "get": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "Field"
         ],
-        "operationId": "GetAllFieldCartographicConversionSetId",
+        "operationId": "GetAllFieldLight",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldLight"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldCoordinateConversion/Forward": {
+      "post": {
+        "tags": [
+          "FieldCoordinateConversion"
+        ],
+        "operationId": "ForwardFieldCoordinates",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldForwardConversionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldForwardConversionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldForwardConversionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCoordinateConversionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldCoordinateConversion/Inverse": {
+      "post": {
+        "tags": [
+          "FieldCoordinateConversion"
+        ],
+        "operationId": "InverseFieldCoordinates",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldInverseConversionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldInverseConversionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldInverseConversionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCoordinateConversionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldDelineationLineType": {
+      "get": {
+        "tags": [
+          "FieldDelineationLineType"
+        ],
+        "operationId": "GetAllFieldDelineationLineTypeId",
         "responses": {
           "200": {
             "description": "OK",
@@ -1403,41 +636,48 @@
       },
       "post": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "PostFieldCartographicConversionSet",
+        "operationId": "PostFieldDelineationLineType",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/FieldCartographicConversionSet/MetaInfo": {
+    "/FieldDelineationLineType/MetaInfo": {
       "get": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "GetAllFieldCartographicConversionSetMetaInfo",
+        "operationId": "GetAllFieldDelineationLineTypeMetaInfo",
         "responses": {
           "200": {
             "description": "OK",
@@ -1446,7 +686,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
                   }
                 }
               }
@@ -1455,12 +695,12 @@
         }
       }
     },
-    "/FieldCartographicConversionSet/{id}": {
+    "/FieldDelineationLineType/{id}": {
       "get": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "GetFieldCartographicConversionSetById",
+        "operationId": "GetFieldDelineationLineTypeById",
         "parameters": [
           {
             "name": "id",
@@ -1478,7 +718,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
                 }
               }
             }
@@ -1487,9 +727,9 @@
       },
       "put": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "PutFieldCartographicConversionSetById",
+        "operationId": "PutFieldDelineationLineTypeById",
         "parameters": [
           {
             "name": "id",
@@ -1499,38 +739,64 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "DeleteFieldCartographicConversionSetById",
+        "operationId": "DeleteFieldDelineationLineTypeById",
         "parameters": [
           {
             "name": "id",
@@ -1549,12 +815,12 @@
         }
       }
     },
-    "/FieldCartographicConversionSet/LightData": {
+    "/FieldDelineationLineType/HeavyData": {
       "get": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldDelineationLineType"
         ],
-        "operationId": "GetAllFieldCartographicConversionSetLight",
+        "operationId": "GetAllFieldDelineationLineType",
         "responses": {
           "200": {
             "description": "OK",
@@ -1563,7 +829,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSetLight"
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
                   }
                 }
               }
@@ -1572,12 +838,12 @@
         }
       }
     },
-    "/FieldCartographicConversionSet/HeavyData": {
+    "/FieldFeatureCategory": {
       "get": {
         "tags": [
-          "FieldCartographicConversionSet"
+          "FieldFeatureCategory"
         ],
-        "operationId": "GetAllFieldCartographicConversionSet",
+        "operationId": "GetAllFieldFeatureCategoryId",
         "responses": {
           "200": {
             "description": "OK",
@@ -1586,7 +852,665 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FieldCartographicConversionSet"
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "PostFieldFeatureCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldFeatureCategory/MetaInfo": {
+      "get": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "GetAllFieldFeatureCategoryMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldFeatureCategory/{id}": {
+      "get": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "GetFieldFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "PutFieldFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "DeleteFieldFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/FieldFeatureCategory/HeavyData": {
+      "get": {
+        "tags": [
+          "FieldFeatureCategory"
+        ],
+        "operationId": "GetAllFieldFeatureCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldIdentity": {
+      "get": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "GetAllFieldIdentityId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "PostFieldIdentity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldIdentity/MetaInfo": {
+      "get": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "GetAllFieldIdentityMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldIdentity/{id}": {
+      "get": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "GetFieldIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "PutFieldIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "DeleteFieldIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/FieldIdentity/HeavyData": {
+      "get": {
+        "tags": [
+          "FieldIdentity"
+        ],
+        "operationId": "GetAllFieldIdentity",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldMembershipCategory": {
+      "get": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "GetAllFieldMembershipCategoryId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "PostFieldMembershipCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldMembershipCategory/MetaInfo": {
+      "get": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "GetAllFieldMembershipCategoryMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/FieldMembershipCategory/{id}": {
+      "get": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "GetFieldMembershipCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "PutFieldMembershipCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "DeleteFieldMembershipCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/FieldMembershipCategory/HeavyData": {
+      "get": {
+        "tags": [
+          "FieldMembershipCategory"
+        ],
+        "operationId": "GetAllFieldMembershipCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
                   }
                 }
               }
@@ -1607,7 +1531,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsField"
+                  "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.UsageStatisticsField"
                 }
               }
             }
@@ -1618,665 +1542,7 @@
   },
   "components": {
     "schemas": {
-      "CountPerDay": {
-        "type": "object",
-        "properties": {
-          "Date": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "Count": {
-            "type": "integer",
-            "format": "int64"
-          }
-        }
-      },
-      "History": {
-        "type": "object",
-        "properties": {
-          "Data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CountPerDay"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsCartographicProjection": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllCartographicProjectionTypeIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionTypeByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionTypePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicProjectionPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicProjectionByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "AreaNormalizationTransformType": {
-        "enum": [
-          "None",
-          "Linear",
-          "Quadratic",
-          "Tangent"
-        ],
-        "type": "string"
-      },
-      "AxisType": {
-        "enum": [
-          "None",
-          "x",
-          "y"
-        ],
-        "type": "string"
-      },
-      "CartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "CartographicCoordinateList": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "CartographicConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CartographicProjectionName": {
-            "type": "string",
-            "nullable": true
-          },
-          "CartographicProjectionDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicCoordinate": {
-        "type": "object",
-        "properties": {
-          "Northing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Easting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GeodeticCoordinate": {
-            "$ref": "#/components/schemas/GeodeticCoordinate"
-          },
-          "GridConvergenceDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        },
-        "additionalProperties": { }
-      },
-      "CartographicProjection": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "ProjectionType": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "GeodeticDatumID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "LatitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeTrueScale": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeOrigin": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Scaling": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseEasting": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "FalseNorthing": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Zone": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "IsSouth": {
-            "type": "boolean"
-          },
-          "IsHyperbolic": {
-            "type": "boolean"
-          },
-          "ProjectionHeight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "HeightViewPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Sweep": {
-            "$ref": "#/components/schemas/AxisType"
-          },
-          "AzimuthCentralLine": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Weight": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Landsat": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Path": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "Alpha": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Gamma": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude1": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude2": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeCentralPoint": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "NoOffset": {
-            "type": "boolean"
-          },
-          "NoRotation": {
-            "type": "boolean"
-          },
-          "AreaNormalizationTransform": {
-            "$ref": "#/components/schemas/AreaNormalizationTransformType"
-          },
-          "PegLatitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegLongitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "PegHeading": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "N": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Q": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "CartographicProjectionLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "CartographicProjectionType": {
-        "type": "object",
-        "properties": {
-          "Projection": {
-            "$ref": "#/components/schemas/ProjectionType"
-          },
-          "UseLatitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLatitudeTrueScale": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeOrigin": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseScaling": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseFalseEastingNorthing": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseZone": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSouth": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHyperbolic": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseProjectionHeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseHeightViewPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseSweep": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAzimuthCentralLine": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseWeight": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLandsat": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePath": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAlpha": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseGamma": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude1": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitude2": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseLongitudeCentralPoint": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoOffset": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseNoRotation": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseAreaNormalizationTransform": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLatitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegLongitude": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UsePegHeading": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseN": {
-            "type": "boolean",
-            "readOnly": true
-          },
-          "UseQ": {
-            "type": "boolean",
-            "readOnly": true
-          }
-        }
-      },
-      "ProjectionType": {
-        "enum": [
-          "Unknown",
-          "UTM",
-          "LambertConformalConic",
-          "LambertConformalConicAlternative",
-          "LambertEqualAreaConic",
-          "TransverseMercator",
-          "Mercator",
-          "Polyconic",
-          "ModifiedStereographicAlaska",
-          "AlbersEqualArea",
-          "AzimuthalEquidistant",
-          "Aitoff",
-          "Bonne",
-          "CalCoopOceanFish",
-          "Cassini",
-          "CentralCylinder",
-          "EqualAreaCylindrical",
-          "EquidistantCylindrical",
-          "EquidistantConic",
-          "GeostationarySatelliteView",
-          "GeneralSinusoidalSeries",
-          "ModifiedStereographic48US",
-          "ModifiedStereographic50US",
-          "InternationalMapWorldPolyconic",
-          "Laborde",
-          "LambertAzimuthalEqualArea",
-          "Lagrange",
-          "LeeOblatedStereographic",
-          "SpaceObliqueLandsat",
-          "McBrydeThomasFlatPolarSinusoidal",
-          "MillerOblatedStereographic",
-          "SpaceObliqueMISR",
-          "NewZealandMapGrid",
-          "ObliqueMercator",
-          "Orthographic",
-          "QuadrilateralizedSphericalCube",
-          "RoussilheStereographic",
-          "S2",
-          "SphericalCrossTrackHeight",
-          "Sinusoidal",
-          "SwissObliqueMercator",
-          "Stereographic",
-          "ObliqueStereographicAlternative",
-          "UniversalPolarStereographic",
-          "UrmaevV",
-          "WebMercator"
-        ],
-        "type": "string"
-      },
-      "GeodeticCoordinate": {
-        "type": "object",
-        "properties": {
-          "LatitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthWGS84": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LatitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "LongitudeDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalDepthDatum": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "OctreeDepth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "OctreeCode": {
-            "$ref": "#/components/schemas/OctreeCodeLong"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "OctreeCodeLong": {
-        "type": "object",
-        "properties": {
-          "Depth": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "CodeHigh": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "CodeLow": {
-            "type": "integer",
-            "format": "int64"
-          }
-        },
-        "additionalProperties": { }
-      },
-      "MetaInfo": {
+      "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
         "type": "object",
         "properties": {
           "ID": {
@@ -2295,319 +1561,10 @@
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsGeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllSpheroidIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostSpheroidPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteSpheroidByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticDatumPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticDatumByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostGeodeticConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteGeodeticConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "GeodeticConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatum": {
-            "$ref": "#/components/schemas/GeodeticDatum"
-          },
-          "OctreeBounds": {
-            "$ref": "#/components/schemas/Bounds"
-          },
-          "GeodeticCoordinates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GeodeticCoordinate"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticConversionSetLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "GeodeticDatumName": {
-            "type": "string",
-            "nullable": true
-          },
-          "GeodeticDatumDescription": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "GeodeticDatum": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "Spheroid": {
-            "$ref": "#/components/schemas/Spheroid"
-          },
-          "DeltaX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "DeltaZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationX": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationY": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "RotationZ": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "ScaleFactor": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          }
-        }
-      },
-      "GeodeticDatumLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          }
-        }
-      },
-      "Spheroid": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "IsDefault": {
-            "type": "boolean"
-          },
-          "SemiMajorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMajorAxisSet": {
-            "type": "boolean"
-          },
-          "SemiMinorAxis": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSemiMinorAxisSet": {
-            "type": "boolean"
-          },
-          "Eccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsEccentricitySet": {
-            "type": "boolean"
-          },
-          "SquaredEccentricity": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsSquaredEccentricitySet": {
-            "type": "boolean"
-          },
-          "Flattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsFlatteningSet": {
-            "type": "boolean"
-          },
-          "InverseFlattening": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "IsInverseFlatteningSet": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ScalarDrillingProperty": {
-        "type": "object",
-        "properties": {
-          "DiracDistributionValue": {
-            "$ref": "#/components/schemas/DiracDistribution"
-          }
-        }
-      },
-      "Point3D": {
+      "OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates": {
         "type": "object",
         "properties": {
           "X": {
@@ -2624,106 +1581,54 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "RiemannianNorth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianEast": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TVD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "Bounds": {
+      "OSDC.Drilling.Field.Model.CountPerDay": {
         "type": "object",
         "properties": {
-          "MinX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "Date": {
+            "type": "string",
+            "format": "date-time"
           },
-          "MaxX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MinZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MaxZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MiddleX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "MiddleZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "IntervalZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "Center": {
-            "$ref": "#/components/schemas/Point3D"
+          "Count": {
+            "type": "integer",
+            "format": "int64"
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "DiracDistribution": {
-        "type": "object",
-        "properties": {
-          "MinValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "MaxValue": {
-            "type": "number",
-            "format": "double"
-          },
-          "Value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "Field": {
+      "OSDC.Drilling.Field.Model.Field": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
           },
           "Name": {
             "type": "string",
@@ -2743,56 +1648,813 @@
             "format": "date-time",
             "nullable": true
           },
-          "CartographicProjectionID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          }
-        }
-      },
-      "FieldCartographicConversionSet": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "FieldID": {
+          "ProjectionDefinitionID": {
             "type": "string",
             "format": "uuid",
             "nullable": true
           },
-          "CartographicCoordinateList": {
+          "ReferencePoint": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates"
+          },
+          "FieldFeatureAssignments": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CartographicCoordinate"
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureAssignment"
+            },
+            "nullable": true
+          },
+          "FieldIdentityAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentityAssignment"
+            },
+            "nullable": true
+          },
+          "FieldMembershipAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipAssignment"
+            },
+            "nullable": true
+          },
+          "DelineationLines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLine"
             },
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "FieldCartographicConversionSetLight": {
+      "OSDC.Drilling.Field.Model.FieldApplicabilityPolicy": {
+        "enum": [
+          "RequireApplicable",
+          "AllowUnknown"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchCatalogDependencies": {
+        "type": "object",
+        "properties": {
+          "FeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureCategory"
+            },
+            "nullable": true
+          },
+          "MembershipCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipCategory"
+            },
+            "nullable": true
+          },
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldIdentity"
+            },
+            "nullable": true
+          },
+          "DelineationLineTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationLineType"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchCatalogMapping": {
+        "type": "object",
+        "properties": {
+          "Catalog": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchCatalogDependencies"
+          },
+          "Fields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.Field"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportScope"
+          },
+          "FieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchCatalogRestorePolicy"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchExportDocument"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogOptionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "FieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldCatalogReference": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Authority": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldConversionErrorEnvelope": {
+        "required": [
+          "Error",
+          "Message"
+        ],
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionValidationError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldConversionValidationError": {
+        "required": [
+          "Code",
+          "Message",
+          "Property"
+        ],
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldConversionWarning": {
+        "required": [
+          "Code",
+          "Message"
+        ],
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldCoordinateConversionPositionResult": {
+        "required": [
+          "ProjectedCoordinate",
+          "ProjectionDatumGeographicCoordinate"
+        ],
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ProjectionDatumGeographicCoordinate": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldGeographicCoordinate"
+          },
+          "Wgs84GeographicCoordinate": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldGeographicCoordinate"
+          },
+          "ProjectedCoordinate": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldProjectedCoordinate"
+          },
+          "ProjectionDatumVerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "Wgs84VerticalDepth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CoordinateEpochUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "GridConvergence": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldCoordinateConversionResponse": {
+        "required": [
+          "ApiAxisConvention",
+          "ProjectionDatum",
+          "ProjectionDefinition",
+          "Wgs84Datum"
+        ],
+        "type": "object",
+        "properties": {
+          "FieldID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ProjectionDefinition": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCatalogReference"
+          },
+          "ProjectionDatum": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCatalogReference"
+          },
+          "Wgs84Datum": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCatalogReference"
+          },
+          "ApiAxisConvention": {
+            "type": "string",
+            "nullable": true
+          },
+          "Positions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldCoordinateConversionPositionResult"
+            },
+            "nullable": true
+          },
+          "Warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldConversionWarning"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldDelineationBoundaryLine": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IsInteriorBoundary": {
+            "type": "boolean"
+          },
+          "IsClosed": {
+            "type": "boolean"
+          },
+          "Points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldDelineationLine": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "DelineationLineTypeID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Margin": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TopDepth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "BottomDepth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Math.Point3DGlobalCoordinates"
+            },
+            "nullable": true
+          },
+          "CalculatedBoundaryLines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDelineationBoundaryLine"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldDelineationLineType": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldDepthTransformationPolicy": {
+        "enum": [
+          "PreservePhysicalPoint",
+          "AllowUntransformedDepthFor2D"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldFeatureAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FeatureCategoryID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FeatureOptionID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ToDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldFeatureCategory": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldFeatureOption"
+            },
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldFeatureOption": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldForwardConversionPosition": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "VerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "CoordinateEpochUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldForwardConversionRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "FieldID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "SourceGeographicReference": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldGeographicReference"
+          },
+          "ProjectionApplicabilityPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldApplicabilityPolicy"
+          },
+          "Transformation": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldTransformationOptions"
+          },
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldForwardConversionPosition"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldGeographicCoordinate": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldGeographicReference": {
+        "enum": [
+          "ProjectionDatum",
+          "Wgs84"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.FieldIdentity": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldIdentityAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IdentityID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldInverseConversionPosition": {
+        "type": "object",
+        "properties": {
+          "Easting": {
+            "type": "number",
+            "format": "double"
+          },
+          "Northing": {
+            "type": "number",
+            "format": "double"
+          },
+          "VerticalDepth": {
+            "type": "number",
+            "format": "double"
+          },
+          "CoordinateEpochUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldInverseConversionRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "FieldID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ProjectionApplicabilityPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldApplicabilityPolicy"
+          },
+          "Transformation": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldTransformationOptions"
+          },
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldInverseConversionPosition"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldLight": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
           },
           "Name": {
             "type": "string",
@@ -2811,18 +2473,200 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldMembershipAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
           },
-          "FieldName": {
+          "MembershipCategoryID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "MembershipOptionID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ToDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldMembershipCategory": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+          },
+          "Name": {
             "type": "string",
             "nullable": true
           },
-          "FieldDescription": {
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMembershipOption"
+            },
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldMembershipOption": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
             "type": "string",
             "nullable": true
           }
-        }
+        },
+        "additionalProperties": false
       },
-      "UsageStatisticsField": {
+      "OSDC.Drilling.Field.Model.FieldMutationError": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReferencingFieldIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldMutationErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldMutationError"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldProjectedCoordinate": {
+        "type": "object",
+        "properties": {
+          "Easting": {
+            "type": "number",
+            "format": "double"
+          },
+          "Northing": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldTransformationOptions": {
+        "type": "object",
+        "properties": {
+          "SelectionPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldTransformationSelectionPolicy"
+          },
+          "TransformationPathIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "SelectionToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "ApplicabilityPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldApplicabilityPolicy"
+          },
+          "DepthPolicy": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.FieldDepthTransformationPolicy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.FieldTransformationSelectionPolicy": {
+        "enum": [
+          "RequireUnambiguous",
+          "FirstAvailable",
+          "ExplicitPath"
+        ],
+        "type": "string"
+      },
+      "OSDC.Drilling.Field.Model.History": {
+        "type": "object",
+        "properties": {
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.CountPerDay"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.Field.Model.UsageStatisticsField": {
         "type": "object",
         "properties": {
           "LastSaved": {
@@ -2834,54 +2678,124 @@
             "format": "date-span"
           },
           "GetAllFieldIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "GetAllFieldMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "GetFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "GetAllFieldLightPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "GetAllFieldPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "BatchExportFieldsPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "BatchRestoreFieldsPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "PostFieldPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "PutFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
           "DeleteFieldByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "GetAllFieldCartographicConversionSetIdPerDay": {
-            "$ref": "#/components/schemas/History"
+          "GetAllFieldDelineationLineTypeIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "GetAllFieldCartographicConversionSetMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
+          "GetAllFieldDelineationLineTypeMetaInfoPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "GetFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+          "GetFieldDelineationLineTypeByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "GetAllFieldCartographicConversionSetLightPerDay": {
-            "$ref": "#/components/schemas/History"
+          "GetAllFieldDelineationLineTypePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "GetAllFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
+          "PostFieldDelineationLineTypePerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "PostFieldCartographicConversionSetPerDay": {
-            "$ref": "#/components/schemas/History"
+          "PutFieldDelineationLineTypeByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "PutFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+          "DeleteFieldDelineationLineTypeByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           },
-          "DeleteFieldCartographicConversionSetByIdPerDay": {
-            "$ref": "#/components/schemas/History"
+          "GetAllFieldFeatureCategoryIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldFeatureCategoryMetaInfoPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetFieldFeatureCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldFeatureCategoryPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PostFieldFeatureCategoryPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PutFieldFeatureCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "DeleteFieldFeatureCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldIdentityIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldIdentityMetaInfoPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetFieldIdentityByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldIdentityPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PostFieldIdentityPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PutFieldIdentityByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "DeleteFieldIdentityByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldMembershipCategoryIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldMembershipCategoryMetaInfoPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetFieldMembershipCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetAllFieldMembershipCategoryPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PostFieldMembershipCategoryPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "PutFieldMembershipCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "DeleteFieldMembershipCategoryByIdPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
+          },
+          "GetFieldUsageStatisticsPerDay": {
+            "$ref": "#/components/schemas/OSDC.Drilling.Field.Model.History"
           }
-        }
+        },
+        "additionalProperties": false
       }
     }
   }

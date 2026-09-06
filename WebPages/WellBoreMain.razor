@@ -74,7 +74,7 @@
     private List<Well> wellList = new();
     private List<Cluster> clusterList = new();
     private List<Field> fieldList = new();
-    private List<Rig> rigList = new();
+    private List<RigReadResponse> rigList = new();
 
     private List<WellBore> selectedWellBoreList = new();
     private WellBore? currentWellBore;
@@ -200,7 +200,7 @@
                 {
                     try
                     {
-                        rigList = (List<Rig>)await rigTask;
+                        rigList = (List<RigReadResponse>)await rigTask;
                         if (rigList != null)
                         {
                             rigList.Sort((t1, t2) => t1.Name.CompareTo(t2.Name));

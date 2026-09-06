@@ -16,6 +16,8 @@ End-to-end OSDC WellBore solution consisting of a backend microservice (REST API
 - Data (`home/`)
   - Local storage used by the Service: `home/WellBore.db` (SQLite) and `home/history.json` (usage stats).
 
+The trajectory and survey-run display pages provide searchable Field/Cluster/Well/WellBore selectors and render North/East positions relative to WGS84, the owning Field's cartographic projection, the selected Field or Cluster reference point, or the selected Well-head slot. Their `RTE` depth reference uses the explicit WellBore Rig where available, otherwise the fixed-platform Cluster Rig.
+
 ## Prerequisites
 - .NET 8 SDK
 - Optional: Docker (for containerized builds)

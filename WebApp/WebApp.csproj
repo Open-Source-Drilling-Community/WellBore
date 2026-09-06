@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="9.6.0" />
+    <PackageReference Include="MudBlazor" Version="9.9.0" />
     <PackageReference Include="OSDC.Drilling.Cluster.WebPages" Version="1.1.0" />
     <PackageReference Include="OSDC.Drilling.EarthCartographicProjection.WebPages" Version="1.1.0" />
     <PackageReference Include="OSDC.Drilling.EarthGeodesy.WebPages" Version="1.1.1" />

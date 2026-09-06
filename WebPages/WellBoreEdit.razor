@@ -195,7 +195,7 @@
     public List<WellBore>? WellBores { get; set; }
 
     [Parameter]
-    public List<Rig>? Rigs { get; set; }
+    public List<RigReadResponse>? Rigs { get; set; }
 
     [Parameter]
     public GroundMudLineDepthReferenceSource? GroundMudLineDepthSource { get; set; }
@@ -284,9 +284,9 @@
             {
                 MeanSeaLevelDepthSource.MeanSeaLevelDepthReference = await ResolveMeanSeaLevelDepthReferenceAsync();
             }
-            if (WellHeadDepthSource != null && _selectedCluster.ReferenceDepth != null && _selectedCluster.ReferenceDepth.GaussianValue != null)
+            if (WellHeadDepthSource != null && _selectedCluster.ReferencePoint?.TVD != null)
             {
-                WellHeadDepthSource.WellHeadDepthReference = -_selectedCluster.ReferenceDepth.GaussianValue.Mean;
+                WellHeadDepthSource.WellHeadDepthReference = -_selectedCluster.ReferencePoint.TVD;
             }
             if (RotaryTableDepthSource != null)
             {
