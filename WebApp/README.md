@@ -36,6 +36,9 @@ Base path and configuration
   - `WellHostURL`
   - `RigHostURL`
   - `TrajectoryHostURL`
+
+The Kubernetes production value is `http://osdcdrillingtrajectoryservice/` and
+the reusable pages append the stable `Trajectory/api/` path.
   - `EarthCartographicProjectionHostURL`
   - `EarthGeodesyHostURL`
   - `EarthGravityHostURL`

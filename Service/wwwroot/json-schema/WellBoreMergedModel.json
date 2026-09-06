@@ -2066,1325 +2066,6 @@
         }
       }
     },
-    "/EarthMagneticField": {
-      "get": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "GetAllEarthMagneticFieldId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "PostEarthMagneticField",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/EarthMagneticField/MetaInfo": {
-      "get": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "GetAllEarthMagneticFieldMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/EarthMagneticField/{id}": {
-      "get": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "GetEarthMagneticFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EarthMagneticField"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "PutEarthMagneticFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticField"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "DeleteEarthMagneticFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/EarthMagneticField/HeavyData": {
-      "get": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "GetAllEarthMagneticField",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EarthMagneticField"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/EarthMagneticField/Completed": {
-      "get": {
-        "tags": [
-          "EarthMagneticField"
-        ],
-        "operationId": "GetAllCompletedEarthMagneticField",
-        "parameters": [
-          {
-            "name": "isCompleted",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EarthMagneticField"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/EarthMagneticFieldCalculationOrder": {
-      "get": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "GetAllEarthMagneticFieldCalculationOrderId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "PostEarthMagneticFieldCalculationOrder",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/EarthMagneticFieldCalculationOrder/MetaInfo": {
-      "get": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "GetAllEarthMagneticFieldCalculationOrderMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/EarthMagneticFieldCalculationOrder/{id}": {
-      "get": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "GetEarthMagneticFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "PutEarthMagneticFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "DeleteEarthMagneticFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/EarthMagneticFieldCalculationOrder/LightData": {
-      "get": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "GetAllEarthMagneticFieldCalculationOrderLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrderLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/EarthMagneticFieldCalculationOrder/HeavyData": {
-      "get": {
-        "tags": [
-          "EarthMagneticFieldCalculationOrder"
-        ],
-        "operationId": "GetAllEarthMagneticFieldCalculationOrder",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EarthMagneticFieldCalculationOrder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalField": {
-      "get": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "GetAllGravitationalFieldId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid",
-                    "nullable": true
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "PostGravitationalField",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GravitationalField/MetaInfo": {
-      "get": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "GetAllGravitationalFieldMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalField/{id}": {
-      "get": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "GetGravitationalFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GravitationalField"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "PutGravitationalFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalField"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "DeleteGravitationalFieldById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GravitationalField/HeavyData": {
-      "get": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "GetAllGravitationalField",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GravitationalField"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalField/Completed": {
-      "get": {
-        "tags": [
-          "GravitationalField"
-        ],
-        "operationId": "GetAllCompletedGravitationalField",
-        "parameters": [
-          {
-            "name": "completedBool",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GravitationalField"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalFieldCalculationOrder": {
-      "get": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "GetAllGravitationalFieldCalculationOrderId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "PostGravitationalFieldCalculationOrder",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GravitationalFieldCalculationOrder/MetaInfo": {
-      "get": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "GetAllGravitationalFieldCalculationOrderMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalFieldCalculationOrder/{id}": {
-      "get": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "GetGravitationalFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "PutGravitationalFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "DeleteGravitationalFieldCalculationOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/GravitationalFieldCalculationOrder/LightData": {
-      "get": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "GetAllGravitationalFieldCalculationOrderLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GravitationalFieldCalculationOrderLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/GravitationalFieldCalculationOrder/HeavyData": {
-      "get": {
-        "tags": [
-          "GravitationalFieldCalculationOrder"
-        ],
-        "operationId": "GetAllGravitationalFieldCalculationOrder",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/GravitationalFieldCalculationOrder"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ErrorSource": {
-      "get": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "GetAllErrorSourceId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "PostErrorSource",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/ErrorSource/MetaInfo": {
-      "get": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "GetAllErrorSourceMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ErrorSource/{id}": {
-      "get": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "GetErrorSourceById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorSource"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "PutErrorSourceById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ErrorSource"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "DeleteErrorSourceById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/ErrorSource/HeavyData": {
-      "get": {
-        "tags": [
-          "ErrorSource"
-        ],
-        "operationId": "GetAllErrorSource",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ErrorSource"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/SurveyInstrument": {
-      "get": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "GetAllSurveyInstrumentId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "PostSurveyInstrument",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/SurveyInstrument/MetaInfo": {
-      "get": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "GetAllSurveyInstrumentMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/SurveyInstrument/{id}": {
-      "get": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "GetSurveyInstrumentById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SurveyInstrument"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "PutSurveyInstrumentById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SurveyInstrument"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "DeleteSurveyInstrumentById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/SurveyInstrument/LightData": {
-      "get": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "GetAllSurveyInstrumentLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SurveyInstrumentLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/SurveyInstrument/HeavyData": {
-      "get": {
-        "tags": [
-          "SurveyInstrument"
-        ],
-        "operationId": "GetAllSurveyInstrument",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SurveyInstrument"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/SurveyInstrumentUsageStatistics": {
-      "get": {
-        "tags": [
-          "SurveyInstrumentUsageStatistics"
-        ],
-        "operationId": "GetSurveyInstrumentUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsSurveyInstrument"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/GlobalAntiCollisions": {
       "get": {
         "tags": [
@@ -3431,7 +2112,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalAntiCollision"
+                }
+              }
+            }
           }
         }
       }
@@ -3499,7 +2187,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalAntiCollision"
+                }
+              }
+            }
           }
         }
       },
@@ -3520,6 +2215,35 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/GlobalAntiCollisions/{id}/Status": {
+      "get": {
+        "tags": [
+          "GlobalAntiCollisions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GlobalAntiCollisionCalculationStatus"
+                }
+              }
+            }
           }
         }
       }
@@ -3653,6 +2377,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -3693,6 +2426,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -3857,6 +2599,22 @@
         "tags": [
           "Octrees"
         ],
+        "parameters": [
+          {
+            "name": "trajectoryType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/TrajectoryType"
+            }
+          },
+          {
+            "name": "isDefinitive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -3924,7 +2682,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeIndexStatus"
+                }
+              }
+            }
           }
         }
       },
@@ -3945,7 +2710,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeIndexStatus"
+                }
+              }
+            }
           }
         }
       },
@@ -3956,6 +2728,162 @@
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Octrees/{id}/Status": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeIndexStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeIndexStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs": {
+      "post": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "QueueOctreeSearch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OctreeSearchJobRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}/Status": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeSearchStatus",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}/Result": {
+      "get": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "GetOctreeSearchResult",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OctreeSearchJobResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Octrees/SearchJobs/{jobId}": {
+      "delete": {
+        "tags": [
+          "Octrees"
+        ],
+        "operationId": "DeleteOctreeSearch",
+        "parameters": [
+          {
+            "name": "jobId",
             "in": "path",
             "required": true,
             "schema": {
@@ -4120,6 +3048,210 @@
         }
       }
     },
+    "/SurveyRun/Search": {
+      "get": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "SearchSurveyRun",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "surveyInstrumentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "surveyRunType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SurveyRunType"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunSearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SurveyRun/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "ValidateSurveyRunExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/SurveyRun/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "SurveyRun"
+        ],
+        "operationId": "AuditSurveyRunExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SurveyRunExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/SurveyRun/HeavyData": {
       "get": {
         "tags": [
@@ -4252,6 +3384,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -4292,6 +3433,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -4711,6 +3861,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -4751,6 +3910,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -4890,6 +4058,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -4930,6 +4107,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -5186,11 +4372,158 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/Trajectory/BatchExport": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "BatchExportTrajectoryData",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchExportDocument"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/BatchRestore": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "BatchRestoreTrajectoryData",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryBatchRestoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchRestoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryBatchErrorEnvelope"
+                }
+              }
+            }
           }
         }
       }
@@ -5324,6 +4657,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -5364,6 +4706,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -5510,6 +4861,209 @@
                   "items": {
                     "$ref": "#/components/schemas/TrajectoryLight"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/Search": {
+      "get": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "SearchTrajectory",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fieldId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "clusterId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "wellBoreId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "trajectoryType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/TrajectoryType"
+            }
+          },
+          {
+            "name": "isDefinitive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectorySearchResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/{id}/ExternalReferences": {
+      "get": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "ValidateTrajectoryExternalReferences",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryExternalReferenceValidation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Trajectory/ExternalReferenceAudit": {
+      "post": {
+        "tags": [
+          "Trajectory"
+        ],
+        "operationId": "AuditTrajectoryExternalReferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryExternalReferenceAuditResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -5717,6 +5271,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -5757,6 +5320,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -6131,6 +5703,430 @@
         }
       }
     },
+    "/TrajectoryFeatureCategory": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategoryId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "PostTrajectoryFeatureCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/MetaInfo": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategoryMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/HeavyData": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetAllTrajectoryFeatureCategory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryFeatureCategory/{id}": {
+      "get": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "GetTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "PutTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TrajectoryFeatureCategory"
+        ],
+        "operationId": "DeleteTrajectoryFeatureCategoryById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentityId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "PostTrajectoryIdentity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/MetaInfo": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentityMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/HeavyData": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetAllTrajectoryIdentity",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrajectoryIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/TrajectoryIdentity/{id}": {
+      "get": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "GetTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrajectoryIdentity"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "PutTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrajectoryIdentity"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "TrajectoryIdentity"
+        ],
+        "operationId": "DeleteTrajectoryIdentityById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/TrajectoryMinimumDistanceCalculation": {
       "get": {
         "tags": [
@@ -6260,6 +6256,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -6300,6 +6305,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -6557,6 +6571,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "requestBody": {
@@ -6597,6 +6620,15 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedModifiedUtc",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
@@ -7188,254 +7220,6 @@
         }
       }
     },
-    "/Well": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "PostWell",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Well/MetaInfo": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWellMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/{id}": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Well"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "PutWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Well"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "DeleteWellById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/Well/HeavyData": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllWell",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Well"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/Well/UsedSlot/{clusterId}": {
-      "get": {
-        "tags": [
-          "Well"
-        ],
-        "operationId": "GetAllUsedSlotMetaInfoByClusterId",
-        "parameters": [
-          {
-            "name": "clusterId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellUsageStatistics": {
-      "get": {
-        "tags": [
-          "WellUsageStatistics"
-        ],
-        "operationId": "GetWellUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsWell"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/WellBore": {
       "get": {
         "tags": [
@@ -7640,243 +7424,6 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/WellBore"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreUsageStatistics": {
-      "get": {
-        "tags": [
-          "WellBoreUsageStatistics"
-        ],
-        "operationId": "GetWellBoreUsageStatistics",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsageStatisticsWellBore"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitectureId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "PostWellBoreArchitecture",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture/MetaInfo": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitectureMetaInfo",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture/{id}": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetWellBoreArchitectureById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WellBoreArchitecture"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "PutWellBoreArchitectureById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/WellBoreArchitecture"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "DeleteWellBoreArchitectureById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture/LightData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitectureLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WellBoreArchitectureLight"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/WellBoreArchitecture/HeavyData": {
-      "get": {
-        "tags": [
-          "WellBoreArchitecture"
-        ],
-        "operationId": "GetAllWellBoreArchitecture",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WellBoreArchitecture"
                   }
                 }
               }
@@ -9275,6 +8822,274 @@
                   "items": {
                     "$ref": "#/components/schemas/WellBoreIdentity"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellBoreUsageStatistics": {
+      "get": {
+        "tags": [
+          "WellBoreUsageStatistics"
+        ],
+        "operationId": "GetWellBoreUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageStatisticsWellBore"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellId",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PostWell",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Well/MetaInfo": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWellMetaInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/{id}": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Well"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "PutWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Well"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "DeleteWellById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/Well/HeavyData": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllWell",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Well"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/Well/UsedSlot/{clusterId}": {
+      "get": {
+        "tags": [
+          "Well"
+        ],
+        "operationId": "GetAllUsedSlotMetaInfoByClusterId",
+        "parameters": [
+          {
+            "name": "clusterId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetaInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/WellUsageStatistics": {
+      "get": {
+        "tags": [
+          "WellUsageStatistics"
+        ],
+        "operationId": "GetWellUsageStatistics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageStatisticsWell"
                 }
               }
             }
@@ -14966,374 +14781,32 @@
           }
         }
       },
-      "EarthMagneticData": {
+      "ProblemDetails": {
         "type": "object",
         "properties": {
-          "Latitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Depth": {
-            "type": "number",
-            "format": "double"
-          },
-          "Year": {
-            "type": "number",
-            "format": "double"
-          },
-          "Dip": {
-            "type": "number",
-            "format": "double",
+          "type": {
+            "type": "string",
             "nullable": true
           },
-          "FieldIntensity": {
-            "type": "number",
-            "format": "double",
+          "title": {
+            "type": "string",
             "nullable": true
           },
-          "Declination": {
-            "type": "number",
-            "format": "double",
+          "status": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
-          "HorizontalMagneticField": {
-            "type": "number",
-            "format": "double",
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
             "nullable": true
           }
-        }
-      },
-      "EarthMagneticField": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "EarthMagneticFieldData": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EarthMagneticData"
-            },
-            "nullable": true
-          },
-          "Type": {
-            "$ref": "#/components/schemas/EarthMagneticFieldType"
-          }
-        }
-      },
-      "EarthMagneticFieldCalculationMethod": {
-        "enum": [
-          "WMM2025",
-          "IGRJ14"
-        ],
-        "type": "string"
-      },
-      "EarthMagneticFieldCalculationOrder": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "CalculationMethod": {
-            "$ref": "#/components/schemas/EarthMagneticFieldCalculationMethod"
-          },
-          "RawEarthMagneticFieldTable": {
-            "$ref": "#/components/schemas/EarthMagneticField"
-          },
-          "CompletedEarthMagneticFieldTable": {
-            "$ref": "#/components/schemas/EarthMagneticField"
-          }
-        }
-      },
-      "EarthMagneticFieldCalculationOrderLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "EarthMagneticFieldType": {
-        "enum": [
-          "Raw",
-          "Completed"
-        ],
-        "type": "string"
-      },
-      "GravitationalData": {
-        "type": "object",
-        "properties": {
-          "Lattitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double"
-          },
-          "Depth": {
-            "type": "number",
-            "format": "double"
-          },
-          "GravitatyIntensityX": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GravitatyIntensityY": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GravitatyIntensityZ": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "GravitationalField": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "Type": {
-            "$ref": "#/components/schemas/GravitationalFieldType"
-          },
-          "GravitationalDataTable": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/GravitationalData"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "GravitationalFieldCalculationOrder": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "RawGravitationalField": {
-            "$ref": "#/components/schemas/GravitationalField"
-          },
-          "CompletedGravitationalField": {
-            "$ref": "#/components/schemas/GravitationalField"
-          }
-        }
-      },
-      "GravitationalFieldCalculationOrderLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "GravitationalFieldType": {
-        "enum": [
-          "Raw",
-          "Completed"
-        ],
-        "type": "string"
-      },
-      "SurveyInstrumentLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "UsageStatisticsSurveyInstrument": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllSurveyInstrumentIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSurveyInstrumentMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetSurveyInstrumentByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSurveyInstrumentLightPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllSurveyInstrumentPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostSurveyInstrumentPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutSurveyInstrumentByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteSurveyInstrumentByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllErrorSourceIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllErrorSourceMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetErrorSourceByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllErrorSourcePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostErrorSourcePerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutErrorSourceByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteErrorSourceByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
+        },
+        "additionalProperties": { }
       },
       "ErrorCode": {
         "enum": [
@@ -15638,6 +15111,277 @@
         ],
         "type": "string"
       },
+      "SurveyPoint": {
+        "type": "object",
+        "properties": {
+          "Z": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Abscissa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Inclination": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Azimuth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "MD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "X": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TVD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianNorth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianEast": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Curvature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Toolface": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "BUR": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TUR": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "VerticalSection": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Annotation": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SurveyStation": {
+        "type": "object",
+        "properties": {
+          "Z": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Abscissa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Inclination": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Azimuth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "MD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "X": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TVD": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianNorth": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "RiemannianEast": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Curvature": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Toolface": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "BUR": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "TUR": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "VerticalSection": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Annotation": {
+            "type": "string",
+            "nullable": true
+          },
+          "Covariance": {
+            "$ref": "#/components/schemas/SymmetricMatrix3x3"
+          },
+          "EigenVectors": {
+            "$ref": "#/components/schemas/Matrix3x3"
+          },
+          "EigenValues": {
+            "$ref": "#/components/schemas/Vector3D"
+          },
+          "Bias": {
+            "$ref": "#/components/schemas/Vector3D"
+          },
+          "SurveyTool": {
+            "$ref": "#/components/schemas/SurveyInstrument"
+          },
+          "BoreholeRadius": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryCalculationType": {
+        "enum": [
+          "MinimumCurvatureMethod",
+          "ConstantBuildAndTurnMethod",
+          "ConstantCurvatureAndToolfaceMethod"
+        ],
+        "type": "string"
+      },
+      "Matrix3x3": {
+        "type": "object",
+        "properties": {
+          "RowCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "ColumnCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        }
+      },
+      "SymmetricMatrix3x3": {
+        "type": "object",
+        "properties": {
+          "ColumnCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "RowCount": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        }
+      },
+      "Vector3D": {
+        "type": "object",
+        "properties": {
+          "X": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Y": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Z": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Dim": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          }
+        }
+      },
       "GlobalAntiCollision": {
         "type": "object",
         "properties": {
@@ -15670,6 +15414,46 @@
             "items": {
               "$ref": "#/components/schemas/SeparationFactorResult"
             },
+            "nullable": true
+          },
+          "CalculationState": {
+            "$ref": "#/components/schemas/GlobalAntiCollisionCalculationState"
+          },
+          "CalculationProgress": {
+            "type": "number",
+            "format": "double"
+          },
+          "CalculationMessage": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "GlobalAntiCollisionCalculationState": {
+        "enum": [
+          "Completed",
+          "Queued",
+          "Running",
+          "Failed"
+        ],
+        "type": "string"
+      },
+      "GlobalAntiCollisionCalculationStatus": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "nullable": true
+          },
+          "CalculationState": {
+            "$ref": "#/components/schemas/GlobalAntiCollisionCalculationState"
+          },
+          "CalculationProgress": {
+            "type": "number",
+            "format": "double"
+          },
+          "CalculationMessage": {
+            "type": "string",
             "nullable": true
           }
         }
@@ -15746,6 +15530,38 @@
           "Running",
           "Failed",
           "NotCalculated"
+        ],
+        "type": "string"
+      },
+      "ExternalReferenceAuditScope": {
+        "enum": [
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "ExternalReferenceIssue": {
+        "type": "object",
+        "properties": {
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ExternalReferenceValidationStatus": {
+        "enum": [
+          "Valid",
+          "Invalid",
+          "Unavailable"
         ],
         "type": "string"
       },
@@ -15932,6 +15748,147 @@
           "EndMD": {
             "type": "number",
             "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "OctreeIndexState": {
+        "enum": [
+          "Missing",
+          "NotIndexable",
+          "Stale",
+          "Current"
+        ],
+        "type": "string"
+      },
+      "OctreeIndexStatus": {
+        "type": "object",
+        "properties": {
+          "TrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "State": {
+            "$ref": "#/components/schemas/OctreeIndexState"
+          },
+          "HasIndex": {
+            "type": "boolean"
+          },
+          "IsCurrent": {
+            "type": "boolean"
+          },
+          "TrajectoryType": {
+            "$ref": "#/components/schemas/TrajectoryType"
+          },
+          "IsDefinitive": {
+            "type": "boolean"
+          },
+          "SurveyStationCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "BucketCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "OctreeCodeCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "SourceLastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "IndexSchemaVersion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ConfidenceFactor": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CalculationParametersHash": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "OctreeSearchJobRequest": {
+        "type": "object",
+        "properties": {
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IncludePlanned": {
+            "type": "boolean"
+          },
+          "IncludeActual": {
+            "type": "boolean"
+          },
+          "DefinitiveOnly": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OctreeSearchJobResult": {
+        "type": "object",
+        "properties": {
+          "JobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "CandidateTrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "OctreeSearchJobStatus": {
+        "type": "object",
+        "properties": {
+          "JobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ReferenceTrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "CalculationState": {
+            "$ref": "#/components/schemas/CalculationState"
+          },
+          "CalculationProgress": {
+            "type": "number",
+            "format": "double"
+          },
+          "CalculationMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "CandidateCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "CreatedUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CompletedUtc": {
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         }
@@ -16166,6 +16123,20 @@
             "type": "string",
             "nullable": true
           },
+          "SurveyRunIdentityAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryIdentityAssignment"
+            },
+            "nullable": true
+          },
+          "SurveyRunFeatureAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureAssignment"
+            },
+            "nullable": true
+          },
           "TieInPoint": {
             "$ref": "#/components/schemas/SurveyStation"
           },
@@ -16304,6 +16275,139 @@
           },
           "FileContentBase64": {
             "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SurveyRunExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/ExternalReferenceAuditScope"
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SurveyRunExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRunExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "SurveyRunExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "SurveyRunID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "SurveyInstrumentID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ClusterExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "SurveyInstrumentExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/ExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalReferenceIssue"
+            },
             "nullable": true
           }
         }
@@ -16737,6 +16841,30 @@
           }
         }
       },
+      "SurveyRunSearchResult": {
+        "type": "object",
+        "properties": {
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRunLight"
+            },
+            "nullable": true
+          }
+        }
+      },
       "SurveyRunType": {
         "enum": [
           "Actual",
@@ -16947,6 +17075,20 @@
           },
           "CalculationMessage": {
             "type": "string",
+            "nullable": true
+          },
+          "TrajectoryIdentityAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryIdentityAssignment"
+            },
+            "nullable": true
+          },
+          "TrajectoryFeatureAssignments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureAssignment"
+            },
             "nullable": true
           },
           "SurveyRunSectionList": {
@@ -17366,6 +17508,485 @@
           "ConstantCurvatureAndToolface"
         ],
         "type": "string"
+      },
+      "TrajectoryBatchCatalogDependencies": {
+        "type": "object",
+        "properties": {
+          "Identities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryIdentity"
+            },
+            "nullable": true
+          },
+          "FeatureCategories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureCategory"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchCatalogMapping": {
+        "type": "object",
+        "properties": {
+          "Catalog": {
+            "type": "string",
+            "nullable": true
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "SourceID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "LocalID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Resolution": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchCatalogRestorePolicy": {
+        "enum": [
+          "Unspecified",
+          "MapExisting",
+          "MapOrCreateMissing"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
+            "type": "string",
+            "nullable": true
+          },
+          "Code": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryBatchError"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportDocument": {
+        "type": "object",
+        "properties": {
+          "FormatIdentifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "SchemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ExportedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CatalogDependencies": {
+            "$ref": "#/components/schemas/TrajectoryBatchCatalogDependencies"
+          },
+          "SurveyRuns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SurveyRun"
+            },
+            "nullable": true
+          },
+          "Trajectories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trajectory"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportRequest": {
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/TrajectoryBatchExportScope"
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryBatchExportScope": {
+        "enum": [
+          "Unspecified",
+          "All",
+          "Selected"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchRestoreConflictPolicy": {
+        "enum": [
+          "Unspecified",
+          "FailIfExists",
+          "ReplaceExisting"
+        ],
+        "type": "string"
+      },
+      "TrajectoryBatchRestoreRequest": {
+        "type": "object",
+        "properties": {
+          "ConflictPolicy": {
+            "$ref": "#/components/schemas/TrajectoryBatchRestoreConflictPolicy"
+          },
+          "CatalogPolicy": {
+            "$ref": "#/components/schemas/TrajectoryBatchCatalogRestorePolicy"
+          },
+          "AllowNormalizedNameMapping": {
+            "type": "boolean"
+          },
+          "Document": {
+            "$ref": "#/components/schemas/TrajectoryBatchExportDocument"
+          }
+        }
+      },
+      "TrajectoryBatchRestoreResponse": {
+        "type": "object",
+        "properties": {
+          "RestoredAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CreatedSurveyRunCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedSurveyRunCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedTrajectoryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ReplacedTrajectoryCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CreatedCatalogDefinitionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CatalogMappings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryBatchCatalogMapping"
+            },
+            "nullable": true
+          },
+          "SurveyRunIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryExternalReferenceAuditRequest": {
+        "required": [
+          "Scope"
+        ],
+        "type": "object",
+        "properties": {
+          "Scope": {
+            "$ref": "#/components/schemas/ExternalReferenceAuditScope"
+          },
+          "TrajectoryIDs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TrajectoryExternalReferenceAuditResult": {
+        "type": "object",
+        "properties": {
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ValidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "InvalidCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "UnavailableCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryExternalReferenceValidation"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryExternalReferenceValidation": {
+        "type": "object",
+        "properties": {
+          "TrajectoryID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "WellBoreID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FieldExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "ClusterExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "WellBoreExists": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "Status": {
+            "$ref": "#/components/schemas/ExternalReferenceValidationStatus"
+          },
+          "CheckedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalReferenceIssue"
+            },
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "FeatureCategoryID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FeatureOptionID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "FromDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ToDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureCategory": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "IsExclusive": {
+            "type": "boolean"
+          },
+          "HasValidityPeriod": {
+            "type": "boolean"
+          },
+          "Options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryFeatureOption"
+            },
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryFeatureOption": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryIdentity": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "TrajectoryIdentityAssignment": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "IdentityID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "Value": {
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
       "TrajectoryLight": {
         "type": "object",
@@ -17966,6 +18587,30 @@
           }
         }
       },
+      "TrajectorySearchResult": {
+        "type": "object",
+        "properties": {
+          "Offset": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Limit": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TotalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrajectoryLight"
+            },
+            "nullable": true
+          }
+        }
+      },
       "TrajectorySurveyRunSection": {
         "type": "object",
         "properties": {
@@ -18020,277 +18665,6 @@
           },
           "DeleteTrajectoryByIdPerDay": {
             "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "SurveyPoint": {
-        "type": "object",
-        "properties": {
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Abscissa": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Inclination": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Azimuth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MD": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "TVD": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianNorth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianEast": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Curvature": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Toolface": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "BUR": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "TUR": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalSection": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Annotation": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "SurveyStation": {
-        "type": "object",
-        "properties": {
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Abscissa": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Inclination": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Azimuth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "MD": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "TVD": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianNorth": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "RiemannianEast": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Latitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Longitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Curvature": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Toolface": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "BUR": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "TUR": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "VerticalSection": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Annotation": {
-            "type": "string",
-            "nullable": true
-          },
-          "Covariance": {
-            "$ref": "#/components/schemas/SymmetricMatrix3x3"
-          },
-          "EigenVectors": {
-            "$ref": "#/components/schemas/Matrix3x3"
-          },
-          "EigenValues": {
-            "$ref": "#/components/schemas/Vector3D"
-          },
-          "Bias": {
-            "$ref": "#/components/schemas/Vector3D"
-          },
-          "SurveyTool": {
-            "$ref": "#/components/schemas/SurveyInstrument"
-          },
-          "BoreholeRadius": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        }
-      },
-      "TrajectoryCalculationType": {
-        "enum": [
-          "MinimumCurvatureMethod",
-          "ConstantBuildAndTurnMethod",
-          "ConstantCurvatureAndToolfaceMethod"
-        ],
-        "type": "string"
-      },
-      "Matrix3x3": {
-        "type": "object",
-        "properties": {
-          "RowCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "ColumnCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        }
-      },
-      "SymmetricMatrix3x3": {
-        "type": "object",
-        "properties": {
-          "ColumnCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          },
-          "RowCount": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
-          }
-        }
-      },
-      "Vector3D": {
-        "type": "object",
-        "properties": {
-          "X": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Y": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Z": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "Dim": {
-            "type": "integer",
-            "format": "int32",
-            "readOnly": true
           }
         }
       },
@@ -18429,79 +18803,6 @@
         ],
         "type": "string"
       },
-      "UsageStatisticsWell": {
-        "type": "object",
-        "properties": {
-          "LastSaved": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "BackUpInterval": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "GetAllWellIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllWellMetaInfoPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "GetAllWellPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PostWellPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "PutWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          },
-          "DeleteWellByIdPerDay": {
-            "$ref": "#/components/schemas/History"
-          }
-        }
-      },
-      "Well": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "SlotID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "ClusterID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "IsSingleWell": {
-            "type": "boolean"
-          }
-        }
-      },
       "SidetrackType": {
         "enum": [
           "Undefined",
@@ -18619,374 +18920,6 @@
               "$ref": "#/components/schemas/WellBoreFeatureAssignment"
             },
             "nullable": true
-          }
-        }
-      },
-      "BoreHoleSize": {
-        "type": "object",
-        "properties": {
-          "HoleSize": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Length": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "CasingSection": {
-        "type": "object",
-        "properties": {
-          "TopDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "Length": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TopCementDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "CasingSectionElements": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CasingSectionElement"
-            },
-            "nullable": true
-          },
-          "CasingSectionSizeTable": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BoreHoleSize"
-            },
-            "nullable": true
-          },
-          "OpenHoleSection": {
-            "$ref": "#/components/schemas/OpenHoleSection"
-          }
-        }
-      },
-      "CasingSectionElement": {
-        "type": "object",
-        "properties": {
-          "BodyOD": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "BodyID": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "CollarOD": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "JointLength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "SectionLength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "MaxDLS": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "ConnectionType": {
-            "type": "string",
-            "nullable": true
-          },
-          "Grade": {
-            "type": "string",
-            "nullable": true
-          },
-          "MaterialDensity": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "YoungModulus": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "LinearWeight": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TensileStrength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TorsionalStrength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "BurstPressure": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "CollapsePressure": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "YieldStress": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "MakeUpTorqueRecommended": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          }
-        }
-      },
-      "ElementConnectivity": {
-        "type": "object",
-        "properties": {
-          "UpstreamElement": {
-            "$ref": "#/components/schemas/SideElement"
-          },
-          "DownstreamElement": {
-            "$ref": "#/components/schemas/SideElement"
-          }
-        }
-      },
-      "FluidType": {
-        "enum": [
-          "Air",
-          "Water"
-        ],
-        "type": "string"
-      },
-      "OpenHoleSection": {
-        "type": "object",
-        "properties": {
-          "HoleSizes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BoreHoleSize"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "SideConnector": {
-        "type": "object",
-        "properties": {
-          "Position": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "VerticalDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "FirstSideElement": {
-            "$ref": "#/components/schemas/SideElement"
-          },
-          "ElementConnectivities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ElementConnectivity"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "SideElement": {
-        "type": "object",
-        "properties": {
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Type": {
-            "$ref": "#/components/schemas/SideElementType"
-          },
-          "Length": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TopVerticalDepth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "OD": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ID": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "SideElementType": {
-        "enum": [
-          "Unknown",
-          "Pipe",
-          "Hose",
-          "GateValve",
-          "Choke",
-          "Pump"
-        ],
-        "type": "string"
-      },
-      "SurfaceSection": {
-        "type": "object",
-        "properties": {
-          "Type": {
-            "$ref": "#/components/schemas/SurfaceSectionType"
-          },
-          "SectionLength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "BodyOD": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "BodyID": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "ConnectionType": {
-            "type": "string",
-            "nullable": true
-          },
-          "Grade": {
-            "type": "string",
-            "nullable": true
-          },
-          "MaterialDensity": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "YoungModulus": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "LinearWeight": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "TensileStrength": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "BurstPressure": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "CollapsePressure": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "YieldStress": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "MakeUpTorqueRecommended": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "SideConnectors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SideConnector"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "SurfaceSectionType": {
-        "enum": [
-          "Unknown",
-          "BOP",
-          "HighPressureRiser",
-          "LowPressureRiser",
-          "MarineRiser",
-          "ExpansionJoint",
-          "BellNipple",
-          "Diverter",
-          "RotatingControlDevice"
-        ],
-        "type": "string"
-      },
-      "WellBoreArchitecture": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "WellBoreID": {
-            "type": "string",
-            "format": "uuid",
-            "nullable": true
-          },
-          "WellHead": {
-            "$ref": "#/components/schemas/WellHead"
-          },
-          "FluidsAboveGroundLevel": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WellBoreArchitectureFluid"
-            },
-            "nullable": true
-          },
-          "SurfaceSections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SurfaceSection"
-            },
-            "nullable": true
-          },
-          "CasingSections": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CasingSection"
-            },
-            "nullable": true
-          }
-        }
-      },
-      "WellBoreArchitectureFluid": {
-        "type": "object",
-        "properties": {
-          "Fluid": {
-            "$ref": "#/components/schemas/FluidType"
-          },
-          "Depth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          }
-        }
-      },
-      "WellBoreArchitectureLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          }
-        }
-      },
-      "WellHead": {
-        "type": "object",
-        "properties": {
-          "MaxOD": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "MinOD": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "Depth": {
-            "$ref": "#/components/schemas/GaussianDrillingProperty"
-          },
-          "CasingHangerDepth": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
-          },
-          "TubingHangerDepth": {
-            "$ref": "#/components/schemas/ScalarDrillingProperty"
           }
         }
       },
@@ -19574,6 +19507,79 @@
           },
           "SidetrackType": {
             "$ref": "#/components/schemas/SidetrackType"
+          }
+        }
+      },
+      "UsageStatisticsWell": {
+        "type": "object",
+        "properties": {
+          "LastSaved": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BackUpInterval": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "GetAllWellIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllWellMetaInfoPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetWellByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "GetAllWellPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "PostWellPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "PutWellByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          },
+          "DeleteWellByIdPerDay": {
+            "$ref": "#/components/schemas/History"
+          }
+        }
+      },
+      "Well": {
+        "type": "object",
+        "properties": {
+          "MetaInfo": {
+            "$ref": "#/components/schemas/MetaInfo"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "CreationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "LastModificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "SlotID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ClusterID": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "IsSingleWell": {
+            "type": "boolean"
           }
         }
       }
