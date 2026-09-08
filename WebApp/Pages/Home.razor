@@ -138,7 +138,8 @@
     <MudText Typo="Typo.body1" Class="mb-2">
         WellBore updates, deletes, and individual identity/feature assignment changes use <b>optimistic
         concurrency</b>: every mutation must echo back the <code>LastModificationDate</code> from the caller's latest
-        read, and a stale request is rejected rather than silently overwriting a concurrent change. Deleting a
+        read, and a stale request is rejected rather than silently overwriting a concurrent change. MCP create returns
+        the created WellBore with its initial server-owned token. Deleting a
         catalog definition or option still in use by a wellbore is likewise rejected, and a wellbore cannot be
         deleted while it still has sidetrack children — the child must be removed or re-parented first.
     </MudText>

@@ -90,7 +90,7 @@ public static class McpServiceCollectionExtensions
         if (name is "well_bore_get_all" or "well_bore_get_all_by_well_id" or "well_bore_get_all_by_rig_id" or
             "well_bore_get_all_by_parent_id" or "well_bore_get_all_sidetracked")
             return Tools.McpToolArgumentHelpers.CreateWellBoreListOutputSchema();
-        if (name == "well_bore_get_by_id" || name.Contains("_assignment_", StringComparison.Ordinal) ||
+        if (name is "well_bore_get_by_id" or "well_bore_create" || name.Contains("_assignment_", StringComparison.Ordinal) ||
             name is "well_bore_details_update" or "well_bore_topology_update")
             return Tools.McpToolArgumentHelpers.CreateWellBoreOutputSchema();
         if (name.StartsWith("well_bore_identity_", StringComparison.Ordinal))
@@ -105,7 +105,7 @@ public static class McpServiceCollectionExtensions
                 : name.EndsWith("_get_all", StringComparison.Ordinal)
                     ? Tools.McpToolArgumentHelpers.CreateFeatureCategoryListOutputSchema()
                     : Tools.McpToolArgumentHelpers.CreateStatusOnlyOutputSchema();
-        if (name is "well_bore_create" or "well_bore_update_by_id" or "well_bore_delete_by_id")
+        if (name is "well_bore_update_by_id" or "well_bore_delete_by_id")
             return Tools.McpToolArgumentHelpers.CreateStatusOnlyOutputSchema();
         return GenericOutputSchema();
     }

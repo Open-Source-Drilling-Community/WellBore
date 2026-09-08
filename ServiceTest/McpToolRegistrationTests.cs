@@ -205,6 +205,13 @@ public sealed class McpToolRegistrationTests
     }
 
     [Test]
+    public void Create_returns_the_created_well_bore_contract()
+    {
+        Assert.That(_tools["well_bore_create"].OutputSchema.ToJsonString(),
+            Is.EqualTo(_tools["well_bore_get_by_id"].OutputSchema.ToJsonString()));
+    }
+
+    [Test]
     public void Destructive_and_read_only_hints_match_tool_semantics()
     {
         Assert.That(_tools["well_bore_get_by_id"].Behavior.ReadOnlyHint, Is.True);

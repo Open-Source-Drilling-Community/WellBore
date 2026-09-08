@@ -54,8 +54,8 @@ public static class WellBoreRestMcpToolRegistrations
         services.AddLegacyMcpTool("well_bore_audit_external_references", "Check a deterministic, bounded page of all or selected stored WellBores against the configured Well and Rig services without changing data. Each result and the page counts distinguish valid references, invalid references, and checks that could not complete because a dependency was unavailable.", McpToolArgumentHelpers.CreateWellBoreExternalReferenceAuditSchema(),
             (sp, args, ct) => InvokeWithBodyResultAsync<WellBoreExternalReferenceAuditRequestModel, WellBoreExternalReferenceAuditResultModel>(
                 args, "request", ct, (request, token) => Controller(sp).AuditWellBoreExternalReferences(request, token)));
-        services.AddLegacyMcpTool("well_bore_create", "Create and persist a new wellbore. Supply the complete WellBore object using the documented PascalCase fields; wellBore.MetaInfo.ID must be a caller-generated, non-empty UUID and must not already exist. For sidetracks, set IsSidetrack and provide the applicable parent and tie-in depth; classification belongs in an exclusive SidetrackClassification feature assignment. The deprecated SidetrackType field is accepted and mapped for compatibility. TieInPointAlongHoleDepth is always expressed in meters (SI) against WGS84. Returns 200 on success, 400 for malformed data, and 409 for an existing ID.", McpToolArgumentHelpers.CreateWellBoreSchema(),
-            (sp, args, ct) => InvokeWithBody<WellBoreModel>(args, "wellBore", ct, data => Controller(sp).PostWellBore(data)));
+        services.AddLegacyMcpTool("well_bore_create", "Create and persist a new wellbore, returning it with server-owned CreationDate and LastModificationDate. Supply the complete WellBore object using the documented PascalCase fields; wellBore.MetaInfo.ID must be a caller-generated, non-empty UUID and must not already exist. For sidetracks, set IsSidetrack and provide the applicable parent and tie-in depth; classification belongs in an exclusive SidetrackClassification feature assignment. The deprecated SidetrackType field is accepted and mapped for compatibility. TieInPointAlongHoleDepth is always expressed in meters (SI) against WGS84.", McpToolArgumentHelpers.CreateWellBoreSchema(),
+            InvokeWellBoreCreate);
         services.AddLegacyMcpTool("well_bore_update_by_id", "Replace the stored data for an existing wellbore. The top-level id and wellBore.MetaInfo.ID must be the same non-empty UUID, and expectedModifiedUtc must exactly match the LastModificationDate from the latest read. Include the complete desired WellBore object because this is a full replacement. A stale revision returns 409 without changing data.", McpToolArgumentHelpers.CreateWellBoreSchema(includeId: true),
             (sp, args, ct) => InvokeWithIdTimestampAndBody<WellBoreModel>(args, "wellBore", ct, (id, expected, data) => Controller(sp).PutWellBoreById(id, expected, data)));
         services.AddLegacyMcpTool("well_bore_details_update", "Replace only Name and Description without resending topology or assignment arrays. Both properties must be supplied and may be null. expectedModifiedUtc protects against stale edits, and the updated WellBore with its new revision is returned.", McpToolArgumentHelpers.CreateWellBoreDetailsMutationSchema(),
@@ -178,6 +178,23 @@ public static class WellBoreRestMcpToolRegistrations
         return TryDeserialize(args, bodyName, out TBody? data, out JsonNode? error)
             ? Task.FromResult<JsonNode?>(McpActionResultConverter.FromActionResult(action(data)))
             : Task.FromResult(error);
+    }
+
+    private static Task<JsonNode?> InvokeWellBoreCreate(
+        IServiceProvider serviceProvider, JsonObject? arguments, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!TryDeserialize(arguments, "wellBore", out WellBoreModel? wellBore, out JsonNode? error))
+        {
+            return Task.FromResult(error);
+        }
+
+        ActionResult result = Controller(serviceProvider).PostWellBore(wellBore);
+        JsonObject response = McpActionResultConverter.FromActionResult(result);
+        int status = response["status"]?.GetValue<int>() ?? 500;
+        return Task.FromResult<JsonNode?>(status is >= 200 and <= 299 && wellBore != null
+            ? McpActionResultConverter.FromActionResult(new OkObjectResult(wellBore))
+            : response);
     }
 
     private static async Task<JsonNode?> InvokeWithBodyResultAsync<TBody, TResult>(JsonObject? args, string bodyName,

@@ -192,6 +192,8 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 The service publishes 38 REST-backed MCP tools plus `ping`: 24 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, single and paged external-reference diagnostics, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Success envelopes use lowercase `status` and `data`, while model properties inside `data` preserve their declared PascalCase names such as `MetaInfo`, `ID`, and `WellID`, exactly matching the output schema. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
 
+`well_bore_create` returns the created WellBore rather than a status-only response, including its server-owned `CreationDate` and initial `LastModificationDate` concurrency token.
+
 - Streamable HTTP: `/wellbore/api/mcp`
 - WebSocket: `/wellbore/api/mcp/ws`
 - Utility tool: `ping`
