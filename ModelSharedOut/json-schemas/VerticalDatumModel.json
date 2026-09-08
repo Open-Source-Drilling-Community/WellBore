@@ -1,81 +1,77 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "ModelShared (Service)",
-    "description": "Data model containing model dependencies of the clients of the current microservice (WebApp, ServiceTest)",
+    "title": "OSDC Earth Vertical Datum distributed shared model",
+    "description": "Generated API client and DTO contract consumed by WebPages and ServiceTest.",
     "version": "1.0"
   },
   "paths": {
-    "/VerticalDatum": {
+    "/EarthVerticalDatum": {
       "get": {
         "tags": [
-          "VerticalDatum"
+          "EarthVerticalDatum"
         ],
-        "operationId": "GetAllVerticalDatumId",
+        "summary": "Returns the loaded EGM84-30 geoid-model information for service discovery.",
+        "description": "This is the microservice entry endpoint. It returns the same model identity and provenance as the ModelInfo endpoint.",
+        "operationId": "GetEarthVerticalDatumEntry",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/EarthVerticalDatum/ConvertMeanSeaLevelToWgs84": {
       "post": {
         "tags": [
-          "VerticalDatum"
+          "EarthVerticalDatum"
         ],
-        "operationId": "PostVerticalDatum",
+        "summary": "Synchronously converts EGM84 mean-sea-level depths to WGS84 ellipsoidal depths.",
+        "description": "This operation is stateless. Latitude and longitude are WGS84 radians. Input and output depths are SI metres, positive downward from their explicitly named reference surfaces. The complete request is rejected if any position is invalid.",
+        "operationId": "ConvertMeanSeaLevelToWgs84",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
+                "$ref": "#/components/schemas/MeanSeaLevelToWgs84Request"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatumMetaInfo",
-        "responses": {
-          "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
+                  "$ref": "#/components/schemas/MeanSeaLevelToWgs84Response"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
                 }
               }
             }
@@ -83,225 +79,50 @@
         }
       }
     },
-    "/VerticalDatum/{id}": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerticalDatum"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "PutVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatum"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "DeleteVerticalDatumById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatum/HeavyData": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllVerticalDatum",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatum/CompletedVerticalDatum": {
-      "get": {
-        "tags": [
-          "VerticalDatum"
-        ],
-        "operationId": "GetAllCompletedVerticalDatum",
-        "parameters": [
-          {
-            "name": "isCompleted",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatum"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderId",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string",
-                    "format": "uuid"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
+    "/EarthVerticalDatum/ConvertWgs84ToMeanSeaLevel": {
       "post": {
         "tags": [
-          "VerticalDatumOrder"
+          "EarthVerticalDatum"
         ],
-        "operationId": "PostVerticalDatumOrder",
+        "summary": "Synchronously converts WGS84 ellipsoidal depths to EGM84 mean-sea-level depths.",
+        "description": "This inverse operation is stateless. Latitude and longitude are WGS84 radians. Input and output depths are SI metres, positive downward from their explicitly named reference surfaces. The complete request is rejected if any position is invalid.",
+        "operationId": "ConvertWgs84ToMeanSeaLevel",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
+                "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/MetaInfo": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderMetaInfo",
-        "responses": {
-          "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MetaInfo"
-                  }
+                  "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EarthVerticalDatumValidationProblem"
                 }
               }
             }
@@ -309,116 +130,20 @@
         }
       }
     },
-    "/VerticalDatumOrder/{id}": {
+    "/EarthVerticalDatum/ModelInfo": {
       "get": {
         "tags": [
-          "VerticalDatumOrder"
+          "EarthVerticalDatum"
         ],
-        "operationId": "GetVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
+        "summary": "Returns the loaded EGM84-30 geoid model identity, resolution, interpolation accuracy, runtime version, and coefficient hash.",
+        "operationId": "GetEarthVerticalDatumModelInfo",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VerticalDatumOrder"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "PutVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerticalDatumOrder"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "DeleteVerticalDatumOrderById",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/VerticalDatumOrder/LightData": {
-      "get": {
-        "tags": [
-          "VerticalDatumOrder"
-        ],
-        "operationId": "GetAllVerticalDatumOrderLight",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrderLight"
-                  }
+                  "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
                 }
               }
             }
@@ -426,22 +151,20 @@
         }
       }
     },
-    "/VerticalDatumOrder/HeavyData": {
+    "/EarthVerticalDatumUsageStatistics": {
       "get": {
         "tags": [
-          "VerticalDatumOrder"
+          "EarthVerticalDatumUsageStatistics"
         ],
-        "operationId": "GetAllVerticalDatumOrder",
+        "summary": "Returns cumulative usage counters retained across service restarts. This operation is intentionally not exposed as an MCP tool.",
+        "operationId": "GetEarthVerticalDatumUsageStatistics",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/VerticalDatumOrder"
-                  }
+                  "$ref": "#/components/schemas/UsageStatisticsEarthVerticalDatum"
                 }
               }
             }
@@ -452,13 +175,14 @@
   },
   "components": {
     "schemas": {
-      "VerticalDatum": {
+      "EarthVerticalDatumModelInfo": {
         "type": "object",
         "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
           "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "ID": {
             "type": "string",
             "nullable": true
           },
@@ -466,147 +190,304 @@
             "type": "string",
             "nullable": true
           },
-          "CreationDate": {
+          "DataDateTime": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "LastModificationDate": {
+          "GridResolutionMinutes": {
+            "type": "number",
+            "format": "double"
+          },
+          "Interpolation": {
             "type": "string",
-            "format": "date-time",
             "nullable": true
           },
-          "DatumSet": {
+          "MaximumInterpolationError": {
+            "type": "number",
+            "format": "double"
+          },
+          "RMSInterpolationError": {
+            "type": "number",
+            "format": "double"
+          },
+          "GeographicLibVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "ReferenceEllipsoid": {
+            "type": "string",
+            "nullable": true
+          },
+          "SupportedVerticalDatums": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/VerticalDatumSet"
+              "type": "string"
             },
             "nullable": true
           },
-          "ConversionFrom": {
-            "$ref": "#/components/schemas/VerticalDatumConversion"
+          "SupportedConversionDirections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           },
-          "Type": {
-            "$ref": "#/components/schemas/VerticalDatumType"
-          }
-        }
-      },
-      "VerticalDatumConversion": {
-        "enum": [
-          "FromMeanSeaLevel",
-          "FromMeanHighWater",
-          "FromMeanLowWater",
-          "LowestAstronimalTide",
-          "HighestAstronimalTide",
-          "MeanHigherHighWater",
-          "MeanLowerLowWater"
-        ],
-        "type": "string"
-      },
-      "VerticalDatumOrder": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
+          "DepthPositiveDirection": {
             "type": "string",
             "nullable": true
           },
-          "Description": {
-            "type": "string",
-            "nullable": true
+          "IsThreadSafe": {
+            "type": "boolean"
           },
-          "CreationDate": {
+          "CoefficientSHA256": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "VerticalDatum": {
-            "$ref": "#/components/schemas/VerticalDatum"
-          }
-        }
-      },
-      "VerticalDatumOrderLight": {
-        "type": "object",
-        "properties": {
-          "MetaInfo": {
-            "$ref": "#/components/schemas/MetaInfo"
-          },
-          "Name": {
-            "type": "string",
-            "nullable": true
-          },
-          "Description": {
-            "type": "string",
-            "nullable": true
-          },
-          "CreationDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "LastModificationDate": {
-            "type": "string",
-            "format": "date-time",
             "nullable": true
           }
-        }
+        },
+        "description": "Identity, accuracy, and provenance of the geoid model used for conversion."
       },
-      "VerticalDatumSet": {
+      "EarthVerticalDatumPosition": {
         "type": "object",
         "properties": {
           "Latitude": {
+            "maximum": 1.5707963267948966,
+            "minimum": -1.5707963267948966,
             "type": "number",
+            "description": "WGS84 geodetic latitude in SI radians, between -π/2 and π/2.",
             "format": "double"
           },
           "Longitude": {
+            "maximum": 3.141592653589793,
+            "minimum": -3.141592653589793,
             "type": "number",
+            "description": "WGS84 geodetic longitude in SI radians, between -π and π.",
             "format": "double"
           },
-          "VerticalDatumWGS64": {
+          "MeanSeaLevelDepth": {
             "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "GenericVerticalDatum": {
-            "type": "number",
+            "description": "Depth in SI metres, positive downward from the EGM84 mean-sea-level geoid. A negative value is above that surface.",
             "format": "double"
           }
-        }
+        },
+        "description": "A WGS84 horizontal position and a mean-sea-level depth expressed using OSDC SI conventions."
       },
-      "VerticalDatumType": {
-        "enum": [
-          "Completed",
-          "Raw"
-        ],
-        "type": "string"
-      },
-      "MetaInfo": {
+      "EarthVerticalDatumSample": {
         "type": "object",
         "properties": {
-          "ID": {
-            "type": "string",
-            "format": "uuid"
+          "Position": {
+            "$ref": "#/components/schemas/EarthVerticalDatumPosition"
           },
-          "HttpHostName": {
+          "Wgs84EllipsoidalDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the WGS84 reference ellipsoid.",
+            "format": "double"
+          },
+          "GeoidUndulation": {
+            "type": "number",
+            "description": "EGM84 geoid undulation in SI metres, positive upward from the WGS84 ellipsoid to the geoid.",
+            "format": "double"
+          }
+        },
+        "description": "An input position and its corresponding WGS84 ellipsoidal-depth conversion."
+      },
+      "EarthVerticalDatumValidationError": {
+        "type": "object",
+        "properties": {
+          "PositionIndex": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Property": {
             "type": "string",
             "nullable": true
           },
-          "HttpHostBasePath": {
+          "Code": {
             "type": "string",
             "nullable": true
           },
-          "HttpEndPoint": {
+          "Message": {
             "type": "string",
             "nullable": true
           }
         }
+      },
+      "EarthVerticalDatumValidationProblem": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "nullable": true
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumValidationError"
+            },
+            "nullable": true
+          }
+        },
+        "description": "Details returned when a conversion request is rejected atomically."
+      },
+      "MeanSeaLevelToWgs84Request": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumPosition"
+            },
+            "description": "Positions and mean-sea-level depths to convert. The entire request is rejected when any item is invalid."
+          }
+        },
+        "description": "A stateless synchronous request to convert mean-sea-level depths to WGS84 ellipsoidal depths."
+      },
+      "MeanSeaLevelToWgs84Response": {
+        "type": "object",
+        "properties": {
+          "Model": {
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+          },
+          "Samples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarthVerticalDatumSample"
+            },
+            "nullable": true
+          }
+        },
+        "description": "EGM84-30 conversion results in the same order as the request positions."
+      },
+      "UsageStatisticsEarthVerticalDatum": {
+        "type": "object",
+        "properties": {
+          "StartedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "Scope": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "RestConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "MCPConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "FailedConversions": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "PositionsConverted": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "ModelInfoRequests": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "StatisticsRequests": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          }
+        }
+      },
+      "Wgs84ToMeanSeaLevelPosition": {
+        "type": "object",
+        "properties": {
+          "Latitude": {
+            "maximum": 1.5707963267948966,
+            "minimum": -1.5707963267948966,
+            "type": "number",
+            "description": "WGS84 geodetic latitude in SI radians, between -π/2 and π/2.",
+            "format": "double"
+          },
+          "Longitude": {
+            "maximum": 3.141592653589793,
+            "minimum": -3.141592653589793,
+            "type": "number",
+            "description": "WGS84 geodetic longitude in SI radians, between -π and π.",
+            "format": "double"
+          },
+          "Wgs84EllipsoidalDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the WGS84 reference ellipsoid. A negative value is above it.",
+            "format": "double"
+          }
+        },
+        "description": "A WGS84 horizontal position and ellipsoidal depth expressed using OSDC SI conventions."
+      },
+      "Wgs84ToMeanSeaLevelRequest": {
+        "required": [
+          "Positions"
+        ],
+        "type": "object",
+        "properties": {
+          "Positions": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
+            },
+            "description": "Positions and WGS84 ellipsoidal depths to convert. Any invalid item rejects the entire request."
+          }
+        },
+        "description": "A stateless synchronous request to convert WGS84 ellipsoidal depths to mean-sea-level depths."
+      },
+      "Wgs84ToMeanSeaLevelResponse": {
+        "type": "object",
+        "properties": {
+          "Model": {
+            "$ref": "#/components/schemas/EarthVerticalDatumModelInfo"
+          },
+          "Samples": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelSample"
+            },
+            "nullable": true
+          }
+        },
+        "description": "EGM84-30 inverse-conversion results in the same order as the request positions."
+      },
+      "Wgs84ToMeanSeaLevelSample": {
+        "type": "object",
+        "properties": {
+          "Position": {
+            "$ref": "#/components/schemas/Wgs84ToMeanSeaLevelPosition"
+          },
+          "MeanSeaLevelDepth": {
+            "type": "number",
+            "description": "Depth in SI metres, positive downward from the EGM84 mean-sea-level geoid.",
+            "format": "double"
+          },
+          "GeoidUndulation": {
+            "type": "number",
+            "description": "EGM84 geoid undulation in SI metres, positive upward from the WGS84 ellipsoid to the geoid.",
+            "format": "double"
+          }
+        },
+        "description": "An input WGS84 position and its corresponding EGM84 mean-sea-level depth."
       }
     }
   }

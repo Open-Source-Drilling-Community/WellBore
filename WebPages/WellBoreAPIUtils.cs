@@ -82,7 +82,7 @@ public class WellBoreAPIUtils : APIUtils, IWellBoreAPIUtils
     public string HostBasePathUnitConversion { get; } = "UnitConversion/api/";
 
     public string HostNameVerticalDatum { get; }
-    public string HostBasePathVerticalDatum { get; } = "VerticalDatum/api/";
+    public string HostBasePathVerticalDatum { get; } = "EarthVerticalDatum/api/";
     public HttpClient HttpClientVerticalDatum { get; }
     public Client ClientVerticalDatum { get; }
 }

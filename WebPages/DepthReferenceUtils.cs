@@ -20,65 +20,21 @@ public static class DepthReferenceUtils
             return null;
         }
 
-        Guid orderId = Guid.NewGuid();
-        VerticalDatumOrder order = new()
+        MeanSeaLevelToWgs84Request request = new()
         {
-            MetaInfo = new ModelShared.MetaInfo()
-            {
-                ID = orderId,
-                HttpHostName = api.HostNameVerticalDatum,
-                HttpHostBasePath = api.HostBasePathVerticalDatum,
-                HttpEndPoint = "VerticalDatumOrder/"
-            },
-            Name = $"MSL reference at wellbore slot {orderId}",
-            Description = "Temporary MSL-to-WGS84 conversion for WellBore depth reference.",
-            CreationDate = DateTimeOffset.UtcNow,
-            LastModificationDate = DateTimeOffset.UtcNow,
-            VerticalDatum = new VerticalDatum()
-            {
-                MetaInfo = new ModelShared.MetaInfo()
+            Positions =
+            [
+                new EarthVerticalDatumPosition
                 {
-                    ID = Guid.NewGuid(),
-                    HttpHostName = api.HostNameVerticalDatum,
-                    HttpHostBasePath = api.HostBasePathVerticalDatum,
-                    HttpEndPoint = "VerticalDatum/"
-                },
-                Name = $"MSL reference {orderId}",
-                Description = "Temporary MSL-to-WGS84 conversion.",
-                CreationDate = DateTimeOffset.UtcNow,
-                LastModificationDate = DateTimeOffset.UtcNow,
-                ConversionFrom = VerticalDatumConversion.FromMeanSeaLevel,
-                Type = VerticalDatumType.Raw,
-                DatumSet =
-                [
-                    new VerticalDatumSet()
-                    {
-                        Latitude = latitude.Value,
-                        Longitude = longitude.Value,
-                        GenericVerticalDatum = 0
-                    }
-                ]
-            }
+                    Latitude = latitude.Value,
+                    Longitude = longitude.Value,
+                    MeanSeaLevelDepth = 0
+                }
+            ]
         };
-
-        try
-        {
-            await api.ClientVerticalDatum.PostVerticalDatumOrderAsync(order);
-            VerticalDatumOrder calculatedOrder = await api.ClientVerticalDatum.GetVerticalDatumOrderByIdAsync(orderId);
-            double? meanSeaLevelInWgs84 = calculatedOrder.VerticalDatum?.DatumSet?.FirstOrDefault()?.VerticalDatumWGS64;
-            return meanSeaLevelInWgs84 == null ? null : -meanSeaLevelInWgs84;
-        }
-        finally
-        {
-            try
-            {
-                await api.ClientVerticalDatum.DeleteVerticalDatumOrderByIdAsync(orderId);
-            }
-            catch
-            {
-                // Best-effort cleanup of a temporary calculation order.
-            }
-        }
+        MeanSeaLevelToWgs84Response response =
+            await api.ClientVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
+        return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
     }
 
     private static Slot? ResolveRootSlot(
