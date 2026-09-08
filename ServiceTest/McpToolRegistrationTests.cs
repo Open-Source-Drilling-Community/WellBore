@@ -1,4 +1,5 @@
 using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
@@ -69,6 +70,26 @@ public sealed class McpToolRegistrationTests
 
     [TearDown]
     public void TearDown() => _provider.Dispose();
+
+    [Test]
+    public void Action_result_converter_preserves_declared_model_property_names()
+    {
+        ActionResult<CasingPayload> actionResult = new CasingPayload
+        {
+            MetaInfo = new CasingMetaInfo { ID = Guid.NewGuid() }
+        };
+
+        JsonObject response = McpActionResultConverter.FromActionResult(actionResult);
+        JsonObject data = (JsonObject)response["data"]!;
+        JsonObject metaInfo = (JsonObject)data["MetaInfo"]!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(metaInfo["ID"]?.GetValue<Guid>(), Is.EqualTo(actionResult.Value!.MetaInfo.ID));
+            Assert.That(data.ContainsKey("metaInfo"), Is.False);
+            Assert.That(metaInfo.ContainsKey("id"), Is.False);
+        });
+    }
 
     [Test]
     public void Every_non_statistics_controller_endpoint_has_a_registered_tool()
@@ -272,6 +293,16 @@ public sealed class McpToolRegistrationTests
     {
         Assert.That(node, Is.TypeOf<JsonObject>());
         return (JsonObject)node!;
+    }
+
+    private sealed class CasingPayload
+    {
+        public required CasingMetaInfo MetaInfo { get; init; }
+    }
+
+    private sealed class CasingMetaInfo
+    {
+        public Guid ID { get; init; }
     }
 
     private static JsonObject Property(JsonObject schema, string name)

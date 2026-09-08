@@ -28,6 +28,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="ServiceTest" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Folder Include="wwwroot\json-schema\" />
 	</ItemGroup>
 
