@@ -454,8 +454,9 @@
             return null;
         }
 
-        return rigList.FirstOrDefault(rig => rig.MetaInfo?.ID == resolvedRigId)?.DrillFloorElevation is double drillFloorElevation
-            ? -drillFloorElevation
+        return rigList.FirstOrDefault(rig => rig.MetaInfo?.ID == resolvedRigId)?
+            .FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth
+            ? -drillFloorDepth
             : null;
     }
 

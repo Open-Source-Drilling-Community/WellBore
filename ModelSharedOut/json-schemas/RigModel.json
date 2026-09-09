@@ -1103,6 +1103,20 @@
   },
   "components": {
     "schemas": {
+      "OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty": {
+        "type": "object",
+        "properties": {
+          "GaussianValue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.Statistics.GaussianDistribution"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.DotnetLibraries.General.DataManagement.MetaInfo": {
         "type": "object",
         "properties": {
@@ -1120,6 +1134,30 @@
           },
           "HttpEndPoint": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.DotnetLibraries.General.Statistics.GaussianDistribution": {
+        "type": "object",
+        "properties": {
+          "MinValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "MaxValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "Mean": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "StandardDeviation": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         },
@@ -3738,6 +3776,20 @@
         },
         "additionalProperties": false
       },
+      "OSDC.Drilling.Rig.Model.FixedPlatformProperties": {
+        "type": "object",
+        "properties": {
+          "DrillFloorDepth": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "OSDC.Drilling.Rig.Model.FloatValve": {
         "type": "object",
         "properties": {
@@ -5968,13 +6020,23 @@
             ],
             "nullable": true
           },
+          "FixedPlatformProperties": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FixedPlatformProperties"
+              }
+            ],
+            "nullable": true
+          },
           "DrillFloorElevation": {
             "type": "number",
             "format": "double",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "IsFixedPlatform": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           },
           "ClusterID": {
             "type": "string",
@@ -7365,13 +7427,23 @@
             ],
             "nullable": true
           },
+          "FixedPlatformProperties": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.Drilling.Rig.Model.FixedPlatformProperties"
+              }
+            ],
+            "nullable": true
+          },
           "DrillFloorElevation": {
             "type": "number",
             "format": "double",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "IsFixedPlatform": {
-            "type": "boolean"
+            "type": "boolean",
+            "deprecated": true
           },
           "ClusterID": {
             "type": "string",

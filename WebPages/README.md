@@ -20,7 +20,7 @@ This release targets MudBlazor 9.9.0 and the matching OSDC shared web component 
 
 The trajectory and survey-run pages provide complete, searchable Field, Cluster, Well, and WellBore selectors. Typing any part of a name filters the applicable hierarchy level case-insensitively.
 The same pages convert plotted North/East coordinates between WGS84, the selected Field reference point, the selected Cluster reference point, the selected Well-head slot, and the owning Field's cartographic projection. WGS84 metres remain the canonical wire values.
-Their shared `Rotary table`/`RTE` depth choice is backed by `Rig.DrillFloorElevation`: an explicit WellBore Rig takes precedence, followed by the Cluster Rig only for a fixed platform.
+Their shared `Rotary table`/`RTE` depth choice is backed by the mean of `Rig.FixedPlatformProperties.DrillFloorDepth`: an explicit WellBore platform Rig takes precedence, followed by the Cluster Rig only for a fixed platform.
 
 ## Dependencies
 
