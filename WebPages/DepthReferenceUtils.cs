@@ -34,7 +34,7 @@ public static class DepthReferenceUtils
         };
         MeanSeaLevelToWgs84Response response =
             await api.ClientVerticalDatum.ConvertMeanSeaLevelToWgs84Async(request);
-        return response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
+        return -response.Samples?.FirstOrDefault()?.Wgs84EllipsoidalDepth;
     }
 
     private static Slot? ResolveRootSlot(
