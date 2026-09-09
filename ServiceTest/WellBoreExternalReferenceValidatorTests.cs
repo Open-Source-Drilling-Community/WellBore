@@ -104,6 +104,46 @@ public sealed class WellBoreExternalReferenceValidatorTests
         });
     }
 
+    [Test]
+    public async Task RigJob_depth_source_must_match_the_resolved_rig_type()
+    {
+        Guid fixedRig = Guid.NewGuid();
+        Guid mobileRig = Guid.NewGuid();
+        var handler = new StubHandler(request => request.RequestUri!.AbsolutePath.EndsWith(fixedRig.ToString(), StringComparison.OrdinalIgnoreCase)
+            ? RigResource(fixedRig, "PlatformRig")
+            : RigResource(mobileRig, "LandRig"));
+        var wellBore = new WellBoreModel
+        {
+            MetaInfo = new MetaInfo { ID = Guid.NewGuid() },
+            RigJobs =
+            [
+                new RigJob
+                {
+                    RigJobID = Guid.NewGuid(), RigID = fixedRig, StartDate = DateTimeOffset.UtcNow.AddDays(-1),
+                    DrillFloorDepthSource = DrillFloorDepthSource.RigJob,
+                    DrillFloorDepth = new() { Mean = -10, StandardDeviation = 0.5 }
+                },
+                new RigJob
+                {
+                    RigJobID = Guid.NewGuid(), RigID = mobileRig, StartDate = DateTimeOffset.UtcNow,
+                    DrillFloorDepthSource = DrillFloorDepthSource.Rig
+                }
+            ]
+        };
+
+        WellBoreExternalReferenceValidation result = (await CreateValidator(handler)
+            .ValidateAsync([wellBore], CancellationToken.None)).Single();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Status, Is.EqualTo(WellBoreExternalReferenceValidationStatus.Invalid));
+            Assert.That(result.RigExists, Is.True);
+            Assert.That(result.Issues.Select(value => value.Code), Does.Contain("fixed_platform_depth_owned_by_rig"));
+            Assert.That(result.Issues.Select(value => value.Code), Does.Contain("depth_source_rig_requires_fixed_platform"));
+            Assert.That(handler.CallCount, Is.EqualTo(2));
+        });
+    }
+
     private static WellBoreExternalReferenceValidator CreateValidator(HttpMessageHandler handler)
     {
         IConfiguration configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
@@ -121,6 +161,12 @@ public sealed class WellBoreExternalReferenceValidatorTests
     private static HttpResponseMessage Resource(Guid id) => new(HttpStatusCode.OK)
     {
         Content = new StringContent($"{{\"MetaInfo\":{{\"ID\":\"{id}\"}}}}", Encoding.UTF8, "application/json")
+    };
+
+    private static HttpResponseMessage RigResource(Guid id, string rigType) => new(HttpStatusCode.OK)
+    {
+        Content = new StringContent($"{{\"MetaInfo\":{{\"ID\":\"{id}\"}},\"RigType\":\"{rigType}\"}}",
+            Encoding.UTF8, "application/json")
     };
 
     private sealed class StubClientFactory(HttpMessageHandler handler) : IHttpClientFactory

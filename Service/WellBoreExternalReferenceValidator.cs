@@ -66,8 +66,7 @@ public sealed class WellBoreExternalReferenceValidator : IWellBoreExternalRefere
             .Where(value => value.WellID is Guid id && id != Guid.Empty)
             .Select(value => value.WellID!.Value), "WellHostURL", "Well/api/Well", "well", cancellationToken);
         Dictionary<Guid, ReferenceResolution> rigs = await ResolveDistinctAsync(wellBores
-            .Where(value => value.RigID is Guid id && id != Guid.Empty)
-            .Select(value => value.RigID!.Value), "RigHostURL", "Rig/api/Rig", "rig", cancellationToken);
+            .SelectMany(RigIdentifiers), "RigHostURL", "Rig/api/Rig", "rig", cancellationToken);
         return wellBores.Select(value => Validate(value, checkedAt, wells, rigs)).ToList();
     }
 
@@ -97,7 +96,7 @@ public sealed class WellBoreExternalReferenceValidator : IWellBoreExternalRefere
                     $"{ToTitle(resourceName)} service returned HTTP {(int)response.StatusCode}.");
             ExternalResourceDto? resource = await response.Content.ReadFromJsonAsync<ExternalResourceDto>(JsonOptions, cancellationToken);
             return resource?.MetaInfo?.ID == id
-                ? ReferenceResolution.Found()
+                ? ReferenceResolution.Found(resource.RigType)
                 : ReferenceResolution.Unavailable($"{resourceName}_response_invalid",
                     $"{ToTitle(resourceName)} service returned a malformed or mismatched resource.");
         }
@@ -120,8 +119,67 @@ public sealed class WellBoreExternalReferenceValidator : IWellBoreExternalRefere
             Status = WellBoreExternalReferenceValidationStatus.Valid
         };
         ValidateReference(result, "WellID", "well", wellBore.WellID, wells, value => result.WellExists = value);
-        ValidateReference(result, "RigID", "rig", wellBore.RigID, rigs, value => result.RigExists = value);
+        if (wellBore.RigJobs is null)
+        {
+#pragma warning disable CS0618
+            ValidateReference(result, "RigID", "rig", wellBore.RigID, rigs, value => result.RigExists = value);
+#pragma warning restore CS0618
+        }
+        else
+        {
+            ValidateRigJobs(result, wellBore.RigJobs, rigs);
+        }
         return result;
+    }
+
+    private static IEnumerable<Guid> RigIdentifiers(WellBoreModel wellBore)
+    {
+        if (wellBore.RigJobs is not null)
+            return wellBore.RigJobs.Where(job => job is not null && job.RigID != Guid.Empty).Select(job => job.RigID);
+#pragma warning disable CS0618
+        return wellBore.RigID is Guid id && id != Guid.Empty ? [id] : [];
+#pragma warning restore CS0618
+    }
+
+    private static void ValidateRigJobs(WellBoreExternalReferenceValidation result, IReadOnlyList<RigJob> jobs,
+        IReadOnlyDictionary<Guid, ReferenceResolution> resolutions)
+    {
+        if (jobs.Count == 0) return;
+        bool anyUnavailable = false;
+        bool allExist = true;
+        for (int index = 0; index < jobs.Count; index++)
+        {
+            RigJob? job = jobs[index];
+            if (job is null) continue;
+            string property = $"RigJobs[{index}].RigID";
+            if (!resolutions.TryGetValue(job.RigID, out ReferenceResolution? resolution) || resolution.IsUnavailable)
+            {
+                anyUnavailable = true;
+                if (result.Status != WellBoreExternalReferenceValidationStatus.Invalid)
+                    result.Status = WellBoreExternalReferenceValidationStatus.Unavailable;
+                result.Issues.Add(new WellBoreExternalReferenceIssue
+                {
+                    Property = property,
+                    Code = resolution?.Code ?? "rig_service_unavailable",
+                    Message = resolution?.Message ?? "Rig reference validation is unavailable."
+                });
+                continue;
+            }
+            if (!resolution.Exists)
+            {
+                allExist = false;
+                AddInvalid(result, property, "rig_not_found", $"Rig UUID '{job.RigID}' does not exist.");
+                continue;
+            }
+            bool isFixedPlatform = string.Equals(resolution.RigType, "PlatformRig", StringComparison.OrdinalIgnoreCase);
+            if (job.DrillFloorDepthSource == DrillFloorDepthSource.Rig && !isFixedPlatform)
+                AddInvalid(result, $"RigJobs[{index}].DrillFloorDepthSource", "depth_source_rig_requires_fixed_platform",
+                    "DrillFloorDepthSource Rig is valid only for a PlatformRig.");
+            if (job.DrillFloorDepthSource == DrillFloorDepthSource.RigJob && isFixedPlatform)
+                AddInvalid(result, $"RigJobs[{index}].DrillFloorDepthSource", "fixed_platform_depth_owned_by_rig",
+                    "A PlatformRig owns its drill-floor depth; the rig job must use DrillFloorDepthSource Rig.");
+        }
+        result.RigExists = anyUnavailable ? null : allExist;
     }
 
     private static void ValidateReference(WellBoreExternalReferenceValidation result, string property,
@@ -158,12 +216,16 @@ public sealed class WellBoreExternalReferenceValidator : IWellBoreExternalRefere
     }
 
     private static string ToTitle(string value) => char.ToUpperInvariant(value[0]) + value[1..];
-    private sealed class ExternalResourceDto { public MetaInfoDto? MetaInfo { get; set; } }
-    private sealed class MetaInfoDto { public Guid ID { get; set; } }
-    private sealed record ReferenceResolution(bool Exists, bool IsUnavailable, string? Code, string? Message)
+    private sealed class ExternalResourceDto
     {
-        public static ReferenceResolution Found() => new(true, false, null, null);
-        public static ReferenceResolution NotFound() => new(false, false, null, null);
-        public static ReferenceResolution Unavailable(string code, string message) => new(false, true, code, message);
+        public MetaInfoDto? MetaInfo { get; set; }
+        public string? RigType { get; set; }
+    }
+    private sealed class MetaInfoDto { public Guid ID { get; set; } }
+    private sealed record ReferenceResolution(bool Exists, bool IsUnavailable, string? Code, string? Message, string? RigType)
+    {
+        public static ReferenceResolution Found(string? rigType) => new(true, false, null, null, rigType);
+        public static ReferenceResolution NotFound() => new(false, false, null, null, null);
+        public static ReferenceResolution Unavailable(string code, string message) => new(false, true, code, message, null);
     }
 }

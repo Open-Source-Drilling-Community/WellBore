@@ -38197,6 +38197,55 @@ namespace OSDC.Drilling.WellBore.ModelShared
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum DrillFloorDepthSource
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Undefined")]
+        Undefined = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Rig")]
+        Rig = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"RigJob")]
+        RigJob = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RigJob
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigJobID")]
+        public System.Guid RigJobID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigID")]
+        public System.Guid RigID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("StartDate")]
+        public System.DateTimeOffset StartDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("EndDate")]
+        public System.DateTimeOffset? EndDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillFloorDepthSource")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public DrillFloorDepthSource DrillFloorDepthSource { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("DrillFloorDepth")]
+        public GaussianDrillingProperty DrillFloorDepth { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.4.0.0 (NJsonSchema v11.3.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum SidetrackType
     {
 
@@ -38294,7 +38343,11 @@ namespace OSDC.Drilling.WellBore.ModelShared
         public System.Guid? WellID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
+        [System.Obsolete]
         public System.Guid? RigID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigJobs")]
+        public System.Collections.Generic.ICollection<RigJob> RigJobs { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("IsSidetrack")]
         public bool IsSidetrack { get; set; }
@@ -38991,7 +39044,11 @@ namespace OSDC.Drilling.WellBore.ModelShared
         public System.Guid? WellID { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("RigID")]
+        [System.Obsolete]
         public System.Guid? RigID { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("RigJobs")]
+        public System.Collections.Generic.ICollection<RigJob> RigJobs { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("IsSidetrack")]
         public bool IsSidetrack { get; set; }

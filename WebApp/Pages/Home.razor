@@ -19,10 +19,16 @@
             <MudText Typo="Typo.body1" Class="mb-2">
                 A <b>WellBore</b> is the record for one physical drilled path: a name, a description, server-owned
                 creation and modification timestamps, an optional <code>WellID</code> linking it to the well it
-                belongs to, an optional <code>RigID</code> for the rig that drilled it, its sidetrack topology, and
+                belongs to, an optional chronological <code>RigJobs</code> history, its sidetrack topology, and
                 the identity and feature assignments that describe it. It is where trajectory geometry, survey
                 stations, and casing ultimately attach, and it never stands in for the administrative well record
                 itself.
+            </MudText>
+            <MudText Typo="Typo.body1" Class="mt-2">
+                A rig history may be empty when a planned or historical wellbore has no known rig. Mobile-rig jobs
+                store the Gaussian drill-floor depth used by that job; fixed Platform Rig jobs use the drill-floor
+                depth owned by the Rig. The old <code>RigID</code> remains only as a temporary latest-job projection
+                for legacy clients.
             </MudText>
             <MudText Typo="Typo.body1">
                 WellBore UUIDs are caller-generated so that consuming systems can mint and reference an identifier
@@ -144,7 +150,7 @@
         deleted while it still has sidetrack children — the child must be removed or re-parented first.
     </MudText>
     <MudText Typo="Typo.body1">
-        Because <code>WellID</code> and <code>RigID</code> point at other services, WellBore also offers read-only
+        Because <code>WellID</code> and each <code>RigJobs[].RigID</code> point at other services, WellBore also offers read-only
         <b>external-reference validation</b> for one wellbore and a bounded <b>audit</b> across all or selected
         wellbores, each reference reported as <code>Valid</code>, <code>Invalid</code>, or <code>Unavailable</code>
         so a dependency outage is never confused with a genuinely broken reference. The

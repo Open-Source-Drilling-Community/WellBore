@@ -26057,6 +26057,42 @@
         },
         "description": "An input WGS84 position and its corresponding EGM84 mean-sea-level depth."
       },
+      "DrillFloorDepthSource": {
+        "enum": [
+          "Undefined",
+          "Rig",
+          "RigJob"
+        ],
+        "type": "string"
+      },
+      "RigJob": {
+        "type": "object",
+        "properties": {
+          "RigJobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "StartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "DrillFloorDepthSource": {
+            "$ref": "#/components/schemas/DrillFloorDepthSource"
+          },
+          "DrillFloorDepth": {
+            "$ref": "#/components/schemas/GaussianDrillingProperty"
+          }
+        }
+      },
       "SidetrackType": {
         "enum": [
           "Undefined",
@@ -26145,6 +26181,14 @@
           "RigID": {
             "type": "string",
             "format": "uuid",
+            "nullable": true,
+            "deprecated": true
+          },
+          "RigJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RigJob"
+            },
             "nullable": true
           },
           "IsSidetrack": {
@@ -26746,6 +26790,14 @@
           "RigID": {
             "type": "string",
             "format": "uuid",
+            "nullable": true,
+            "deprecated": true
+          },
+          "RigJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RigJob"
+            },
             "nullable": true
           },
           "IsSidetrack": {

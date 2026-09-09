@@ -16,7 +16,9 @@ End-to-end OSDC WellBore solution consisting of a backend microservice (REST API
 - Data (`home/`)
   - Local storage used by the Service: `home/WellBore.db` (SQLite) and `home/history.json` (usage stats).
 
-The trajectory and survey-run display pages provide searchable Field/Cluster/Well/WellBore selectors and render North/East positions relative to WGS84, the owning Field's cartographic projection, the selected Field or Cluster reference point, or the selected Well-head slot. Their `RTE` depth reference uses the explicit WellBore Rig where available, otherwise the fixed-platform Cluster Rig.
+WellBores can carry an optional chronological `RigJobs` history. A missing (`null`) history denotes a legacy record, an empty history explicitly means that no rig is known, and a populated history records stable job IDs, rig IDs, start dates, optional end dates, and drill-floor-depth ownership. Mobile-rig jobs own a Gaussian drill-floor depth in SI metres WGS84 (default standard uncertainty 0.5 m); fixed-platform jobs refer to the depth owned by the Platform Rig. The deprecated `RigID` is retained temporarily as a projection of the latest job for compatibility.
+
+The trajectory and survey-run display pages provide searchable Field/Cluster/Well/WellBore selectors and render North/East positions relative to WGS84, the owning Field's cartographic projection, the selected Field or Cluster reference point, or the selected Well-head slot. Their `RTE` depth reference uses the latest WellBore rig job. A job-owned depth is used for a mobile rig, while a fixed-platform job resolves the depth from the Rig. Only legacy records with `RigJobs = null` fall back to the old direct `RigID` and Cluster association.
 
 ## Prerequisites
 - .NET 8 SDK

@@ -145,7 +145,7 @@ public sealed class McpToolRegistrationTests
         Assert.That(PropertyNames(wellBore), Is.EquivalentTo(new[]
         {
             "MetaInfo", "Name", "Description", "CreationDate", "LastModificationDate",
-            "WellID", "RigID", "IsSidetrack", "ParentWellBoreID",
+            "WellID", "RigID", "RigJobs", "IsSidetrack", "ParentWellBoreID",
             "TieInPointAlongHoleDepth", "SidetrackType",
             "WellBoreIdentityAssignments", "WellBoreFeatureAssignments"
         }));
@@ -157,6 +157,13 @@ public sealed class McpToolRegistrationTests
         Assert.That(Property(wellBore, "CreationDate")["format"]?.GetValue<string>(), Is.EqualTo("date-time"));
         Assert.That(Property(wellBore, "WellID")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
         Assert.That(Property(wellBore, "ParentWellBoreID")["format"]?.GetValue<string>(), Is.EqualTo("uuid"));
+
+        JsonObject rigJobs = Property(wellBore, "RigJobs");
+        JsonObject rigJob = RequireObject(rigJobs["items"]);
+        JsonArray variants = (JsonArray)rigJob["oneOf"]!;
+        Assert.That(variants, Has.Count.EqualTo(2));
+        Assert.That(variants.Select(node => Property(RequireObject(node), "DrillFloorDepthSource")["const"]!.GetValue<string>()),
+            Is.EquivalentTo(new[] { "Rig", "RigJob" }));
 
         JsonObject tieIn = Property(wellBore, "TieInPointAlongHoleDepth");
         JsonObject gaussian = Property(tieIn, "GaussianValue");

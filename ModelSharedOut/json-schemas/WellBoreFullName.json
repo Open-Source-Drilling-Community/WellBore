@@ -1706,6 +1706,14 @@
         },
         "additionalProperties": false
       },
+      "OSDC.Drilling.WellBore.Model.DrillFloorDepthSource": {
+        "enum": [
+          "Undefined",
+          "Rig",
+          "RigJob"
+        ],
+        "type": "string"
+      },
       "OSDC.Drilling.WellBore.Model.History": {
         "type": "object",
         "properties": {
@@ -1715,6 +1723,35 @@
               "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.CountPerDay"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OSDC.Drilling.WellBore.Model.RigJob": {
+        "type": "object",
+        "properties": {
+          "RigJobID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "RigID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "StartDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "EndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "DrillFloorDepthSource": {
+            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.DrillFloorDepthSource"
+          },
+          "DrillFloorDepth": {
+            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
           }
         },
         "additionalProperties": false
@@ -1808,6 +1845,14 @@
           "RigID": {
             "type": "string",
             "format": "uuid",
+            "nullable": true,
+            "deprecated": true
+          },
+          "RigJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.RigJob"
+            },
             "nullable": true
           },
           "IsSidetrack": {
@@ -2431,6 +2476,14 @@
           "RigID": {
             "type": "string",
             "format": "uuid",
+            "nullable": true,
+            "deprecated": true
+          },
+          "RigJobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.RigJob"
+            },
             "nullable": true
           },
           "IsSidetrack": {

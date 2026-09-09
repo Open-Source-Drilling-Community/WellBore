@@ -443,17 +443,24 @@
 
     private double? ResolveRotaryTableReference(WellBoreModelShared.Cluster? cluster, WellBoreModelShared.WellBore? wellBore)
     {
-        Guid? rigId = wellBore?.RigID;
-        if ((rigId == null || rigId == Guid.Empty) && cluster?.IsFixedPlatform == true)
+        if (wellBore?.RigJobs is not null)
         {
-            rigId = cluster.RigID;
+            WellBoreModelShared.RigJob? latest = wellBore.RigJobs.OrderBy(job => job.StartDate).LastOrDefault();
+            if (latest is null) return null;
+            if (latest.DrillFloorDepthSource == WellBoreModelShared.DrillFloorDepthSource.RigJob &&
+                latest.DrillFloorDepth?.GaussianValue?.Mean is double jobDepth)
+                return -jobDepth;
+            return ResolveFixedPlatformDepth(latest.RigID);
         }
+#pragma warning disable CS0612
+        Guid? rigId = wellBore?.RigID ?? (cluster?.IsFixedPlatform == true ? cluster.RigID : null);
+#pragma warning restore CS0612
+        return rigId is Guid resolvedRigId ? ResolveFixedPlatformDepth(resolvedRigId) : null;
+    }
 
-        if (rigId is not Guid resolvedRigId || resolvedRigId == Guid.Empty || rigList == null)
-        {
-            return null;
-        }
-
+    private double? ResolveFixedPlatformDepth(Guid resolvedRigId)
+    {
+        if (resolvedRigId == Guid.Empty || rigList == null) return null;
         return rigList.FirstOrDefault(rig => rig.MetaInfo?.ID == resolvedRigId)?
             .FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth
             ? -drillFloorDepth

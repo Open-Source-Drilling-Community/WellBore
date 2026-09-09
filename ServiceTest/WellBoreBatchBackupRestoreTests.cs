@@ -200,6 +200,61 @@ public class WellBoreBatchBackupRestoreTests
         Assert.That(Count(path, "WellBoreFeatureCategoryTable"), Is.EqualTo(featureCountBefore));
     }
 
+    [Test]
+    public void Restore_RigJobs_PersistsNormalizedHistoryAndLegacyProjection()
+    {
+        string path = TempDatabase();
+        SqlConnectionManager connections = Manager(path);
+        Guid earlierRig = Guid.NewGuid();
+        Guid latestRig = Guid.NewGuid();
+        WellBoreModel incoming = new()
+        {
+            MetaInfo = new MetaInfo { ID = Guid.NewGuid() },
+            Name = "Rig history",
+            RigJobs =
+            [
+                new RigJob
+                {
+                    RigJobID = Guid.NewGuid(), RigID = latestRig,
+                    StartDate = new DateTimeOffset(2025, 1, 2, 0, 0, 0, TimeSpan.Zero),
+                    DrillFloorDepthSource = DrillFloorDepthSource.RigJob,
+                    DrillFloorDepth = new() { Mean = -30 }
+                },
+                new RigJob
+                {
+                    RigJobID = Guid.NewGuid(), RigID = earlierRig,
+                    StartDate = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndDate = new DateTimeOffset(2025, 1, 2, 0, 0, 0, TimeSpan.Zero),
+                    DrillFloorDepthSource = DrillFloorDepthSource.RigJob,
+                    DrillFloorDepth = new() { Mean = -20 }
+                }
+            ]
+        };
+
+        using SqliteConnection connection = connections.GetConnection()!;
+        WellBoreBatchRestoreOutcome outcome = WellBoreBatchRestorer.Restore(connection, new WellBoreBatchRestoreRequest
+        {
+            ConflictPolicy = WellBoreBatchRestoreConflictPolicy.FailIfExists,
+            CatalogPolicy = WellBoreBatchCatalogRestorePolicy.MapExisting,
+            Document = new WellBoreBatchExportDocument
+            {
+                ExportedAtUtc = DateTimeOffset.UtcNow,
+                WellBores = [incoming]
+            }
+        }, DateTimeOffset.UtcNow);
+
+        Assert.That(outcome.IsSuccess, Is.True);
+        WellBoreModel restored = ReadWell(path, incoming.MetaInfo.ID);
+        Assert.Multiple(() =>
+        {
+            Assert.That(restored.RigJobs!.Select(value => value.RigID),
+                Is.EqualTo(new[] { earlierRig, latestRig }));
+            Assert.That(restored.RigID, Is.EqualTo(latestRig));
+            Assert.That(restored.RigJobs[0].DrillFloorDepth!.StandardDeviation, Is.EqualTo(0.5));
+            Assert.That(restored.RigJobs[1].DrillFloorDepth!.StandardDeviation, Is.EqualTo(0.5));
+        });
+    }
+
     private static WellBoreIdentity Identity(string name) => new() { MetaInfo = new MetaInfo { ID = Guid.NewGuid() }, Name = name };
     private static WellBoreFeatureCategory Category(string name, string option) => new()
     {

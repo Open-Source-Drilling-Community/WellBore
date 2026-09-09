@@ -58,11 +58,11 @@ dotnet run --project WebApp/WebApp.csproj
 ## Usage
 - Navigate to `/WellBore/webapp/WellBore` to access the main page.
 - Select unit system and depth/position references via the unit/reference selector (from OSDC UnitConversion components).
-- View, add, edit, and delete WellBores; associate with Field/Cluster/Well where applicable.
+- View, add, edit, and delete WellBores; associate with Field/Cluster/Well where applicable and maintain an optional chronological rig-job history.
 - Assign identity values and feature options while editing a wellbore.
 - Use the **WellBore Identities** and **WellBore Features** navigation entries to manage the user-extensible catalogues.
 - Open the collapsed **Import/Export** navigation group and use **Backup / Restore** to download a versioned logical JSON backup of all or selected WellBores and atomically restore a validated document.
-- Use the trajectory and survey-run pages to filter the complete Field/Cluster/Well/WellBore hierarchy, display horizontal positions relative to WGS84, the owning Field's cartographic projection, Field, Cluster, or Well-head references, and use the linked Rig drill-floor elevation as the `RTE` depth datum.
+- Use the trajectory and survey-run pages to filter the complete Field/Cluster/Well/WellBore hierarchy, display horizontal positions relative to WGS84, the owning Field's cartographic projection, Field, Cluster, or Well-head references, and resolve the `RTE` depth datum from the latest rig job.
 
 The left navigation follows the Well application layout: a dedicated `/WellBore/webapp/Home` entry, an expanded **WellBore Management** group, and collapsed **Import/Export**, **Survey Display**, **Contextual Data**, **Calculators**, and **Monitoring** groups. Contextual Well, Cluster, Field, and Rig pages are embedded under the WellBore path. The calculators provide cartographic conversion, vertical-datum conversion, gravity evaluation, and magnetic-field evaluation.
 

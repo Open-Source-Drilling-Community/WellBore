@@ -8,7 +8,8 @@ Domain data model for the WellBore solution. This project defines the core types
 - Nullable reference types: enabled
 
 ### Key Types
-- `WellBore`: Main entity with identity (`MetaInfo.ID`), descriptive fields, parent relationships for sidetracks, an optional `TieInPointAlongHoleDepth`, and identity/feature assignment collections.
+- `WellBore`: Main entity with identity (`MetaInfo.ID`), descriptive fields, parent relationships for sidetracks, an optional `TieInPointAlongHoleDepth`, optional chronological `RigJobs`, and identity/feature assignment collections.
+- `RigJob` and `DrillFloorDepthSource`: A rig-history entry with a stable ID, external Rig ID, start date, optional end date, and a discriminated drill-floor-depth source. `RigJob` source requires a Gaussian depth; `Rig` source forbids one because a fixed Platform Rig owns it.
 - `WellBoreIdentity` and `WellBoreIdentityAssignment`: User-managed identity definitions and values assigned to a wellbore.
 - `WellBoreFeatureCategory`, `WellBoreFeatureOption`, and `WellBoreFeatureAssignment`: User-managed classifications, options, exclusivity/validity rules, and assignments.
 - `SidetrackType`: Deprecated compatibility projection; new clients use the exclusive `SidetrackClassification` feature.
@@ -78,6 +79,9 @@ Basic defaults validated by tests (see `ModelTest`):
 - `IsSidetrack` defaults to `false`.
 - Deprecated `SidetrackType` defaults to `Undefined`; classification belongs in a `SidetrackClassification` feature assignment.
 - Identity and feature assignment collections are optional for backward compatibility with stored pre-version-1 wellbores.
+- `RigJobs = null` is the legacy/unmigrated state; an empty list is an authoritative and valid statement that no rig history is known. Populated histories are stored in increasing start-date order, may contain gaps, and may leave only the latest job open-ended.
+- A rig-job drill-floor depth is stored in SI metres relative to WGS84. Missing standard deviation is normalized to 0.5 m. Depth references transform the mean for presentation but never transform the uncertainty.
+- Deprecated `RigID` is a temporary compatibility projection of the latest job and is preserved only when `RigJobs` is absent.
 
 ## Integration In The Solution
 This model is the contract shared across projects:

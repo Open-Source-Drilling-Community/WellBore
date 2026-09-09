@@ -114,6 +114,71 @@
 </MudGrid>
 
 <MudExpansionPanels MultiExpansion="true" Class="mt-4">
+    <MudExpansionPanel Text="Rig-job history">
+        @if (_rigJobs is null)
+        {
+            <MudAlert Severity="Severity.Info" Dense="true" Class="mb-3">
+                This is a legacy rig association. Start a rig-job history when reliable dates are available; saving without doing so preserves the legacy value.
+            </MudAlert>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartRigJobHistory">Start rig-job history</MudButton>
+        }
+        else
+        {
+            <MudText Typo="Typo.body2" Class="mb-2">
+                The list may remain empty when no rig is known. Jobs are saved chronologically; gaps are allowed and only the last job may omit its end date.
+            </MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Add" OnClick="AddRigJob" Class="mb-3">Add rig job</MudButton>
+            @foreach (RigJob job in _rigJobs.OrderBy(item => item.StartDate))
+            {
+                <MudPaper Outlined="true" Class="pa-3 mb-3" @key="job.RigJobID">
+                    <MudGrid>
+                        <MudItem xs="12" md="4">
+                            <MudSelect T="Guid" Label="Rig" Value="job.RigID" ValueChanged="@((Guid id) => SelectRig(job, id))" Required="true">
+                                @foreach (RigReadResponse rig in (Rigs ?? []).Where(item => item.MetaInfo?.ID != Guid.Empty).OrderBy(item => item.Name))
+                                {
+                                    <MudSelectItem T="Guid" Value="rig.MetaInfo.ID">@rig.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="5" md="3">
+                            <MudDatePicker Label="Start date" Date="@ToDateTime(job.StartDate)" DateChanged="@((DateTime? value) => SetRigJobStart(job, value))" Required="true" />
+                        </MudItem>
+                        <MudItem xs="10" sm="5" md="3">
+                            <MudDatePicker Label="End date" Date="@ToDateTime(job.EndDate)" DateChanged="@((DateTime? value) => job.EndDate = ToDateTimeOffset(value))" Clearable="true" />
+                        </MudItem>
+                        <MudItem xs="2" md="1" Class="d-flex align-center">
+                            <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="@(() => _rigJobs.Remove(job))" />
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudChip T="string" Variant="Variant.Outlined" Color="Color.Primary">@DepthOwnershipLabel(job)</MudChip>
+                        </MudItem>
+                        @if (job.DrillFloorDepthSource == DrillFloorDepthSource.RigJob)
+                        {
+                            <MudItem xs="12" sm="6">
+                                <MudInputWithUnitAdornment QuantityName="DepthDrilling"
+                                                           QuantityLabel="Drill-floor depth"
+                                                           DrillingSignalReference="@DrillingSignalReferenceType.Depth"
+                                                           SIValueNullable="@RigJobDepth(job)"
+                                                           SIValueNullableChanged="@(value => SetRigJobDepth(job, value))" />
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudInputWithUnitAdornment QuantityName="LengthSmall"
+                                                           QuantityLabel="Drill-floor depth standard uncertainty"
+                                                           SIValueNullable="@RigJobDepthUncertainty(job)"
+                                                           SIValueNullableChanged="@(value => SetRigJobDepthUncertainty(job, value))" />
+                            </MudItem>
+                        }
+                        else if (job.DrillFloorDepthSource == DrillFloorDepthSource.Rig)
+                        {
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.caption">The fixed-platform Rig owns the drill-floor depth.</MudText>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            }
+        }
+    </MudExpansionPanel>
     <MudExpansionPanel Text="Identities">
         <MudGrid>
             <MudItem xs="12" md="4">
@@ -244,6 +309,7 @@
     private List<WellBoreFeatureAssignment> _wellBoreFeatureAssignments = [];
     private Guid? _selectedFeatureCategoryId;
     private Guid? _selectedFeatureOptionId;
+    private List<RigJob>? _rigJobs;
 
     private async Task ProcessSelectedClusterAsync()
     {
@@ -324,17 +390,27 @@
 
     private double? ResolveRotaryTableReference(Cluster? cluster, WellBore? wellBore)
     {
-        Guid? rigId = cluster?.RigID;
-        if (rigId == null || rigId == Guid.Empty)
+        IReadOnlyCollection<RigJob>? jobs = _rigJobs ?? wellBore?.RigJobs?.ToList();
+        if (jobs is not null)
         {
-            rigId = wellBore?.RigID;
+            RigJob? latest = jobs.OrderBy(item => item.StartDate).LastOrDefault();
+            if (latest is null) return null;
+            if (latest.DrillFloorDepthSource == DrillFloorDepthSource.RigJob &&
+                latest.DrillFloorDepth?.GaussianValue?.Mean is double jobDepth)
+                return -jobDepth;
+            return ResolveFixedPlatformDrillFloorDepth(latest.RigID);
         }
 
-        if (rigId is not Guid resolvedRigId || Rigs == null)
-        {
-            return null;
-        }
+#pragma warning disable CS0612
+        Guid? rigId = wellBore?.RigID;
+#pragma warning restore CS0612
+        rigId ??= cluster?.RigID;
+        return rigId is Guid resolvedRigId ? ResolveFixedPlatformDrillFloorDepth(resolvedRigId) : null;
+    }
 
+    private double? ResolveFixedPlatformDrillFloorDepth(Guid resolvedRigId)
+    {
+        if (Rigs == null) return null;
         return Rigs.FirstOrDefault(rig => rig?.MetaInfo?.ID == resolvedRigId)?
             .FixedPlatformProperties?.DrillFloorDepth?.GaussianValue?.Mean is double drillFloorDepth
             ? -drillFloorDepth
@@ -358,6 +434,7 @@
                 descr = CurrentWellBore.Description;
                 _wellBoreIdentityAssignments = CloneIdentityAssignments(CurrentWellBore.WellBoreIdentityAssignments);
                 _wellBoreFeatureAssignments = CloneFeatureAssignments(CurrentWellBore.WellBoreFeatureAssignments);
+                _rigJobs = CloneRigJobs(CurrentWellBore.RigJobs);
                 _isSidetrack = CurrentWellBore.IsSidetrack;
                 if (_isSidetrack && WellBores != null && CurrentWellBore.ParentWellBoreID != null && CurrentWellBore.ParentWellBoreID != Guid.Empty)
                 {
@@ -454,10 +531,18 @@
                     CreationDate = CurrentWellBore.CreationDate,
                     LastModificationDate = DateTimeOffset.UtcNow,
                     IsSidetrack = _isSidetrack,
-                    RigID = CurrentWellBore.RigID,
+                    RigJobs = CloneRigJobs(_rigJobs),
                     WellBoreIdentityAssignments = CloneIdentityAssignments(_wellBoreIdentityAssignments),
                     WellBoreFeatureAssignments = CloneFeatureAssignments(_wellBoreFeatureAssignments),
                 };
+#pragma warning disable CS0612
+                wellBore.RigID = _rigJobs switch
+                {
+                    null => CurrentWellBore.RigID,
+                    { Count: 0 } => null,
+                    _ => _rigJobs.OrderBy(item => item.StartDate).Last().RigID
+                };
+#pragma warning restore CS0612
                 if (_selectedWell != null && _selectedWell.MetaInfo != null && _selectedWell.MetaInfo.ID != Guid.Empty)
                 {
                     wellBore.WellID = _selectedWell.MetaInfo.ID;
@@ -507,6 +592,74 @@
             _wellBoreIdentityAssignments.Any(item => item.IdentityID == identityId)) return;
         _wellBoreIdentityAssignments.Add(new WellBoreIdentityAssignment { ID = Guid.NewGuid(), IdentityID = identityId });
     }
+
+    private void StartRigJobHistory() => _rigJobs = [];
+
+    private void AddRigJob()
+    {
+        DateTimeOffset start = _rigJobs?.Count > 0
+            ? _rigJobs.Max(item => item.EndDate ?? item.StartDate).Date
+            : DateTimeOffset.UtcNow.Date;
+        _rigJobs ??= [];
+        _rigJobs.Add(new RigJob
+        {
+            RigJobID = Guid.NewGuid(),
+            StartDate = start,
+            DrillFloorDepthSource = DrillFloorDepthSource.Undefined
+        });
+    }
+
+    private void SelectRig(RigJob job, Guid rigId)
+    {
+        job.RigID = rigId;
+        RigReadResponse? rig = Rigs?.FirstOrDefault(item => item.MetaInfo?.ID == rigId);
+        job.DrillFloorDepthSource = rig?.RigType == RigType.PlatformRig
+            ? DrillFloorDepthSource.Rig
+            : DrillFloorDepthSource.RigJob;
+        if (job.DrillFloorDepthSource == DrillFloorDepthSource.Rig)
+            job.DrillFloorDepth = null;
+        else
+            job.DrillFloorDepth ??= new GaussianDrillingProperty
+            {
+                GaussianValue = new GaussianDistribution { StandardDeviation = 0.5 }
+            };
+        RefreshRotaryTableReference();
+    }
+
+    private void SetRigJobStart(RigJob job, DateTime? value) =>
+        job.StartDate = ToDateTimeOffset(value) ?? default;
+
+    private static double? RigJobDepth(RigJob job) => job.DrillFloorDepth?.GaussianValue?.Mean;
+    private static double? RigJobDepthUncertainty(RigJob job) => job.DrillFloorDepth?.GaussianValue?.StandardDeviation;
+
+    private void SetRigJobDepth(RigJob job, double? value)
+    {
+        EnsureRigJobDepth(job).Mean = value;
+        RefreshRotaryTableReference();
+    }
+
+    private static void SetRigJobDepthUncertainty(RigJob job, double? value) =>
+        EnsureRigJobDepth(job).StandardDeviation = value;
+
+    private static GaussianDistribution EnsureRigJobDepth(RigJob job)
+    {
+        job.DrillFloorDepth ??= new GaussianDrillingProperty();
+        job.DrillFloorDepth.GaussianValue ??= new GaussianDistribution();
+        return job.DrillFloorDepth.GaussianValue;
+    }
+
+    private void RefreshRotaryTableReference()
+    {
+        if (RotaryTableDepthSource != null)
+            RotaryTableDepthSource.RotaryTableDepthReference = ResolveRotaryTableReference(_selectedCluster, CurrentWellBore);
+    }
+
+    private string DepthOwnershipLabel(RigJob job) => job.DrillFloorDepthSource switch
+    {
+        DrillFloorDepthSource.Rig => "Depth owned by fixed-platform Rig",
+        DrillFloorDepthSource.RigJob => "Depth owned by this rig job",
+        _ => "Select a rig"
+    };
 
     private async Task<List<WellBoreIdentity>> LoadWellBoreIdentitiesAsync()
     {
@@ -579,6 +732,7 @@
 
     private bool ValidateCatalogAssignments()
     {
+        if (!ValidateRigJobs()) return false;
         if (_wellBoreIdentityAssignments.Any(item => item.IdentityID == null || string.IsNullOrWhiteSpace(item.Value)))
         {
             Snackbar.Add("Every identity assignment requires an identity and value", Severity.Warning);
@@ -593,6 +747,41 @@
         return true;
     }
 
+    private bool ValidateRigJobs()
+    {
+        if (_rigJobs is null) return true;
+        List<RigJob> ordered = _rigJobs.OrderBy(item => item.StartDate).ToList();
+        for (int index = 0; index < ordered.Count; index++)
+        {
+            RigJob job = ordered[index];
+            if (job.RigID == Guid.Empty || job.StartDate == default || job.DrillFloorDepthSource == DrillFloorDepthSource.Undefined)
+            {
+                Snackbar.Add("Every rig job requires a rig, start date, and depth source", Severity.Warning);
+                return false;
+            }
+            if (job.EndDate is DateTimeOffset end && end <= job.StartDate)
+            {
+                Snackbar.Add("A rig-job end date must be later than its start date", Severity.Warning);
+                return false;
+            }
+            if (index < ordered.Count - 1 && job.EndDate is null ||
+                index > 0 && ordered[index - 1].EndDate is DateTimeOffset previousEnd && previousEnd > job.StartDate)
+            {
+                Snackbar.Add("Rig jobs must not overlap, and only the last job may have no end date", Severity.Warning);
+                return false;
+            }
+            if (job.DrillFloorDepthSource == DrillFloorDepthSource.RigJob &&
+                (RigJobDepth(job) is not double depth || !double.IsFinite(depth) ||
+                 RigJobDepthUncertainty(job) is double uncertainty && (!double.IsFinite(uncertainty) || uncertainty < 0)))
+            {
+                Snackbar.Add("A job-owned drill-floor depth requires a finite mean and non-negative uncertainty", Severity.Warning);
+                return false;
+            }
+        }
+        _rigJobs = ordered;
+        return true;
+    }
+
     private static List<WellBoreIdentityAssignment> CloneIdentityAssignments(IEnumerable<WellBoreIdentityAssignment>? values) =>
         values?.Select(item => new WellBoreIdentityAssignment { ID = item.ID, IdentityID = item.IdentityID, Value = item.Value }).ToList() ?? [];
 
@@ -602,6 +791,25 @@
             ID = item.ID, FeatureCategoryID = item.FeatureCategoryID, FeatureOptionID = item.FeatureOptionID,
             FromDate = item.FromDate, ToDate = item.ToDate
         }).ToList() ?? [];
+
+    private static List<RigJob>? CloneRigJobs(IEnumerable<RigJob>? values) => values?.Select(item => new RigJob
+    {
+        RigJobID = item.RigJobID,
+        RigID = item.RigID,
+        StartDate = item.StartDate,
+        EndDate = item.EndDate,
+        DrillFloorDepthSource = item.DrillFloorDepthSource,
+        DrillFloorDepth = item.DrillFloorDepth?.GaussianValue == null ? null : new GaussianDrillingProperty
+        {
+            GaussianValue = new GaussianDistribution
+            {
+                MinValue = item.DrillFloorDepth.GaussianValue.MinValue,
+                MaxValue = item.DrillFloorDepth.GaussianValue.MaxValue,
+                Mean = item.DrillFloorDepth.GaussianValue.Mean,
+                StandardDeviation = item.DrillFloorDepth.GaussianValue.StandardDeviation
+            }
+        }
+    }).ToList();
 
     private static DateTime? ToDateTime(DateTimeOffset? value) => value?.UtcDateTime;
     private static DateTimeOffset? ToDateTimeOffset(DateTime? value) => value == null ? null : new DateTimeOffset(DateTime.SpecifyKind(value.Value, DateTimeKind.Utc));

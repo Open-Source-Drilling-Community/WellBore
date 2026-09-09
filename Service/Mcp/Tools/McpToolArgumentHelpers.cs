@@ -91,11 +91,12 @@ internal static class McpToolArgumentHelpers
     public static JsonObject CreateWellBoreTopologyMutationSchema() => CreateSubresourceSchema("topology", new JsonObject
     {
         ["type"] = "object",
-        ["description"] = "Complete replacement of Well, Rig, and structural sidetrack topology fields. Sidetrack classification is represented by a SidetrackClassification feature assignment; SidetrackType is retained only for compatibility. WellID and RigID are externally owned and are not synchronously validated.",
+        ["description"] = "Complete replacement of Well, rig-job history, and structural sidetrack topology fields. RigJobs may be null for a legacy payload or empty when no rig history is known. Sidetrack classification is represented by a SidetrackClassification feature assignment. External Well and Rig UUIDs are audited separately and are not synchronously validated.",
         ["properties"] = new JsonObject
         {
             ["WellID"] = NullableUuid("External Well UUID, or null."),
-            ["RigID"] = NullableUuid("External Rig UUID, or null."),
+            ["RigID"] = NullableUuid("Deprecated compatibility projection of the last chronological RigJob.RigID, or null."),
+            ["RigJobs"] = NullableArray(CreateRigJobSchema()),
             ["IsSidetrack"] = new JsonObject { ["type"] = "boolean" },
             ["ParentWellBoreID"] = NullableUuid("Local parent WellBore UUID required for a sidetrack, otherwise null."),
             ["TieInPointAlongHoleDepth"] = CreateTieInPointSchema(),
@@ -382,7 +383,8 @@ internal static class McpToolArgumentHelpers
                 ["CreationDate"] = NullableDateTime("UTC or offset timestamp at which the wellbore record was created."),
                 ["LastModificationDate"] = NullableDateTime("UTC or offset timestamp of the most recent modification."),
                 ["WellID"] = NullableUuid("Identifier of the well to which this wellbore belongs."),
-                ["RigID"] = NullableUuid("Identifier of the rig used to work on this wellbore."),
+                ["RigID"] = NullableUuid("Deprecated compatibility projection of the last chronological RigJob.RigID. Retained temporarily for legacy clients."),
+                ["RigJobs"] = NullableArray(CreateRigJobSchema()),
                 ["IsSidetrack"] = new JsonObject
                 {
                     ["type"] = "boolean",
@@ -441,6 +443,60 @@ internal static class McpToolArgumentHelpers
             ["additionalProperties"] = false
         };
     }
+
+    private static JsonObject CreateRigJobSchema() => new()
+    {
+        ["description"] = "A chronological rig-job entry. The discriminator enforces whether drill-floor depth is owned by the fixed-platform Rig or by this job.",
+        ["oneOf"] = new JsonArray
+        {
+            CreateRigJobVariant("Rig", new JsonObject
+            {
+                ["type"] = "null",
+                ["description"] = "Must be null because the fixed-platform Rig owns its drill-floor depth."
+            }),
+            CreateRigJobVariant("RigJob", CreateDrillFloorDepthSchema())
+        }
+    };
+
+    private static JsonObject CreateRigJobVariant(string source, JsonObject depthSchema) => new()
+    {
+        ["type"] = "object",
+        ["properties"] = new JsonObject
+        {
+            ["RigJobID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["RigID"] = new JsonObject { ["type"] = "string", ["format"] = "uuid" },
+            ["StartDate"] = new JsonObject { ["type"] = "string", ["format"] = "date-time" },
+            ["EndDate"] = NullableDateTime("Exclusive job end, or null only for the last open-ended job."),
+            ["DrillFloorDepthSource"] = new JsonObject { ["const"] = source },
+            ["DrillFloorDepth"] = depthSchema
+        },
+        ["required"] = new JsonArray("RigJobID", "RigID", "StartDate", "EndDate", "DrillFloorDepthSource", "DrillFloorDepth"),
+        ["additionalProperties"] = false
+    };
+
+    private static JsonObject CreateDrillFloorDepthSchema() => new()
+    {
+        ["type"] = "object",
+        ["description"] = "Drill-floor vertical depth in SI metres relative to WGS84. Datum translation applies to the mean only; standard deviation is only unit-scaled and defaults to 0.5 m when omitted.",
+        ["properties"] = new JsonObject
+        {
+            ["GaussianValue"] = new JsonObject
+            {
+                ["type"] = "object",
+                ["properties"] = new JsonObject
+                {
+                    ["MinValue"] = new JsonObject { ["type"] = "number" },
+                    ["MaxValue"] = new JsonObject { ["type"] = "number" },
+                    ["Mean"] = new JsonObject { ["type"] = "number", ["description"] = "Mean depth in SI metres relative to WGS84." },
+                    ["StandardDeviation"] = NullableNumber("Non-negative standard uncertainty in SI metres; defaults to 0.5 m.")
+                },
+                ["required"] = new JsonArray("Mean"),
+                ["additionalProperties"] = false
+            }
+        },
+        ["required"] = new JsonArray("GaussianValue"),
+        ["additionalProperties"] = false
+    };
 
     private static JsonObject WrapCatalogBody(string key, JsonObject body, bool includeId, string idPath)
     {

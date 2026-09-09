@@ -123,6 +123,114 @@ public sealed class WellBoreContractStrengtheningTests
     }
 
     [Test]
+    public void Authoritative_empty_rig_job_history_is_valid_for_planned_or_incomplete_wellbores()
+    {
+        WellBoreModel value = NewWellBore();
+#pragma warning disable CS0618
+        value.RigID = null;
+#pragma warning restore CS0618
+        value.RigJobs = [];
+
+        Assert.That(_controller.PostWellBore(value), Is.TypeOf<OkResult>());
+        Assert.Multiple(() =>
+        {
+            Assert.That(Read(value.MetaInfo!.ID).RigJobs, Is.Empty);
+#pragma warning disable CS0618
+            Assert.That(Read(value.MetaInfo.ID).RigID, Is.Null);
+#pragma warning restore CS0618
+        });
+    }
+
+    [Test]
+    public void Rig_jobs_are_sorted_project_latest_rig_and_default_job_owned_uncertainty()
+    {
+        Guid earlierRig = Guid.NewGuid();
+        Guid laterRig = Guid.NewGuid();
+        WellBoreModel value = NewWellBore();
+#pragma warning disable CS0618
+        value.RigID = null;
+#pragma warning restore CS0618
+        value.RigJobs =
+        [
+            NewRigJob(laterRig, new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero), null, -40),
+            NewRigJob(earlierRig, new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                new DateTimeOffset(2021, 1, 1, 0, 0, 0, TimeSpan.Zero), -35)
+        ];
+
+        Assert.That(_controller.PostWellBore(value), Is.TypeOf<OkResult>());
+        WellBoreModel stored = Read(value.MetaInfo!.ID);
+        Assert.Multiple(() =>
+        {
+            Assert.That(stored.RigJobs!.Select(job => job.RigID), Is.EqualTo(new[] { earlierRig, laterRig }));
+            Assert.That(stored.RigJobs[0].DrillFloorDepth!.StandardDeviation, Is.EqualTo(0.5));
+#pragma warning disable CS0618
+            Assert.That(stored.RigID, Is.EqualTo(laterRig));
+#pragma warning restore CS0618
+        });
+    }
+
+    [Test]
+    public void Rig_job_discriminator_and_period_rules_are_enforced()
+    {
+        DateTimeOffset start = new(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        WellBoreModel fixedPlatformWithLocalDepth = NewWellBore();
+        fixedPlatformWithLocalDepth.RigJobs =
+        [
+            new RigJob
+            {
+                RigJobID = Guid.NewGuid(), RigID = Guid.NewGuid(), StartDate = start,
+                DrillFloorDepthSource = DrillFloorDepthSource.Rig,
+                DrillFloorDepth = new OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty { Mean = -40 }
+            }
+        ];
+#pragma warning disable CS0618
+        fixedPlatformWithLocalDepth.RigID = null;
+#pragma warning restore CS0618
+        Assert.That(_controller.PostWellBore(fixedPlatformWithLocalDepth), Is.TypeOf<BadRequestObjectResult>());
+
+        WellBoreModel overlapping = NewWellBore();
+#pragma warning disable CS0618
+        overlapping.RigID = null;
+#pragma warning restore CS0618
+        Guid rig = Guid.NewGuid();
+        overlapping.RigJobs =
+        [
+            NewRigJob(rig, start, start.AddDays(10), -40),
+            NewRigJob(rig, start.AddDays(5), null, -40)
+        ];
+        Assert.That(_controller.PostWellBore(overlapping), Is.TypeOf<BadRequestObjectResult>());
+
+        WellBoreModel nullEntry = NewWellBore();
+#pragma warning disable CS0618
+        nullEntry.RigID = null;
+#pragma warning restore CS0618
+        nullEntry.RigJobs = [null!];
+        Assert.That(_controller.PostWellBore(nullEntry), Is.TypeOf<BadRequestObjectResult>());
+    }
+
+    [Test]
+    public void Legacy_full_update_preserves_migrated_rig_job_history()
+    {
+        WellBoreModel value = NewWellBore();
+        Guid rig = Guid.NewGuid();
+        value.RigJobs = [NewRigJob(rig, new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero), null, -42)];
+#pragma warning disable CS0618
+        value.RigID = rig;
+#pragma warning restore CS0618
+        Assert.That(_controller.PostWellBore(value), Is.TypeOf<OkResult>());
+
+        WellBoreModel legacyReplacement = NewWellBore(value.MetaInfo!.ID);
+        legacyReplacement.Name = "Updated by legacy client";
+#pragma warning disable CS0618
+        legacyReplacement.RigID = rig;
+#pragma warning restore CS0618
+        legacyReplacement.RigJobs = null;
+        Assert.That(_controller.PutWellBoreById(value.MetaInfo.ID, value.LastModificationDate!.Value, legacyReplacement),
+            Is.TypeOf<OkResult>());
+        Assert.That(Read(value.MetaInfo.ID).RigJobs, Has.Count.EqualTo(1));
+    }
+
+    [Test]
     public void Legacy_document_without_timestamps_gets_stable_non_destructive_revision()
     {
         WellBoreModel legacy = NewWellBore();
@@ -271,6 +379,16 @@ public sealed class WellBoreContractStrengtheningTests
         RigID = Guid.NewGuid(),
         IsSidetrack = false,
         SidetrackType = SidetrackType.Undefined
+    };
+
+    private static RigJob NewRigJob(Guid rigId, DateTimeOffset start, DateTimeOffset? end, double depth) => new()
+    {
+        RigJobID = Guid.NewGuid(),
+        RigID = rigId,
+        StartDate = start,
+        EndDate = end,
+        DrillFloorDepthSource = DrillFloorDepthSource.RigJob,
+        DrillFloorDepth = new OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty { Mean = depth }
     };
 
     private sealed class RecordingExternalValidator(WellBoreExternalReferenceValidationStatus status)

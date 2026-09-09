@@ -9,6 +9,8 @@ namespace OSDC.Drilling.WellBore.Service.Managers;
 
 internal static class WellBoreReferenceIntegrityValidator
 {
+    internal const double DefaultRigJobDrillFloorDepthStandardDeviation = 0.5;
+
     private sealed record CategoryDefinition(bool IsExclusive, bool HasValidityPeriod, HashSet<Guid> Options);
 
     public static List<WellBoreMutationError> ValidateWellBore(
@@ -27,6 +29,7 @@ internal static class WellBoreReferenceIntegrityValidator
         if (well.ParentWellBoreID == Guid.Empty)
             errors.Add(Error("ParentWellBoreID", "empty_uuid", "ParentWellBoreID must be null or a non-empty UUID."));
 
+        ValidateRigJobs(well, errors);
         ValidateTopology(connection, transaction, well, errors);
 
         HashSet<Guid> assignmentIds = [];
@@ -59,6 +62,94 @@ internal static class WellBoreReferenceIntegrityValidator
 
         ValidateExclusiveCategoryPeriods(well.WellBoreFeatureAssignments ?? [], categories, errors);
         return errors;
+    }
+
+    private static void ValidateRigJobs(Model.WellBore well, List<WellBoreMutationError> errors)
+    {
+        // Null deliberately remains distinguishable from an authoritative empty
+        // list during the compatibility phase.
+        if (well.RigJobs is null) return;
+
+        well.RigJobs.Sort((left, right) =>
+            left is null ? (right is null ? 0 : -1) : right is null ? 1 : left.StartDate.CompareTo(right.StartDate));
+        if (well.RigJobs.Count == 0)
+        {
+            if (well.RigID is not null)
+                errors.Add(Error("RigID", "rig_job_projection_mismatch",
+                    "RigID must be null when RigJobs is an authoritative empty list."));
+            return;
+        }
+
+        HashSet<Guid> jobIds = [];
+        for (int index = 0; index < well.RigJobs.Count; index++)
+        {
+            RigJob? job = well.RigJobs[index];
+            string path = $"RigJobs[{index}]";
+            if (job is null)
+            {
+                errors.Add(Error(path, "null_rig_job", "Rig jobs cannot be null."));
+                continue;
+            }
+            if (job.RigJobID == Guid.Empty)
+                errors.Add(Error($"{path}.RigJobID", "rig_job_id_required", "A non-empty rig-job UUID is required."));
+            else if (!jobIds.Add(job.RigJobID))
+                errors.Add(Error($"{path}.RigJobID", "duplicate_rig_job_id", $"Rig-job UUID {job.RigJobID} is used more than once."));
+            if (job.RigID == Guid.Empty)
+                errors.Add(Error($"{path}.RigID", "rig_id_required", "A non-empty Rig UUID is required."));
+            if (job.StartDate == default)
+                errors.Add(Error($"{path}.StartDate", "start_date_required", "A non-default rig-job start timestamp is required."));
+            if (job.EndDate is DateTimeOffset end && end <= job.StartDate)
+                errors.Add(Error($"{path}.EndDate", "invalid_period", "EndDate must be later than StartDate."));
+            if (index < well.RigJobs.Count - 1 && job.EndDate is null)
+                errors.Add(Error($"{path}.EndDate", "open_job_not_last", "Only the last rig job may have a null EndDate."));
+            if (index > 0 && well.RigJobs[index - 1]?.EndDate is DateTimeOffset previousEnd && previousEnd > job.StartDate)
+                errors.Add(Error(path, "overlapping_rig_jobs", "Rig-job periods must not overlap."));
+
+            ValidateRigJobDepth(job, path, errors);
+        }
+
+#pragma warning disable CS0618
+        RigJob? latestJob = well.RigJobs[^1];
+        if (latestJob is null)
+            return;
+        Guid projectedRigId = latestJob.RigID;
+        if (well.RigID is null)
+            well.RigID = projectedRigId;
+        else if (well.RigID != projectedRigId)
+            errors.Add(Error("RigID", "rig_job_projection_mismatch",
+                "RigID must match the last chronological RigJob while the compatibility projection is present."));
+#pragma warning restore CS0618
+    }
+
+    private static void ValidateRigJobDepth(RigJob job, string path, List<WellBoreMutationError> errors)
+    {
+        if (job.DrillFloorDepthSource == DrillFloorDepthSource.Rig)
+        {
+            if (job.DrillFloorDepth is not null)
+                errors.Add(Error($"{path}.DrillFloorDepth", "depth_owned_by_rig",
+                    "DrillFloorDepth must be null when DrillFloorDepthSource is Rig."));
+            return;
+        }
+        if (job.DrillFloorDepthSource != DrillFloorDepthSource.RigJob)
+        {
+            errors.Add(Error($"{path}.DrillFloorDepthSource", "depth_source_required",
+                "DrillFloorDepthSource must be Rig or RigJob."));
+            return;
+        }
+        if (job.DrillFloorDepth is null)
+        {
+            errors.Add(Error($"{path}.DrillFloorDepth", "drill_floor_depth_required",
+                "DrillFloorDepth is required when DrillFloorDepthSource is RigJob."));
+            return;
+        }
+        job.DrillFloorDepth.StandardDeviation ??= DefaultRigJobDrillFloorDepthStandardDeviation;
+        if (job.DrillFloorDepth.Mean is not double mean || double.IsNaN(mean) || double.IsInfinity(mean))
+            errors.Add(Error($"{path}.DrillFloorDepth.Mean", "invalid_depth",
+                "DrillFloorDepth.Mean is required and must be a finite SI value."));
+        if (job.DrillFloorDepth.StandardDeviation is not double deviation || deviation < 0 ||
+            double.IsNaN(deviation) || double.IsInfinity(deviation))
+            errors.Add(Error($"{path}.DrillFloorDepth.StandardDeviation", "invalid_uncertainty",
+                "DrillFloorDepth.StandardDeviation must be a finite, non-negative SI value."));
     }
 
     private static void ValidateTopology(SqliteConnection connection, SqliteTransaction transaction,

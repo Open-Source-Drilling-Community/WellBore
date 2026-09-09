@@ -63,6 +63,7 @@ internal static class WellBoreDocumentMutationManager
         return Mutate(manager, logger, id, expectedModifiedUtc, stored =>
         {
             wellBore.CreationDate = stored.CreationDate;
+            PreserveMigratedRigJobsForLegacyReplacement(stored, wellBore);
             return wellBore;
         });
     }
@@ -83,7 +84,11 @@ internal static class WellBoreDocumentMutationManager
         {
             if (topology == null) return null;
             stored.WellID = topology.WellID;
+#pragma warning disable CS0618
             stored.RigID = topology.RigID;
+#pragma warning restore CS0618
+            if (topology.RigJobs is not null)
+                stored.RigJobs = topology.RigJobs;
             stored.IsSidetrack = topology.IsSidetrack;
             stored.ParentWellBoreID = topology.ParentWellBoreID;
             stored.TieInPointAlongHoleDepth = topology.TieInPointAlongHoleDepth;
@@ -91,6 +96,15 @@ internal static class WellBoreDocumentMutationManager
             return stored;
         }, topology == null ? WellBoreMutationResult.Invalid("topology", "required", "The WellBore topology is required.") : null,
         legacyTypeIsExplicit: true);
+
+    private static void PreserveMigratedRigJobsForLegacyReplacement(WellBoreModel stored, WellBoreModel replacement)
+    {
+        if (replacement.RigJobs is not null || stored.RigJobs is null) return;
+        replacement.RigJobs = stored.RigJobs;
+#pragma warning disable CS0618
+        replacement.RigID ??= stored.RigID;
+#pragma warning restore CS0618
+    }
 
     public static WellBoreMutationResult AddIdentityAssignment(SqlConnectionManager manager, ILogger logger, Guid id,
         DateTimeOffset expectedModifiedUtc, WellBoreIdentityAssignment? assignment) =>

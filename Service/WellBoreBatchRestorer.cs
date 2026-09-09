@@ -52,14 +52,13 @@ public static class WellBoreBatchRestorer
             }
             RewriteReferences(wellBores, mappings);
 
-            List<PreparedWellBore> prepared = PrepareWellBores(wellBores);
-            List<bool> exists = prepared.Select(value => RowExists(connection, transaction, value.ID)).ToList();
+            List<bool> exists = wellBores.Select(value => RowExists(connection, transaction, value.MetaInfo!.ID)).ToList();
             if (request.ConflictPolicy == WellBoreBatchRestoreConflictPolicy.FailIfExists)
             {
-                List<WellBoreBatchError> conflicts = prepared.Select((value, index) => (value, index))
+                List<WellBoreBatchError> conflicts = wellBores.Select((value, index) => (value, index))
                     .Where(value => exists[value.index])
                     .Select(value => Error(value.index, "Document.WellBores", "well_already_exists",
-                        $"A stored WellBore already has UUID '{value.value.ID}'."))
+                        $"A stored WellBore already has UUID '{value.value.MetaInfo!.ID}'."))
                     .ToList();
                 if (conflicts.Count != 0)
                 {
@@ -84,6 +83,9 @@ public static class WellBoreBatchRestorer
                     "One or more restored WellBores contain invalid identity or feature assignments. No changes were made.",
                     assignmentErrors);
             }
+            // Semantic validation normalizes RigJobs (chronological order, legacy RigID projection,
+            // and default uncertainty), so serialize only after validation has completed.
+            List<PreparedWellBore> prepared = PrepareWellBores(wellBores);
             SaveWellBores(connection, transaction, prepared, request.ConflictPolicy);
             transaction.Commit();
             return new WellBoreBatchRestoreOutcome

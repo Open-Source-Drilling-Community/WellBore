@@ -109,7 +109,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             foreach (Model.WellBore value in query) WellBoreDocumentMutationManager.EnsureRevision(value);
             if (!string.IsNullOrWhiteSpace(name)) query = query.Where(value => value.Name?.Contains(name, StringComparison.OrdinalIgnoreCase) == true);
             if (wellId.HasValue) query = query.Where(value => value.WellID == wellId);
-            if (rigId.HasValue) query = query.Where(value => value.RigID == rigId);
+            if (rigId.HasValue) query = query.Where(value => ReferencesRig(value, rigId.Value));
             if (parentWellBoreId.HasValue) query = query.Where(value => value.ParentWellBoreID == parentWellBoreId);
             if (isSidetrack.HasValue) query = query.Where(value => value.IsSidetrack == isSidetrack);
             if (identityId.HasValue) query = query.Where(value => (value.WellBoreIdentityAssignments ?? []).Any(item => item?.IdentityID == identityId));
@@ -452,7 +452,7 @@ namespace OSDC.Drilling.WellBore.Service.Managers
             if (connection != null)
             {
                 var command = connection.CreateCommand();
-                command.CommandText = $"SELECT WellBore FROM WellBoreTable WHERE RigID = '{RigID}'";
+                command.CommandText = "SELECT WellBore FROM WellBoreTable";
                 try
                 {
                     using var reader = command.ExecuteReader();
@@ -460,7 +460,8 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                     {
                         string data = reader.GetString(0);
                         Model.WellBore? wellBore = JsonSerializer.Deserialize<Model.WellBore>(data, JsonSettings.Options);
-                        vals.Add(wellBore);
+                        if (wellBore != null && ReferencesRig(wellBore, RigID))
+                            vals.Add(wellBore);
                     }
                     _logger.LogInformation("Returning the list of existing WellBore from WellBoreTable");
                     return vals;
@@ -475,6 +476,15 @@ namespace OSDC.Drilling.WellBore.Service.Managers
                 _logger.LogWarning("Impossible to access the SQLite database");
             }
             return null;
+        }
+
+        private static bool ReferencesRig(Model.WellBore wellBore, Guid rigId)
+        {
+            if (wellBore.RigJobs is not null)
+                return wellBore.RigJobs.Any(job => job?.RigID == rigId);
+#pragma warning disable CS0618
+            return wellBore.RigID == rigId;
+#pragma warning restore CS0618
         }
 
         /// <summary>

@@ -41,9 +41,19 @@ namespace OSDC.Drilling.WellBore.Model
         /// </summary>
         public Guid? WellID { get; set; } = null;
         /// <summary>
-        /// the ID of the rig used to work on this wellbore
+        /// Deprecated compatibility projection of the most recent rig job's RigID.
+        /// New clients should use RigJobs. A null RigJobs collection identifies a
+        /// legacy/unmigrated payload; an empty collection explicitly means that no
+        /// rig history is known.
         /// </summary>
+        [Obsolete("Use RigJobs. RigID is retained temporarily for compatibility during migration.")]
         public Guid? RigID { get; set; } = null;
+        /// <summary>
+        /// Chronological rig-job history. Null is the legacy/unmigrated state,
+        /// empty is a valid authoritative history with no known rig, and a
+        /// non-empty list is authoritative and sorted by StartDate.
+        /// </summary>
+        public List<RigJob>? RigJobs { get; set; } = null;
         /// <summary>
         /// indicates whether the wellbore is a sidetrack or not
         /// </summary>
