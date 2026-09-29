@@ -160,3 +160,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 - Root namespaces, generated clients, NuGet packaging, Docker repositories, and Helm chart identities use `OSDC.Drilling.WellBore`.
 - MCP is available over streamable HTTP at `/wellbore/api/mcp` and WebSocket at `/wellbore/api/mcp/ws`. Optional external MCP-hub registration is disabled by default.
 - The WebApp uses the current embedded WebPages packages for Field (1.0.19), Cluster (1.0.12), Cartographic Projection (1.0.8), Geodetic Datum (1.0.7), and Well (1.0.11).
+
+## Shared resource classification
+
+Identity definitions/assignments and feature categories/options/assignments use `OSDC.DotnetLibraries.General.ResourceClassification` **0.1.0**, with DataManagement **2.2.0** retaining the interfaces and `MetaInfo`. The service-specific `WellBore*` type names remain thin derived classes. Existing JSON, catalogue UUIDs, database tables, REST/MCP routes and validation responses are preserved; no data migration is needed for this package adoption.

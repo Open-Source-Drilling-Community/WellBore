@@ -209,3 +209,9 @@ The service publishes 38 REST-backed MCP tools plus `ping`: 24 WellBore operatio
 - External diagnostics: `wellHostURL` and `rigHostURL` chart values, defaulting to the in-cluster OSDC services
 
 Use `persistence.existingClaim=wellbore-claim` while the new release references the old release's PVC. Never uninstall the PVC-owning legacy release until the claim has the Helm keep annotation and an independent backup has been verified.
+
+## Shared classification implementation
+
+ResourceClassification 0.1.0 supplies identity and feature models through Model. Exclusive assignment validation reuses `ClassificationValidation.IntervalsOverlap`: endpoints are inclusive, null bounds are unbounded, and equal instants with different offsets overlap. Existing required-reference, validity, unique-ID, concurrency and catalogue-deletion rules and error envelopes remain service-owned and unchanged.
+
+The complete exported OpenAPI document was verified equal before and after this migration, and equal to the checked-in schema. REST/MCP payloads and database schemas therefore remain unchanged. Rebuild the Service image to include the published package; no database conversion or reseeding is required.

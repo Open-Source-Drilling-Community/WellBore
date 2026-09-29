@@ -1,32 +1,8 @@
-using OSDC.DotnetLibraries.General.DataManagement;
-using System;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 
-namespace OSDC.Drilling.WellBore.Model
+namespace OSDC.Drilling.WellBore.Model;
+
+/// <summary>WellBore IdentityAssignment contract backed by the shared resource classification implementation.</summary>
+public class WellBoreIdentityAssignment : IdentityAssignment
 {
-    public class WellBoreIdentityAssignment : IIdentityAssignment
-    {
-        /// <summary>
-        /// unique ID of the assignment
-        /// </summary>
-        public Guid ID { get; set; }
-
-        /// <summary>
-        /// reference to the selected WellBoreIdentity
-        /// </summary>
-        public Guid? IdentityID { get; set; }
-
-        /// <summary>
-        /// wellbore-specific identity value
-        /// </summary>
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// default constructor required for JSON serialization
-        /// </summary>
-        public WellBoreIdentityAssignment() : base()
-        {
-        }
-    }
 }
-
-

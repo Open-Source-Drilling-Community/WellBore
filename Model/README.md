@@ -109,3 +109,8 @@ This project includes a DocFX configuration (`Model/docfx.json`) to build API do
 - Run unit tests: `dotnet test ModelTest/ModelTest.csproj`
 - Keep types backward compatible where possible, as they are shared contracts across the service and clients.
 
+## ResourceClassification ownership
+
+`WellBoreIdentity`, `WellBoreIdentityAssignment`, `WellBoreFeatureCategory`, `WellBoreFeatureOption` and `WellBoreFeatureAssignment` inherit their implementations from the published `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 NuGet. The package reference is unconditional. `WellBoreFeatureCategory` uses `FeatureCategory<WellBoreFeatureOption>`, retaining concrete mutable options and the existing `IFeatureCategory` adapter. DataManagement 2.2.0 remains the owner of `MetaInfo` and the classification interfaces.
+
+Property names, nullability, timestamps and caller-assigned IDs retain their serialized shape. Constructors do not generate IDs or timestamps. Model contract tests round-trip existing JSON and exercise the interface adapter. The service continues to own catalogue contents, persistence and validation.
