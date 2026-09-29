@@ -118,3 +118,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 The external Razor assembly registration in `ExternalRazorAssemblies.cs` must remain synchronized with the OSDC shared-page package references when they are upgraded. Earth Vertical Datum, Earth Gravity, and Earth Magnetic Field calculators are exposed through local wrapper pages so the packages' unrelated routes, including their Home pages, are not imported into the WellBore router.
 
 The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses OSDC DNS names for WellBore, Well, Field, Cluster, Rig, and all calculator services. The trajectory service retains its existing DNS name until that separate microservice is migrated.
+
+## SemanticCatalogue 0.8.0
+
+The host consumes regenerated clients from the SemanticCatalogue 0.8.0 contracts. Existing routes, configuration and persistence are unchanged. The Home page distinguishes parent-wellbore tie-in MD from vertical depth while retaining the OSDC WGS84 convention.

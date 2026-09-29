@@ -1,3 +1,4 @@
+using Model = OSDC.Drilling.WellBore.Model;
 using System;
 using System.Text.Json.Nodes;
 
@@ -220,7 +221,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     });
 
-    private static JsonObject CreateWellBoreExternalReferenceValidationSchema() => new()
+    private static JsonObject CreateWellBoreExternalReferenceValidationSchema() => Model.ProviderSemantics.Annotate(CreateWellBoreExternalReferenceValidationSchemaRaw(), typeof(Model.WellBoreExternalReferenceValidation));
+
+    private static JsonObject CreateWellBoreExternalReferenceValidationSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -255,7 +258,7 @@ internal static class McpToolArgumentHelpers
     {
         JsonObject schema = CreateWellBoreDeleteSchema();
         JsonObject properties = (JsonObject)schema["properties"]!;
-        properties[bodyName] = body;
+        properties[bodyName] = Model.ProviderSemantics.Annotate(body, bodyName == "details" ? typeof(Model.WellBoreDetailsUpdate) : typeof(Model.WellBoreTopologyUpdate));
         ((JsonArray)schema["required"]!).Add(bodyName);
         return schema;
     }
@@ -321,7 +324,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     });
 
-    private static JsonObject CreateBatchDocumentSchema(int minimumWellBores) => new()
+    private static JsonObject CreateBatchDocumentSchema(int minimumWellBores) => Model.ProviderSemantics.Annotate(CreateBatchDocumentSchemaRaw(minimumWellBores), typeof(Model.WellBoreBatchExportDocument));
+
+    private static JsonObject CreateBatchDocumentSchemaRaw(int minimumWellBores) => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -351,7 +356,9 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("request"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateWellBoreObjectSchema()
+    private static JsonObject CreateWellBoreObjectSchema() => Model.ProviderSemantics.Annotate(CreateWellBoreObjectSchemaRaw(), typeof(Model.WellBore));
+
+    private static JsonObject CreateWellBoreObjectSchemaRaw()
     {
         return new JsonObject
         {
@@ -414,7 +421,7 @@ internal static class McpToolArgumentHelpers
         return new JsonObject
         {
             ["type"] = new JsonArray { "object", "null" },
-            ["description"] = "For a sidetrack, the along-hole depth of the tie-in point in its parent wellbore, represented as a Gaussian drilling property. Values are always expressed in meters (SI) and referenced to the fixed WGS84 vertical datum; convert values from any other unit or vertical datum before calling the service.",
+            ["description"] = "For a sidetrack, the along-hole depth of the tie-in point in its parent wellbore, represented as a Gaussian drilling property. Values are always expressed in meters (SI) and using the OSDC WGS84-referenced MD convention on the parent wellbore; convert display units to SI before calling the service; measured depth is not vertical depth.",
             ["properties"] = new JsonObject
             {
                 ["GaussianValue"] = new JsonObject
@@ -426,14 +433,14 @@ internal static class McpToolArgumentHelpers
                         ["MinValue"] = new JsonObject
                         {
                             ["type"] = "number",
-                            ["description"] = "Minimum tie-in depth in meters (SI), referenced to the fixed WGS84 vertical datum."
+                            ["description"] = "Minimum tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."
                         },
                         ["MaxValue"] = new JsonObject
                         {
                             ["type"] = "number",
-                            ["description"] = "Maximum tie-in depth in meters (SI), referenced to the fixed WGS84 vertical datum."
+                            ["description"] = "Maximum tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."
                         },
-                        ["Mean"] = NullableNumber("Mean tie-in depth in meters (SI), referenced to the fixed WGS84 vertical datum."),
+                        ["Mean"] = NullableNumber("Mean tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."),
                         ["StandardDeviation"] = NullableNumber("Standard deviation expressing uncertainty in the tie-in depth, in meters (SI).")
                     },
                     ["additionalProperties"] = false
@@ -444,7 +451,9 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject CreateRigJobSchema() => new()
+    private static JsonObject CreateRigJobSchema() => Model.ProviderSemantics.Annotate(CreateRigJobSchemaRaw(), typeof(Model.RigJob));
+
+    private static JsonObject CreateRigJobSchemaRaw() => new()
     {
         ["description"] = "A chronological rig-job entry. The discriminator enforces whether drill-floor depth is owned by the fixed-platform Rig or by this job.",
         ["oneOf"] = new JsonArray
@@ -524,7 +533,9 @@ internal static class McpToolArgumentHelpers
         };
     }
 
-    private static JsonObject CreateIdentityDefinitionSchema() => new()
+    private static JsonObject CreateIdentityDefinitionSchema() => Model.ProviderSemantics.Annotate(CreateIdentityDefinitionSchemaRaw(), typeof(Model.WellBoreIdentity));
+
+    private static JsonObject CreateIdentityDefinitionSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -538,7 +549,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureCategoryDefinitionSchema() => new()
+    private static JsonObject CreateFeatureCategoryDefinitionSchema() => Model.ProviderSemantics.Annotate(CreateFeatureCategoryDefinitionSchemaRaw(), typeof(Model.WellBoreFeatureCategory));
+
+    private static JsonObject CreateFeatureCategoryDefinitionSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -564,7 +577,9 @@ internal static class McpToolArgumentHelpers
         ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateIdentityAssignmentSchema() => new()
+    private static JsonObject CreateIdentityAssignmentSchema() => Model.ProviderSemantics.Annotate(CreateIdentityAssignmentSchemaRaw(), typeof(Model.WellBoreIdentityAssignment));
+
+    private static JsonObject CreateIdentityAssignmentSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -576,7 +591,9 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("ID", "IdentityID", "Value"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateFeatureAssignmentSchema() => new()
+    private static JsonObject CreateFeatureAssignmentSchema() => Model.ProviderSemantics.Annotate(CreateFeatureAssignmentSchemaRaw(), typeof(Model.WellBoreFeatureAssignment));
+
+    private static JsonObject CreateFeatureAssignmentSchemaRaw() => new()
     {
         ["type"] = "object",
         ["properties"] = new JsonObject
@@ -590,7 +607,9 @@ internal static class McpToolArgumentHelpers
         ["required"] = new JsonArray("ID", "FeatureCategoryID", "FeatureOptionID"), ["additionalProperties"] = false
     };
 
-    private static JsonObject CreateMetaInfoSchema(string resource) => new()
+    private static JsonObject CreateMetaInfoSchema(string resource) => Model.ProviderSemantics.Annotate(CreateMetaInfoSchemaRaw(resource), typeof(OSDC.DotnetLibraries.General.DataManagement.MetaInfo));
+
+    private static JsonObject CreateMetaInfoSchemaRaw(string resource) => new()
     {
         ["type"] = "object",
         ["description"] = $"Identity and optional HTTP location metadata for the {resource}.",

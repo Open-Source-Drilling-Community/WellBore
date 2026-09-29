@@ -62,3 +62,7 @@ Example routing:
 <Router AppAssembly="@typeof(App).Assembly"
         AdditionalAssemblies="new[] { typeof(OSDC.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
 ```
+
+## SemanticCatalogue 0.8.0
+
+The generated client now comes from contracts annotated with SemanticCatalogue 0.8.0. These annotations do not add payload fields or change classification editing workflows. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.

@@ -64,8 +64,8 @@
                 carries <code>IsSidetrack = false</code> and no parent. A wellbore that branches off an existing one
                 instead carries <code>IsSidetrack = true</code>, a <code>ParentWellBoreID</code> pointing at the
                 wellbore it departs from, and a <code>TieInPointAlongHoleDepth</code> — the along-hole depth in the
-                parent where the sidetrack begins, always expressed in SI metres referenced to the WGS84 vertical
-                datum.
+                parent where the sidetrack begins, expressed in SI metres using the OSDC WGS84-referenced
+                measured-depth convention. It follows the parent path and is distinct from vertical depth.
             </MudText>
             <MudText Typo="Typo.body1">
                 Sidetracks are classified — <b>Technical</b> (drilled to bypass an obstruction or fish),

@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Collections.Generic;
 
@@ -85,8 +86,11 @@ public sealed class WellBoreBatchRestoreResponse
 public sealed class WellBoreBatchCatalogMapping
 {
     public string Catalog { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceName)]
     public string Name { get; set; } = string.Empty;
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid SourceID { get; set; }
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid LocalID { get; set; }
     public string Resolution { get; set; } = string.Empty;
 }

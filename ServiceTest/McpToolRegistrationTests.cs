@@ -170,11 +170,11 @@ public sealed class McpToolRegistrationTests
         Assert.That(Property(gaussian, "Mean")["type"], Is.TypeOf<JsonArray>());
         Assert.Multiple(() =>
         {
-            Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("meters (SI)"));
-            Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("WGS84 vertical datum"));
-            Assert.That(Property(gaussian, "Mean")["description"]?.GetValue<string>(), Does.Contain("meters (SI)"));
-            Assert.That(Property(gaussian, "Mean")["description"]?.GetValue<string>(), Does.Contain("WGS84 vertical datum"));
-            Assert.That(Property(gaussian, "StandardDeviation")["description"]?.GetValue<string>(), Does.Contain("meters (SI)"));
+            Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("SI metres (m)"));
+            Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("WGS84"));
+            Assert.That(Property(gaussian, "Mean")["x-osdc-semantic"]?["siUnit"]?.GetValue<string>(), Is.EqualTo("m"));
+            Assert.That(Property(gaussian, "Mean")["x-osdc-semantic"]?["reference"]?.GetValue<string>(), Is.EqualTo("urn:osdc:semantic:wgs84"));
+            Assert.That(Property(gaussian, "StandardDeviation")["x-osdc-semantic"]?["siUnit"]?.GetValue<string>(), Is.EqualTo("m"));
         });
 
         string[] sidetrackTypes = ((JsonArray)Property(wellBore, "SidetrackType")["enum"]!)

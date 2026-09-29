@@ -114,3 +114,11 @@ This project includes a DocFX configuration (`Model/docfx.json`) to build API do
 `WellBoreIdentity`, `WellBoreIdentityAssignment`, `WellBoreFeatureCategory`, `WellBoreFeatureOption` and `WellBoreFeatureAssignment` inherit their implementations from the published `OSDC.DotnetLibraries.General.ResourceClassification` 0.1.0 NuGet. The package reference is unconditional. `WellBoreFeatureCategory` uses `FeatureCategory<WellBoreFeatureOption>`, retaining concrete mutable options and the existing `IFeatureCategory` adapter. DataManagement 2.2.0 remains the owner of `MetaInfo` and the classification interfaces.
 
 Property names, nullability, timestamps and caller-assigned IDs retain their serialized shape. Constructors do not generate IDs or timestamps. Model contract tests round-trip existing JSON and exercise the interface adapter. The service continues to own catalogue contents, persistence and validation.
+
+## SemanticCatalogue 0.8.0
+
+`OSDC.DotnetLibraries.Drilling.SemanticCatalogue` 0.8.0 supplies the reviewed vocabulary. Local model attributes bind service-owned types and properties; `ProviderSemantics` binds inherited ResourceClassification 0.1.0 members and shared metadata without redefining those package-owned types. Resource identifiers remain UUIDs. Creation/modification timestamps and classification validity endpoints use UTC instant semantics; classification validity retains its inclusive endpoints.
+
+`TieInPointAlongHoleDepth` remains the existing Gaussian parent-wellbore measured-depth property, in SI metres under the OSDC WGS84 convention. `ParentWellBoreID` identifies the path. No additional reference property is introduced, and measured depth is not described as vertical depth. Drill-floor depth is vertical depth relative to WGS84. Means use `DepthDrilling`; standard uncertainties use `LengthStandard` in metres, without a coordinate origin. `MinValue`/`MaxValue` are domain-limit metadata, not confidence limits or Gaussian truncation instructions.
+
+Rig-job periods retain inclusive starts and exclusive ends (`[StartDate, EndDate)`), unlike classification validity intervals. Rig-owned depth is absent; job-owned depth remains required. Null versus empty RigJobs and the legacy projections retain their existing meanings.

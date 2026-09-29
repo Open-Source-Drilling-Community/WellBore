@@ -26,3 +26,7 @@ Enter `Y` when prompted, then build the solution and run the tests. Commit the s
 ## ResourceClassification 0.1.0 migration verification
 
 The service-specific classification types now inherit shared implementations. A fresh Service OpenAPI export was compared with the pre-migration export and this generator's checked-in service input: all paths and schemas are identical. Existing merged contracts and generated clients remain valid, so no generated source changes are required for this implementation-only migration.
+
+## SemanticCatalogue 0.8.0
+
+The checked-in service OpenAPI and sibling Well/WellBore input were refreshed for SemanticCatalogue 0.8.0, then the merged schema and C# client were regenerated. The generator processes the owning service last so its schemas take precedence over dependency snapshots; property-specific semantics on referenced types are preserved through `allOf`. Generated whitespace is normalized. Continue using the documented generator; do not hand-edit the client.
