@@ -95,7 +95,7 @@ namespace OSDC.Drilling.WellBore.Model
         [SemanticFact("GaussianUncertainty#01", Verbs.Enum.HasUncertaintyMean, "tie_in_point_along_hole_depth#01")]
         [DefaultStandardDeviation(0.01)] // 1 cm
         [Semantic(Concepts.GaussianUncertainValue)]
-        [GaussianQuantity(Concepts.TieInMeasuredDepth, Concepts.LinearStandardUncertainty, Reference = Concepts.Wgs84)]
+        [GaussianQuantity(Concepts.TieInAlongHoleDepth, Concepts.LinearStandardUncertainty, Reference = Concepts.Wgs84AlongHoleOrigin)]
         public GaussianDrillingProperty? TieInPointAlongHoleDepth { get; set; } = null;
         /// <summary>
         /// Deprecated compatibility projection of the SidetrackClassification feature assignment.

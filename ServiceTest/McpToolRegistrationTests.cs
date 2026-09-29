@@ -173,7 +173,7 @@ public sealed class McpToolRegistrationTests
             Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("SI metres (m)"));
             Assert.That(tieIn["description"]?.GetValue<string>(), Does.Contain("WGS84"));
             Assert.That(Property(gaussian, "Mean")["x-osdc-semantic"]?["siUnit"]?.GetValue<string>(), Is.EqualTo("m"));
-            Assert.That(Property(gaussian, "Mean")["x-osdc-semantic"]?["reference"]?.GetValue<string>(), Is.EqualTo("urn:osdc:semantic:wgs84"));
+            Assert.That(Property(gaussian, "Mean")["x-osdc-semantic"]?["reference"]?.GetValue<string>(), Is.EqualTo("urn:osdc:semantic:wgs84-along-hole-origin"));
             Assert.That(Property(gaussian, "StandardDeviation")["x-osdc-semantic"]?["siUnit"]?.GetValue<string>(), Is.EqualTo("m"));
         });
 

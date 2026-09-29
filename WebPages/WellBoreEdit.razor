@@ -97,14 +97,14 @@
             </MudItem>
             <MudItem xs="12" sm="4" md="4" lg="4">
                 <MudInputWithUnitAdornment QuantityName="DepthDrilling"
-                                           QuantityLabel="Tie-in MD on parent wellbore"
+                                           QuantityLabel="Tie-in along-hole depth on parent wellbore"
                                            DrillingSignalReference="@DrillingSignalReferenceType.Depth"
                                            SIValueNullable="_sidetrackDepth"
                                            SIValueNullableChanged="(val => _sidetrackDepth = val)" />
             </MudItem>
             <MudItem xs="12" sm="4" md="4" lg="4">
                 <MudInputWithUnitAdornment QuantityName="LengthStandard"
-                                           QuantityLabel="Tie-in MD standard uncertainty"
+                                           QuantityLabel="Tie-in along-hole standard uncertainty"
                                            SIValueNullable="_sidetrackDepthAccuracy"
                                            SIValueNullableChanged="@(val => _sidetrackDepthAccuracy = val)" />
 

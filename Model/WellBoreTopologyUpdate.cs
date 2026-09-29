@@ -34,7 +34,7 @@ public sealed class WellBoreTopologyUpdate
 
     [JsonRequired]
     [Semantic(Concepts.GaussianUncertainValue)]
-    [GaussianQuantity(Concepts.TieInMeasuredDepth, Concepts.LinearStandardUncertainty, Reference = Concepts.Wgs84)]
+    [GaussianQuantity(Concepts.TieInAlongHoleDepth, Concepts.LinearStandardUncertainty, Reference = Concepts.Wgs84AlongHoleOrigin)]
     public GaussianDrillingProperty? TieInPointAlongHoleDepth { get; set; }
 
     /// <summary>Deprecated compatibility fallback; use a SidetrackClassification feature assignment.</summary>

@@ -39331,14 +39331,14 @@ namespace OSDC.Drilling.WellBore.ModelShared
         public bool IsSidetrack { get; set; }
 
         /// <summary>
-        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ParentWellBoreID")]
         public System.Guid? ParentWellBoreID { get; set; }
 
         /// <summary>
-        /// Measured-depth coordinate of a sidetrack tie-in on the parent wellbore path, expressed using that parent path's MD origin. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84-referenced measured-depth convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
+        /// Along-hole coordinate of a sidetrack tie-in on the parent wellbore path, using the applicable reference convention. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84 path-intersection along-hole convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TieInPointAlongHoleDepth")]
@@ -39774,7 +39774,7 @@ namespace OSDC.Drilling.WellBore.ModelShared
     public partial class WellBoreExternalReferenceValidation
     {
         /// <summary>
-        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("WellBoreID")]
@@ -40156,14 +40156,14 @@ namespace OSDC.Drilling.WellBore.ModelShared
         public bool IsSidetrack { get; set; }
 
         /// <summary>
-        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.
+        /// UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("ParentWellBoreID")]
         public System.Guid? ParentWellBoreID { get; set; }
 
         /// <summary>
-        /// Measured-depth coordinate of a sidetrack tie-in on the parent wellbore path, expressed using that parent path's MD origin. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84-referenced measured-depth convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
+        /// Along-hole coordinate of a sidetrack tie-in on the parent wellbore path, using the applicable reference convention. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84 path-intersection along-hole convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("TieInPointAlongHoleDepth")]

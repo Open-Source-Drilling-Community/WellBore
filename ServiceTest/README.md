@@ -24,6 +24,11 @@ Run the complete suite with `dotnet test ServiceTest/ServiceTest.csproj` after s
 
 The ResourceClassification 0.1.0 adoption is covered by ModelTest/ClassificationContractTests (stored JSON compatibility, nullable references, concrete options and interface conversion), plus the existing isolated catalogue, backup/restore, database safety and MCP registration tests. Live HTTP tests require a separately started test service.
 
-## SemanticCatalogue 0.8.0
+## SemanticCatalogue 0.9.0
 
-`SemanticContractTests` verifies REST/MCP binding parity, inherited classification semantics and that published MCP bindings resolve to reviewed SemanticCatalogue 0.8.0 concepts. It also checks parent-path MD versus drill-floor depth, WGS84 references, LengthStandard uncertainties, rig-job endpoints/ownership and the absence of a new tie-in reference field.
+`SemanticContractTests` verifies REST/MCP binding parity, inherited classification semantics and that published MCP bindings resolve to reviewed SemanticCatalogue 0.9.0 concepts. It also checks parent-path along-hole depth versus drill-floor depth, WGS84 references, LengthStandard uncertainties, rig-job endpoints/ownership and the absence of a new tie-in reference field.
+
+
+## Canonical reference adoption (0.9.0)
+
+Semantic contract tests verify the 0.9.0 bindings and reviewed concepts. WellBore also asserts the WGS84 path-intersection origin, rejects a vertical-reference substitution and retains separate uncertainty semantics.

@@ -30,28 +30,8 @@ public static class ProviderSemantics
 
     public static JsonObject Metadata(string concept, string? role = null, string? reference = null)
     {
-        var catalogue = Catalogue.Default;
-        var definition = catalogue.Get(concept);
-        if (definition.Kind != SemanticKind.Noun ||
-            role != null && catalogue.Get(role).Kind != SemanticKind.Role ||
-            reference != null && catalogue.Get(reference).Kind != SemanticKind.Reference)
-            throw new InvalidOperationException("Invalid provider semantic binding.");
-        var result = new JsonObject
-        {
-            ["catalogue"] = catalogue.Document.Id, ["catalogueVersion"] = catalogue.Document.Version,
-            ["concept"] = concept, ["curationStatus"] = definition.Status.ToString(),
-            ["assertionSource"] = "provider-binding-registry",
-            ["requiredContext"] = new JsonArray(catalogue.RequiredContext(concept).Select(x => (JsonNode?)JsonValue.Create(x)).ToArray())
-        };
-        if (role != null) result["role"] = role;
-        if (reference != null) result["reference"] = reference;
-        if (catalogue.SiUnit(concept) is string unit) result["siUnit"] = unit;
-        if (catalogue.Quantity(concept) is QuantityIdentity q)
-        {
-            result["physicalQuantityStatus"] = "resolved";
-            result["physicalQuantity"] = new JsonObject { ["catalogue"] = q.Catalogue, ["id"] = q.Id.ToString(), ["name"] = q.Name, ["siUnitName"] = q.SiUnitName };
-        }
-        return result;
+        return SemanticMetadata.Create(concept, role, reference,
+            Catalogue.OsdcCanonicalDrilling, assertionSource: "provider-binding-registry");
     }
 
     public static JsonObject? ForType(Type type)
@@ -104,7 +84,7 @@ public static class ProviderSemantics
         string? referenceDescription = property.Name switch
         {
             "WellID" => "UUID of the referenced Well resource owned by the Well service.",
-            "WellBoreID" or "ParentWellBoreID" => "UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in MD.",
+            "WellBoreID" or "ParentWellBoreID" => "UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.",
             "ClusterID" => "UUID of the associated Cluster service resource.",
             "SlotID" => "UUID of a Slot owned by the associated Cluster.",
             "RigJobID" => "Stable UUID of this job within the containing WellBore history.",
@@ -125,7 +105,7 @@ public static class ProviderSemantics
             string unit = Catalogue.Default.SiUnit(gaussian.Measurand) == "rad" ? "radians (rad)" : "metres (m)";
             text = Catalogue.Default.Get(gaussian.Measurand).Definition +
                 $" GaussianValue.Mean is the expected value in SI {unit}, " +
-                (gaussian.Measurand == Concepts.TieInMeasuredDepth ? "Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84-referenced measured-depth convention; this is not a vertical depth. " : "Relative to the WGS84 ellipsoid, positive downward. ") +
+                (gaussian.Measurand == Concepts.TieInAlongHoleDepth ? "Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84 path-intersection along-hole convention; this is not a vertical depth. " : "Relative to the WGS84 ellipsoid, positive downward. ") +
                 $"StandardDeviation is a non-negative standard uncertainty in SI {unit}; it has no coordinate origin. " +
                 "MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.";
         }

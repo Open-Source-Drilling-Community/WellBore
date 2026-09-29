@@ -47,7 +47,7 @@ public class SemanticContractTests
     {
         var rest = Rest(typeof(Model.WellBore));
         var mcp = Mcp("well_bore_get_by_id")["properties"]!["data"]!;
-        Assert.That(rest[Extension]!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.8.0"));
+        Assert.That(rest[Extension]!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.9.0"));
         Assert.That(JsonNode.DeepEquals(rest[Extension], mcp[Extension]), Is.True);
         var category = Rest(typeof(Model.WellBoreFeatureCategory));
         Assert.That(category[Extension]!["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.FeatureCategory));
@@ -74,7 +74,7 @@ public class SemanticContractTests
                     if (obj["concept"] != null)
                     {
                         count++;
-                        Assert.That(obj["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.8.0"));
+                        Assert.That(obj["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.9.0"));
                         Assert.That(obj["curationStatus"]!.GetValue<string>(), Is.EqualTo("Reviewed"));
                         Assert.That(SemanticCatalogue.Default.Get(obj["concept"]!.GetValue<string>()).Status, Is.EqualTo(CurationStatus.Reviewed));
                     }
@@ -89,7 +89,7 @@ public class SemanticContractTests
 
 
     [Test]
-    public void TieInIsParentMeasuredDepthAndRigJobsKeepTheirTimeAndOwnershipSemantics()
+    public void TieInIsParentAlongHoleCoordinateAndRigJobsKeepTheirTimeAndOwnershipSemantics()
     {
         var rest = Rest(typeof(Model.WellBore));
         var mcp = Mcp("well_bore_get_by_id")["properties"]!["data"]!["properties"]!;
@@ -97,8 +97,13 @@ public class SemanticContractTests
         var bindings = tie[ProviderSemantics.NestedBindingsExtension]!;
         Assert.That(JsonNode.DeepEquals(bindings, rest["properties"]!["TieInPointAlongHoleDepth"]![ProviderSemantics.NestedBindingsExtension]), Is.True);
         var mean = bindings["/GaussianValue/Mean"]!;
-        Assert.That(mean["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.TieInMeasuredDepth));
-        Assert.That(mean["reference"]!.GetValue<string>(), Is.EqualTo(Concepts.Wgs84));
+        Assert.That(mean["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.TieInAlongHoleDepth));
+        Assert.That(mean["reference"]!.GetValue<string>(), Is.EqualTo(Concepts.Wgs84AlongHoleOrigin));
+        Assert.That(mean["referenceProfile"]!.GetValue<string>(), Is.EqualTo(SemanticCatalogue.OsdcCanonicalDrilling));
+        Assert.That(mean["referenceScope"]!.GetValue<string>(), Is.EqualTo("canonical-storage-and-api"));
+        Assert.That(mean["presentationReferencesAllowed"]!.GetValue<bool>(), Is.True);
+        Assert.That(mean["referenceDefinition"]!.GetValue<string>(), Does.Contain("intersection"));
+        Assert.Throws<InvalidDataException>(() => ProviderSemantics.Metadata(Concepts.TieInAlongHoleDepth, reference: Concepts.Wgs84));
         Assert.That(mean["physicalQuantity"]!["name"]!.GetValue<string>(), Is.EqualTo("DepthDrilling"));
         Assert.That(bindings["/GaussianValue/StandardDeviation"]!["physicalQuantity"]!["name"]!.GetValue<string>(), Is.EqualTo("LengthStandard"));
         Assert.That(bindings["/GaussianValue/StandardDeviation"]!["reference"], Is.Null);

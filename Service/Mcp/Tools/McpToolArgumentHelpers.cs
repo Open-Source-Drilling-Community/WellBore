@@ -421,7 +421,7 @@ internal static class McpToolArgumentHelpers
         return new JsonObject
         {
             ["type"] = new JsonArray { "object", "null" },
-            ["description"] = "For a sidetrack, the along-hole depth of the tie-in point in its parent wellbore, represented as a Gaussian drilling property. Values are always expressed in meters (SI) and using the OSDC WGS84-referenced MD convention on the parent wellbore; convert display units to SI before calling the service; measured depth is not vertical depth.",
+            ["description"] = "For a sidetrack, the along-hole depth of the tie-in point in its parent wellbore, represented as a Gaussian drilling property. Values are always expressed in meters (SI) and using the OSDC WGS84 path-intersection along-hole convention on the parent wellbore; convert display units to SI before calling the service; measured depth is not vertical depth.",
             ["properties"] = new JsonObject
             {
                 ["GaussianValue"] = new JsonObject
@@ -433,14 +433,14 @@ internal static class McpToolArgumentHelpers
                         ["MinValue"] = new JsonObject
                         {
                             ["type"] = "number",
-                            ["description"] = "Minimum tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."
+                            ["description"] = "Minimum tie-in depth in meters (SI), using the OSDC WGS84 path-intersection along-hole convention on the parent wellbore."
                         },
                         ["MaxValue"] = new JsonObject
                         {
                             ["type"] = "number",
-                            ["description"] = "Maximum tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."
+                            ["description"] = "Maximum tie-in depth in meters (SI), using the OSDC WGS84 path-intersection along-hole convention on the parent wellbore."
                         },
-                        ["Mean"] = NullableNumber("Mean tie-in depth in meters (SI), using the OSDC WGS84-referenced MD convention on the parent wellbore."),
+                        ["Mean"] = NullableNumber("Mean tie-in depth in meters (SI), using the OSDC WGS84 path-intersection along-hole convention on the parent wellbore."),
                         ["StandardDeviation"] = NullableNumber("Standard deviation expressing uncertainty in the tie-in depth, in meters (SI).")
                     },
                     ["additionalProperties"] = false
