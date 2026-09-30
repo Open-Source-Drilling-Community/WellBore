@@ -22,3 +22,5 @@ dotnet run --project ModelSharedOut
 ```
 
 Enter `Y` when prompted, then build the solution and run the tests. Commit the service schema, merged document, and generated C# client together.
+
+`ClientJsonSerializerSettings.cs` is a maintained partial-client extension, not generated output. It registers `JsonStringEnumConverter` because NSwag does not attach an item converter to arrays of string enums such as `StationKeepingSystem.Modes`. Keep it linked into WebPages when regenerating `WellBoreMergedModel.cs`.

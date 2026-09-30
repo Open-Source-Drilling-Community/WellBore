@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Include="..\ModelSharedOut\WellBoreMergedModel.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
+		<Compile Include="..\ModelSharedOut\WellBoreMergedModel.cs;..\ModelSharedOut\ClientJsonSerializerSettings.cs" Link="GeneratedDtos\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 </Project>

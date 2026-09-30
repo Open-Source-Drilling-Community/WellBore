@@ -27,6 +27,8 @@ Their shared `Rotary table`/`RTE` depth choice resolves the latest rig job: it u
 The package depends on:
 
 - `ModelSharedOut`
+
+The linked generated client is accompanied by `ModelSharedOut/ClientJsonSerializerSettings.cs`, which preserves OpenAPI string-enum semantics for enum collections in dependency responses, including Rig station-keeping modes.
 - `OSDC.DotnetLibraries.Drilling.WebAppUtils`
 - `OSDC.DotnetLibraries.General.Math`
 - `MudBlazor`
