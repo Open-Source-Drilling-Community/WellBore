@@ -1925,7 +1925,27 @@
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "HttpHostName": {
             "type": "string",
@@ -1940,7 +1960,20 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-metadata",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-binding-registry",
+          "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+          "referenceProfileVersion": "1.0.0",
+          "referenceScope": "canonical-storage-and-api",
+          "presentationReferencesAllowed": true,
+          "requiredContext": [ ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.Well.Model.CountPerDay": {
         "type": "object",
@@ -2014,38 +2047,148 @@
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Description": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable descriptive text about a resource.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-description",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "SlotID": {
             "type": "string",
+            "description": "UUID of a Slot owned by the associated Cluster.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "ClusterID": {
             "type": "string",
+            "description": "UUID of the associated Cluster service resource.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "IsSingleWell": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean declaration that a cluster represents a single-well site rather than a multi-well grouping.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:single-well-cluster-flag",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "WellIdentityAssignments": {
             "type": "array",
@@ -2062,7 +2205,21 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:well",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning Well service",
+            "associated cluster and slot when known",
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellBatchCatalogDependencies": {
         "type": "object",
@@ -2093,15 +2250,57 @@
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "SourceID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "LocalID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Resolution": {
             "type": "string",
@@ -2288,11 +2487,31 @@
         "properties": {
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Description": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable descriptive text about a resource.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-description",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           }
         },
         "additionalProperties": false
@@ -2396,17 +2615,65 @@
         "properties": {
           "WellID": {
             "type": "string",
-            "format": "uuid"
+            "description": "UUID of the referenced Well resource owned by the Well service.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "ClusterID": {
             "type": "string",
+            "description": "UUID of the associated Cluster service resource.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "SlotID": {
             "type": "string",
+            "description": "UUID of a Slot owned by the associated Cluster.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "ClusterExists": {
             "type": "boolean",
@@ -2446,46 +2713,232 @@
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FeatureCategoryID": {
             "type": "string",
+            "description": "UUID of the selected category in the owning service catalogue.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FeatureOptionID": {
             "type": "string",
+            "description": "UUID of an option belonging to the selected category.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FromDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:validity-start",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "ToDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:validity-end",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-assignment",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "assigned resource",
+            "category",
+            "option belonging to category"
+          ],
+          "constraints": [
+            "The assignment, category and option have distinct identity roles.",
+            "Null references describe an unlinked draft only when permitted by the provider."
+          ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellFeatureCategory": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "IsExclusive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean rule declaring that at most one category assignment may be active on a resource at the same instant.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:category-exclusivity",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "category",
+                "validity interpretation"
+              ],
+              "constraints": [
+                "For undated categories, exclusivity permits at most one assignment.",
+                "Repeated assignments of the same option also count as multiple assignments."
+              ]
+            }
           },
           "HasValidityPeriod": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean rule indicating whether assignments in a category may carry validity bounds.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:category-validity-period-enabled",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [
+                "Support for validity bounds does not imply that both bounds must be supplied."
+              ]
+            }
           },
           "Options": {
             "type": "array",
@@ -2496,72 +2949,332 @@
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-category",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellFeatureOption": {
         "type": "object",
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-option",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning category"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellIdentity": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-identity-definition",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [
+            "Not an authentication identity or the resource UUID."
+          ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellIdentityAssignment": {
         "type": "object",
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "IdentityID": {
             "type": "string",
+            "description": "UUID of the selected identity definition in the owning service catalogue.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Value": {
             "type": "string",
-            "nullable": true
+            "description": "Value identifying a resource within a selected identification scheme; its interpretation and uniqueness depend on that scheme.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identity-value",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identity definition",
+                "identified resource"
+              ],
+              "constraints": [
+                "Do not infer global uniqueness or UUID syntax from this value."
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-identity-assignment",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "assigned resource",
+            "identity definition"
+          ],
+          "constraints": [
+            "The assignment UUID is distinct from the definition UUID and the identified resource UUID."
+          ]
+        }
       },
       "OSDC.Drilling.Well.Model.WellLocationUpdate": {
         "required": [
@@ -2573,16 +3286,58 @@
         "properties": {
           "ClusterID": {
             "type": "string",
+            "description": "UUID of the associated Cluster service resource.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "SlotID": {
             "type": "string",
+            "description": "UUID of a Slot owned by the associated Cluster.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "IsSingleWell": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean declaration that a cluster represents a single-well site rather than a multi-well grouping.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:single-well-cluster-flag",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           }
         },
         "additionalProperties": false

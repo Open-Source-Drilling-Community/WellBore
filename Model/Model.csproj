@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -22,6 +22,8 @@
 		<PackageReference Include="OSDC.DotnetLibraries.Drilling.DrillingProperties" Version="10.2.2-build.98" />
 		<PackageReference Include="OSDC.DotnetLibraries.General.Common" Version="1.0.9" />
 		<PackageReference Include="OSDC.DotnetLibraries.General.DataManagement" Version="2.2.0" />
+		<PackageReference Include="OSDC.DotnetLibraries.Drilling.SemanticCatalogue" Version="0.9.0" />
+		<PackageReference Include="OSDC.DotnetLibraries.General.ResourceClassification" Version="0.1.0" />
 		<PackageReference Include="OSDC.DotnetLibraries.General.Statistics" Version="3.1.1" />
 	</ItemGroup>
 

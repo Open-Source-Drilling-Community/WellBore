@@ -1651,7 +1651,27 @@
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "HttpHostName": {
             "type": "string",
@@ -1666,7 +1686,20 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-metadata",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-binding-registry",
+          "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+          "referenceProfileVersion": "1.0.0",
+          "referenceScope": "canonical-storage-and-api",
+          "presentationReferencesAllowed": true,
+          "requiredContext": [ ],
+          "constraints": [ ]
+        }
       },
       "OSDC.DotnetLibraries.General.Statistics.GaussianDistribution": {
         "type": "object",
@@ -1732,29 +1765,297 @@
         "properties": {
           "RigJobID": {
             "type": "string",
-            "format": "uuid"
+            "description": "Stable UUID of this job within the containing WellBore history.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigID": {
             "type": "string",
-            "format": "uuid"
+            "description": "UUID of the associated resource owned by the Rig service.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "StartDate": {
             "type": "string",
-            "format": "date-time"
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
+            "format": "date-time",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:rig-job-start",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "EndDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:rig-job-end",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "DrillFloorDepthSource": {
-            "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.DrillFloorDepthSource"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.DrillFloorDepthSource"
+              }
+            ],
+            "description": "Discriminator identifying whether the authoritative drill-floor depth belongs to the referenced rig or to the rig-job entry.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:drill-floor-depth-source",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "rig job",
+                "associated rig and its type"
+              ],
+              "constraints": [
+                "Rig means resolve depth from the referenced fixed-platform rig; job-local depth is forbidden.",
+                "RigJob means the entry owns the depth; job-local depth is required.",
+                "Undefined is a transport default, not a valid resolved ownership state.",
+                "Ownership does not specify measurement provenance or coordinate reference."
+              ]
+            }
           },
           "DrillFloorDepth": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+              }
+            ],
+            "description": "Vertical depth coordinate locating the drill floor relative to the declared vertical reference. GaussianValue.Mean is the expected value in SI metres (m), Relative to the WGS84 ellipsoid, positive downward. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:gaussian-uncertain-value",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "underlying measurand concept",
+                "physical quantity and units",
+                "interpretation of optional bounds"
+              ],
+              "constraints": [
+                "The wrapper has no universal physical quantity; angle and depth instances share this representation.",
+                "A null standard deviation means unspecified, not zero.",
+                "Bounds do not imply a confidence interval or truncated-normal model without an explicit provider definition."
+              ]
+            },
+            "x-osdc-semantic-bindings": {
+              "/GaussianValue/Mean": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:drill-floor-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:expected-value",
+                "reference": "urn:osdc:semantic:wgs84",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "rig",
+                  "applicable rig job or time",
+                  "vertical reference",
+                  "depth ownership source",
+                  "reference",
+                  "axis/sign convention"
+                ],
+                "constraints": [
+                  "The WellBore provider stores WGS84 ellipsoidal depth in metres, positive downward; another reference must be declared explicitly.",
+                  "A depth position is distinct from its standard uncertainty.",
+                  "Positions are not additive extents.",
+                  "A quantity of length does not make depth positions summable."
+                ],
+                "referenceDefinition": "WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch.",
+                "referenceRequiredContext": [ ]
+              },
+              "/GaussianValue/StandardDeviation": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:linear-standard-uncertainty",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion",
+                  "id": "3716ad37-2b0c-4c0b-8936-6c9cdb47ad1d",
+                  "name": "LengthStandard",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "underlying measurand",
+                  "distribution",
+                  "physical quantity and units"
+                ],
+                "constraints": [
+                  "Uses the same unit dimension as the scalar measurand, not its squared unit.",
+                  "A reference surface does not offset a standard deviation."
+                ]
+              },
+              "/GaussianValue/MinValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:drill-floor-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-lower-bound",
+                "reference": "urn:osdc:semantic:wgs84",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "rig",
+                  "applicable rig job or time",
+                  "vertical reference",
+                  "depth ownership source",
+                  "reference",
+                  "axis/sign convention"
+                ],
+                "constraints": [
+                  "The WellBore provider stores WGS84 ellipsoidal depth in metres, positive downward; another reference must be declared explicitly.",
+                  "A depth position is distinct from its standard uncertainty.",
+                  "Positions are not additive extents.",
+                  "A quantity of length does not make depth positions summable."
+                ],
+                "referenceDefinition": "WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch.",
+                "referenceRequiredContext": [ ]
+              },
+              "/GaussianValue/MaxValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:drill-floor-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-upper-bound",
+                "reference": "urn:osdc:semantic:wgs84",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "rig",
+                  "applicable rig job or time",
+                  "vertical reference",
+                  "depth ownership source",
+                  "reference",
+                  "axis/sign convention"
+                ],
+                "constraints": [
+                  "The WellBore provider stores WGS84 ellipsoidal depth in metres, positive downward; another reference must be declared explicitly.",
+                  "A depth position is distinct from its standard uncertainty.",
+                  "Positions are not additive extents.",
+                  "A quantity of length does not make depth positions summable."
+                ],
+                "referenceDefinition": "WGS84 geodetic latitude/longitude with Greenwich origin and ellipsoidal depth positive downward; not a fully specified terrestrial frame realization or epoch.",
+                "referenceRequiredContext": [ ]
+              }
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:rig-job",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "containing wellbore",
+            "associated rig",
+            "job period",
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [
+            "A rig job is not a rig and does not imply the rig exclusively served this wellbore globally."
+          ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.SidetrackType": {
         "enum": [
@@ -1817,36 +2118,136 @@
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Description": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable descriptive text about a resource.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-description",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "WellID": {
             "type": "string",
+            "description": "UUID of the referenced Well resource owned by the Well service.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigID": {
             "type": "string",
+            "description": "UUID of the associated resource owned by the Rig service.",
             "format": "uuid",
             "nullable": true,
-            "deprecated": true
+            "deprecated": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigJobs": {
             "type": "array",
@@ -1856,15 +2257,243 @@
             "nullable": true
           },
           "IsSidetrack": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean declaration that a wellbore is a branch of a parent wellbore.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:sidetrack-flag",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "wellbore",
+                "parent wellbore when true"
+              ],
+              "constraints": [ ]
+            }
           },
           "ParentWellBoreID": {
             "type": "string",
+            "description": "UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "TieInPointAlongHoleDepth": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+              }
+            ],
+            "description": "Along-hole coordinate of a sidetrack tie-in on the parent wellbore path, using the applicable reference convention. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84 path-intersection along-hole convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:gaussian-uncertain-value",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "underlying measurand concept",
+                "physical quantity and units",
+                "interpretation of optional bounds"
+              ],
+              "constraints": [
+                "The wrapper has no universal physical quantity; angle and depth instances share this representation.",
+                "A null standard deviation means unspecified, not zero.",
+                "Bounds do not imply a confidence interval or truncated-normal model without an explicit provider definition."
+              ]
+            },
+            "x-osdc-semantic-bindings": {
+              "/GaussianValue/Mean": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:expected-value",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              },
+              "/GaussianValue/StandardDeviation": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:linear-standard-uncertainty",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion",
+                  "id": "3716ad37-2b0c-4c0b-8936-6c9cdb47ad1d",
+                  "name": "LengthStandard",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "underlying measurand",
+                  "distribution",
+                  "physical quantity and units"
+                ],
+                "constraints": [
+                  "Uses the same unit dimension as the scalar measurand, not its squared unit.",
+                  "A reference surface does not offset a standard deviation."
+                ]
+              },
+              "/GaussianValue/MinValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-lower-bound",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              },
+              "/GaussianValue/MaxValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-upper-bound",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              }
+            }
           },
           "SidetrackType": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.SidetrackType"
@@ -1884,7 +2513,21 @@
             "nullable": true
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:wellbore",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning WellBore service",
+            "associated well when known",
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreBatchCatalogDependencies": {
         "type": "object",
@@ -1915,15 +2558,57 @@
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "SourceID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "LocalID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Resolution": {
             "type": "string",
@@ -2110,11 +2795,31 @@
         "properties": {
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Description": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable descriptive text about a resource.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-description",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           }
         },
         "additionalProperties": false
@@ -2218,17 +2923,65 @@
         "properties": {
           "WellBoreID": {
             "type": "string",
-            "format": "uuid"
+            "description": "UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "WellID": {
             "type": "string",
+            "description": "UUID of the referenced Well resource owned by the Well service.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigID": {
             "type": "string",
+            "description": "UUID of the associated resource owned by the Rig service.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "WellExists": {
             "type": "boolean",
@@ -2268,46 +3021,232 @@
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FeatureCategoryID": {
             "type": "string",
+            "description": "UUID of the selected category in the owning service catalogue.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FeatureOptionID": {
             "type": "string",
+            "description": "UUID of an option belonging to the selected category.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "FromDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:validity-start",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "ToDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:validity-end",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-assignment",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "assigned resource",
+            "category",
+            "option belonging to category"
+          ],
+          "constraints": [
+            "The assignment, category and option have distinct identity roles.",
+            "Null references describe an unlinked draft only when permitted by the provider."
+          ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreFeatureCategory": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "IsExclusive": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean rule declaring that at most one category assignment may be active on a resource at the same instant.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:category-exclusivity",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "category",
+                "validity interpretation"
+              ],
+              "constraints": [
+                "For undated categories, exclusivity permits at most one assignment.",
+                "Repeated assignments of the same option also count as multiple assignments."
+              ]
+            }
           },
           "HasValidityPeriod": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean rule indicating whether assignments in a category may carry validity bounds.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:category-validity-period-enabled",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [
+                "Support for validity bounds does not imply that both bounds must be supplied."
+              ]
+            }
           },
           "Options": {
             "type": "array",
@@ -2318,72 +3257,332 @@
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-category",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreFeatureOption": {
         "type": "object",
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:feature-option",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning category"
+          ],
+          "constraints": [ ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreIdentity": {
         "type": "object",
         "properties": {
           "MetaInfo": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.General.DataManagement.MetaInfo"
+              }
+            ],
+            "description": "Identity and service-location metadata accompanying a managed resource; a locator is not the semantic identity.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-metadata",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "Name": {
             "type": "string",
-            "nullable": true
+            "description": "Human-readable name of a resource, definition or option; not necessarily unique or stable.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-name",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [ ],
+              "constraints": [ ]
+            }
           },
           "CreationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:creation-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           },
           "LastModificationDate": {
             "type": "string",
+            "description": "A position on a time axis identified using a declared time scale and representation. Neither elapsed duration nor a calendar date alone. Reference: Coordinated Universal Time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:instant",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "role": "urn:osdc:semantic:last-modification-time",
+              "reference": "urn:osdc:semantic:utc",
+              "requiredContext": [
+                "time scale",
+                "timestamp representation"
+              ],
+              "constraints": [ ],
+              "referenceDefinition": "UTC time-scale reference for a timestamp. Accepted serialization and representable precision are provider concerns.",
+              "referenceRequiredContext": [ ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-identity-definition",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "owning service",
+            "resource type"
+          ],
+          "constraints": [
+            "Not an authentication identity or the resource UUID."
+          ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreIdentityAssignment": {
         "type": "object",
         "properties": {
           "ID": {
             "type": "string",
-            "format": "uuid"
+            "description": "A UUID identifying a resource, nested object, catalogue definition, option or assignment in a declared ownership and type scope.",
+            "format": "uuid",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "IdentityID": {
             "type": "string",
+            "description": "UUID of the selected identity definition in the owning service catalogue.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "Value": {
             "type": "string",
-            "nullable": true
+            "description": "Value identifying a resource within a selected identification scheme; its interpretation and uniqueness depend on that scheme.",
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identity-value",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "1.0.0",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
+              "requiredContext": [
+                "identity definition",
+                "identified resource"
+              ],
+              "constraints": [
+                "Do not infer global uniqueness or UUID syntax from this value."
+              ]
+            }
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "x-osdc-semantic": {
+          "catalogue": "urn:osdc:semantic-catalogue",
+          "catalogueVersion": "0.9.0",
+          "concept": "urn:osdc:semantic:resource-identity-assignment",
+          "curationStatus": "Reviewed",
+          "assertionSource": "provider-model-attribute",
+          "requiredContext": [
+            "assigned resource",
+            "identity definition"
+          ],
+          "constraints": [
+            "The assignment UUID is distinct from the definition UUID and the identified resource UUID."
+          ]
+        }
       },
       "OSDC.Drilling.WellBore.Model.WellBoreMutationError": {
         "type": "object",
@@ -2470,14 +3669,46 @@
         "properties": {
           "WellID": {
             "type": "string",
+            "description": "UUID of the referenced Well resource owned by the Well service.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigID": {
             "type": "string",
+            "description": "UUID of the associated resource owned by the Rig service.",
             "format": "uuid",
             "nullable": true,
-            "deprecated": true
+            "deprecated": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "RigJobs": {
             "type": "array",
@@ -2487,15 +3718,243 @@
             "nullable": true
           },
           "IsSidetrack": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Boolean declaration that a wellbore is a branch of a parent wellbore.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:sidetrack-flag",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "wellbore",
+                "parent wellbore when true"
+              ],
+              "constraints": [ ]
+            }
           },
           "ParentWellBoreID": {
             "type": "string",
+            "description": "UUID of the referenced WellBore resource; ParentWellBoreID identifies the parent path for tie-in along-hole depth.",
             "format": "uuid",
-            "nullable": true
+            "nullable": true,
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:resource-identifier",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "identified object type",
+                "owning service or containing resource"
+              ],
+              "constraints": [
+                "A display name or assigned external identity value is not this UUID.",
+                "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+              ]
+            }
           },
           "TieInPointAlongHoleDepth": {
-            "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OSDC.DotnetLibraries.Drilling.DrillingProperties.GaussianDrillingProperty"
+              }
+            ],
+            "description": "Along-hole coordinate of a sidetrack tie-in on the parent wellbore path, using the applicable reference convention. GaussianValue.Mean is the expected value in SI metres (m), Along the parent wellbore identified by ParentWellBoreID, using the OSDC WGS84 path-intersection along-hole convention; this is not a vertical depth. StandardDeviation is a non-negative standard uncertainty in SI metres (m); it has no coordinate origin. MinValue and MaxValue are provider domain-limit metadata in the mean's unit and reference, not confidence limits or instructions to truncate the Gaussian distribution.",
+            "x-osdc-semantic": {
+              "catalogue": "urn:osdc:semantic-catalogue",
+              "catalogueVersion": "0.9.0",
+              "concept": "urn:osdc:semantic:gaussian-uncertain-value",
+              "curationStatus": "Reviewed",
+              "assertionSource": "provider-model-attribute",
+              "requiredContext": [
+                "underlying measurand concept",
+                "physical quantity and units",
+                "interpretation of optional bounds"
+              ],
+              "constraints": [
+                "The wrapper has no universal physical quantity; angle and depth instances share this representation.",
+                "A null standard deviation means unspecified, not zero.",
+                "Bounds do not imply a confidence interval or truncated-normal model without an explicit provider definition."
+              ]
+            },
+            "x-osdc-semantic-bindings": {
+              "/GaussianValue/Mean": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:expected-value",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              },
+              "/GaussianValue/StandardDeviation": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:linear-standard-uncertainty",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion",
+                  "id": "3716ad37-2b0c-4c0b-8936-6c9cdb47ad1d",
+                  "name": "LengthStandard",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "underlying measurand",
+                  "distribution",
+                  "physical quantity and units"
+                ],
+                "constraints": [
+                  "Uses the same unit dimension as the scalar measurand, not its squared unit.",
+                  "A reference surface does not offset a standard deviation."
+                ]
+              },
+              "/GaussianValue/MinValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-lower-bound",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              },
+              "/GaussianValue/MaxValue": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.9.0",
+                "concept": "urn:osdc:semantic:tie-in-along-hole-depth",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "1.0.0",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "role": "urn:osdc:semantic:distribution-upper-bound",
+                "reference": "urn:osdc:semantic:wgs84-along-hole-origin",
+                "siUnit": "m",
+                "physicalQuantityStatus": "resolved",
+                "physicalQuantity": {
+                  "catalogue": "Conversion.DrillingEngineering",
+                  "id": "c0d965b2-a153-420a-9d03-7a2a272d619e",
+                  "name": "DepthDrilling",
+                  "siUnitName": "metre"
+                },
+                "requiredContext": [
+                  "sidetrack wellbore",
+                  "parent wellbore",
+                  "wellbore path and applicable realization",
+                  "reference",
+                  "axis/sign convention",
+                  "axis or path",
+                  "coordinate origin",
+                  "increasing direction",
+                  "physical quantity specialization"
+                ],
+                "constraints": [
+                  "Use the parent path, not the child path or a vertical depth.",
+                  "Not a vertical depth or an additive segment length.",
+                  "Acquisition provenance is independent of the coordinate concept.",
+                  "OSDC canonical storage and API values use the WGS84 reference convention; display/import references require explicit conversion.",
+                  "Positions are not additive extents.",
+                  "Differences require the same path, origin and direction.",
+                  "A curve coordinate does not imply a vertical datum.",
+                  "A quantity of length does not make depth positions summable.",
+                  "This denotes a position coordinate, not an additive segment extent."
+                ],
+                "referenceDefinition": "Zero along-hole depth is the intersection of the oriented wellbore path, or its defined extension, with the WGS84 ellipsoid. The coordinate is signed accumulated arc length from that intersection along the declared path orientation. It is not obtained by adding or subtracting a vertical elevation offset.",
+                "referenceRequiredContext": [
+                  "wellbore path and extension model",
+                  "selected intersection when multiple intersections exist",
+                  "increasing path direction"
+                ]
+              }
+            }
           },
           "SidetrackType": {
             "$ref": "#/components/schemas/OSDC.Drilling.WellBore.Model.SidetrackType"

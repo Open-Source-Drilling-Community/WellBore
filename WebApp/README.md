@@ -118,3 +118,15 @@ The current work has been funded by the [Research Council of Norway](https://www
 The external Razor assembly registration in `ExternalRazorAssemblies.cs` must remain synchronized with the OSDC shared-page package references when they are upgraded. Earth Vertical Datum, Earth Gravity, and Earth Magnetic Field calculators are exposed through local wrapper pages so the packages' unrelated routes, including their Home pages, are not imported into the WellBore router.
 
 The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses OSDC DNS names for WellBore, Well, Field, Cluster, Rig, and all calculator services. The trajectory service retains its existing DNS name until that separate microservice is migrated.
+
+## SemanticCatalogue 0.9.0
+
+The host consumes regenerated clients from the SemanticCatalogue 0.9.0 contracts. Existing routes, configuration and persistence are unchanged. The Home page distinguishes parent-wellbore tie-in along-hole depth from vertical depth while retaining the OSDC WGS84 convention.
+
+
+## Canonical reference adoption (0.9.0)
+
+The tie-in editor retains user-selected presentation references (including MSL and mud line/ground level) through the existing reference-aware component. Internal/API values remain WGS84-referenced along-hole coordinates; the selected display reference is converted at the presentation boundary.
+
+
+Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.

@@ -154,7 +154,9 @@ class Program
                         };
 
                         // Reading locally stored dependencies
-                        IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json");
+                        IEnumerable<string> files = Directory.EnumerateFiles(jsonInputsDirectory, "*.json")
+                            .OrderBy(path => string.Equals(Path.GetFileName(path), "WellBoreFullName.json", StringComparison.OrdinalIgnoreCase) ? 1 : 0)
+                            .ThenBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase);
                         foreach (string file in files)
                         {
                             PrettyPrint(file, "Processing Open Api doc into API client...");
@@ -213,6 +215,8 @@ class Program
                         };
                         var generator = new CSharpClientGenerator(nswDocument, settings);
                         var code = generator.GenerateFile();
+                        code = string.Join(Environment.NewLine,
+                            code.Split(["\r\n", "\n"], StringSplitOptions.None).Select(line => line.TrimEnd()));
                         using (StreamWriter writer = new StreamWriter(modelSharedDir + Path.DirectorySeparatorChar + CSHARP_MODEL))
                         {
                             writer.WriteLine(code);

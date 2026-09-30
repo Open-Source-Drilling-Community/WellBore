@@ -1,4 +1,5 @@
 using Microsoft.Data.Sqlite;
+using OSDC.DotnetLibraries.General.ResourceClassification;
 using OSDC.Drilling.WellBore.Model;
 using System;
 using System.Collections.Generic;
@@ -291,8 +292,7 @@ internal static class WellBoreReferenceIntegrityValidator
     }
 
     private static bool PeriodsOverlap(WellBoreFeatureAssignment left, WellBoreFeatureAssignment right) =>
-        (left.ToDate is null || right.FromDate is null || left.ToDate >= right.FromDate) &&
-        (right.ToDate is null || left.FromDate is null || right.ToDate >= left.FromDate);
+        ClassificationValidation.IntervalsOverlap(left.FromDate, left.ToDate, right.FromDate, right.ToDate);
 
     private static WellBoreMutationError? FindReferences(SqliteConnection connection, SqliteTransaction transaction,
         Func<Model.WellBore, bool> predicate, string property, string code, string message)

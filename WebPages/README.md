@@ -64,3 +64,15 @@ Example routing:
 <Router AppAssembly="@typeof(App).Assembly"
         AdditionalAssemblies="new[] { typeof(OSDC.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
 ```
+
+## SemanticCatalogue 0.9.0
+
+The generated client now comes from contracts annotated with SemanticCatalogue 0.9.0. These annotations do not add payload fields or change classification editing workflows. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.
+
+
+## Canonical reference adoption (0.9.0)
+
+The tie-in editor retains user-selected presentation references (including MSL and mud line/ground level) through the existing reference-aware component. Internal/API values remain WGS84-referenced along-hole coordinates; the selected display reference is converted at the presentation boundary.
+
+
+Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.

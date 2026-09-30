@@ -1,3 +1,4 @@
+using OSDC.DotnetLibraries.Drilling.SemanticCatalogue;
 using System;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
@@ -9,10 +10,12 @@ namespace OSDC.Drilling.WellBore.Model;
 public sealed class WellBoreTopologyUpdate
 {
     [JsonRequired]
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid? WellID { get; set; }
 
     [JsonRequired]
     [Obsolete("Use RigJobs. RigID is retained temporarily for compatibility during migration.")]
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid? RigID { get; set; }
 
     /// <summary>
@@ -22,12 +25,16 @@ public sealed class WellBoreTopologyUpdate
     public List<RigJob>? RigJobs { get; set; }
 
     [JsonRequired]
+    [Semantic(Concepts.SidetrackFlag)]
     public bool IsSidetrack { get; set; }
 
     [JsonRequired]
+    [Semantic(Concepts.ResourceIdentifier)]
     public Guid? ParentWellBoreID { get; set; }
 
     [JsonRequired]
+    [Semantic(Concepts.GaussianUncertainValue)]
+    [GaussianQuantity(Concepts.TieInAlongHoleDepth, Concepts.LinearStandardUncertainty, Reference = Concepts.Wgs84AlongHoleOrigin)]
     public GaussianDrillingProperty? TieInPointAlongHoleDepth { get; set; }
 
     /// <summary>Deprecated compatibility fallback; use a SidetrackClassification feature assignment.</summary>
