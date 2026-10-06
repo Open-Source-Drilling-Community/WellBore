@@ -637,7 +637,8 @@
                     SurveyStationList = surveyStations
                 };
 
-                HttpResponseMessage response = await Api.HttpClientTrajectory.PostAsJsonAsync("SurveyStationEllipseCalculation", order);
+                HttpResponseMessage response = await Api.HttpClientTrajectory.PostAsJsonAsync(
+                    $"SurveyStationEllipseCalculation/Trajectory/{trajectoryId}", order);
                 response.EnsureSuccessStatusCode();
                 WellBoreModelShared.SurveyStationEllipseCalculation? result = await response.Content.ReadFromJsonAsync<WellBoreModelShared.SurveyStationEllipseCalculation>();
                 if (result?.SurveyStationEllipseResultList is { Count: > 0 } ellipseResults)

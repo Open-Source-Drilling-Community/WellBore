@@ -1,0 +1,50 @@
+name: Build OSDC WellBore and run tests
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      OSDC_SERVICE_TEST_BASE_URL: http://localhost:8080/
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build service image
+        run: docker build --file Service/Dockerfile --tag osdc-wellbore-service:test .
+      - name: Run service container
+        run: docker run --detach --name osdc-wellbore-service-test --publish 8080:8080 osdc-wellbore-service:test
+      - name: Wait for service
+        shell: bash
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent http://localhost:8080/WellBore/api/WellBore > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs osdc-wellbore-service-test
+          exit 1
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore local tools
+        shell: bash
+        run: if [ -f .config/dotnet-tools.json ]; then dotnet tool restore; fi
+      - name: Restore solution
+        run: dotnet restore WellBore.sln
+      - name: Build solution
+        run: dotnet build WellBore.sln --configuration Release --no-restore
+      - name: Test solution
+        run: dotnet test WellBore.sln --configuration Release --no-build --logger "trx;LogFileName=tests.trx"
+      - name: Show service logs after failure
+        if: failure()
+        run: docker logs osdc-wellbore-service-test
+      - name: Stop service container
+        if: ${{ always() }}
+        run: docker rm --force osdc-wellbore-service-test

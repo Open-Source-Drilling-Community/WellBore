@@ -20,6 +20,7 @@ This release targets MudBlazor 9.9.0 and the matching OSDC shared web component 
 
 The trajectory and survey-run pages provide complete, searchable Field, Cluster, Well, and WellBore selectors. Typing any part of a name filters the applicable hierarchy level case-insensitively.
 The same pages convert plotted North/East coordinates between WGS84, the selected Field reference point, the selected Cluster reference point, the selected Well-head slot, and the owning Field's cartographic projection. WGS84 metres remain the canonical wire values.
+Uncertainty overlays use the Trajectory service's resource-specific ellipse routes so tied and sidetrack Wolff-de Wardt ancestry is reconstructed before display.
 Their shared `Rotary table`/`RTE` depth choice resolves the latest rig job: it uses the job's Gaussian depth for a mobile rig or `Rig.FixedPlatformProperties.DrillFloorDepth` for a Platform Rig. The old direct WellBore Rig and Cluster fallbacks apply only when `RigJobs` is absent on a legacy record; an authoritative empty history does not infer a rig.
 
 ## Dependencies
@@ -65,9 +66,9 @@ Example routing:
         AdditionalAssemblies="new[] { typeof(OSDC.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
 ```
 
-## SemanticCatalogue 0.9.0
+## SemanticCatalogue 0.15.0
 
-The generated client now comes from contracts annotated with SemanticCatalogue 0.9.0. These annotations do not add payload fields or change classification editing workflows. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.
+The owning Model now consumes SemanticCatalogue 0.15.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.
 
 
 ## Canonical reference adoption (0.9.0)

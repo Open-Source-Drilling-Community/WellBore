@@ -36,7 +36,7 @@ namespace OSDC.Drilling.WellBore.ServiceTest
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            string HostNameWellBore = "https://localhost:5001/";
+            string HostNameWellBore = Environment.GetEnvironmentVariable("OSDC_SERVICE_TEST_BASE_URL") ?? "https://localhost:5001/";
             string HostBasePathWellBore = "WellBore/api/";
             _http = SetHttpClient(HostNameWellBore, HostBasePathWellBore);
             var baseUrl = new Uri(_http.BaseAddress!, "/WellBore/api/").ToString();
