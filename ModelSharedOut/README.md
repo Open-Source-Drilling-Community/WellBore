@@ -27,9 +27,9 @@ Enter `Y` when prompted, then build the solution and run the tests. Commit the s
 
 The service-specific classification types now inherit shared implementations. A fresh Service OpenAPI export was compared with the pre-migration export and this generator's checked-in service input: all paths and schemas are identical. Existing merged contracts and generated clients remain valid, so no generated source changes are required for this implementation-only migration.
 
-## SemanticCatalogue 0.15.0
+## SemanticCatalogue 0.16.0
 
-The owning Model now consumes SemanticCatalogue 0.15.0. When OpenAPI inputs are refreshed, the merged schema and C# client preserve property-specific semantics through `allOf`; the generator processes the owning service last so its schemas take precedence over dependency snapshots. Generated whitespace is normalized. Continue using the documented generator; do not hand-edit the client.
+The owning Model now consumes SemanticCatalogue 0.16.0. When OpenAPI inputs are refreshed, the merged schema and C# client preserve property-specific semantics through `allOf`; the generator processes the owning service last so its schemas take precedence over dependency snapshots. Generated whitespace is normalized. Continue using the documented generator; do not hand-edit the client.
 
 
 ## Canonical reference adoption (0.9.0)

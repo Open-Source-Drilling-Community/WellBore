@@ -66,9 +66,9 @@ Example routing:
         AdditionalAssemblies="new[] { typeof(OSDC.Drilling.WellBore.WebPages.WellBoreMain).Assembly }">
 ```
 
-## SemanticCatalogue 0.15.0
+## SemanticCatalogue 0.16.0
 
-The owning Model now consumes SemanticCatalogue 0.15.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.
+The owning Model now consumes SemanticCatalogue 0.16.0. Semantic annotations do not add payload fields or change classification editing workflows in the generated client. The tie-in editor labels parent-wellbore MD explicitly and uses LengthStandard for tie-in and drill-floor standard uncertainties. Existing depth reference transformations remain in place.
 
 
 ## Canonical reference adoption (0.9.0)

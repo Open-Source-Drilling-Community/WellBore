@@ -119,9 +119,9 @@ The external Razor assembly registration in `ExternalRazorAssemblies.cs` must re
 
 The OSDC image is `docker.io/digiwells/osdcdrillingwellborewebappclient:stable`; its chart is `WebApp/charts/osdcdrillingwellborewebappclient` and the default Deployment/Service name is `osdcwellborewebappclient`. Production configuration uses OSDC DNS names for WellBore, Well, Field, Cluster, Rig, and all calculator services. The trajectory service retains its existing DNS name until that separate microservice is migrated.
 
-## SemanticCatalogue 0.15.0
+## SemanticCatalogue 0.16.0
 
-The host consumes generated clients while the owning Model uses SemanticCatalogue 0.15.0. Existing routes, configuration and persistence are unchanged. The Home page distinguishes parent-wellbore tie-in along-hole depth from vertical depth while retaining the OSDC WGS84 convention.
+The host consumes generated clients while the owning Model uses SemanticCatalogue 0.16.0. Existing routes, configuration and persistence are unchanged. The Home page distinguishes parent-wellbore tie-in along-hole depth from vertical depth while retaining the OSDC WGS84 convention.
 
 
 ## Canonical reference adoption (0.9.0)
