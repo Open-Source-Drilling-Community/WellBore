@@ -180,3 +180,5 @@ TieInPointAlongHoleDepth retains its JSON name. Its preferred concept is TieInAl
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
 
 Rig UUID relationships carry `resourceType=rig` in REST/MCP semantic metadata; the by-id read argument declares `resourceType=wellbore`. Consumers can follow active RigJob intervals and verify the linked rig's reference values without inferring targets from property names. The legacy RigID projection remains a compatibility value rather than a replacement for timed RigJobs.
+
+Well and parent-wellbore UUID links are explicitly typed for generic relationship traversal. Main-wellbore selection can use the declared sidetrack boolean rather than infer it from a resource-name suffix.

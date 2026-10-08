@@ -47,6 +47,12 @@ public static class ProviderSemantics
         if(property.Name=="RigID" && property.DeclaringType is {} owner && (owner==typeof(WellBore) || owner==typeof(RigJob))) {
             var identifier=Metadata(Concepts.ResourceIdentifier);identifier["resourceType"]=Concepts.Rig;return identifier;
         }
+        if(property.DeclaringType==typeof(WellBore)) {
+            string? resource=property.Name switch {
+            "WellID" => Concepts.Well,
+            "ParentWellBoreID" => Concepts.WellBore,                _=>null};
+            if(resource is not null){var id=Metadata(Concepts.ResourceIdentifier);id["resourceType"]=resource;return id;}
+        }
         if (SemanticMetadata.For(property) is JsonObject direct) return direct;
         Type type = property.DeclaringType!;
         if (typeof(Point3DGlobalCoordinates).IsAssignableFrom(type))
