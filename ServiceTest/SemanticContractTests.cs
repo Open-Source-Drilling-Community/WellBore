@@ -57,6 +57,13 @@ public class SemanticContractTests
         Assert.That(assignment["properties"]!["ToDate"]![Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ValidityEnd));
         Assert.That(assignment["properties"]!["FeatureOptionID"]![Extension]!["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceIdentifier));
     }
+    [Test] public void RigRelationshipsAndWellboreLookupDeclareTargetResourceTypes()
+    {
+        var input=Mcp("well_bore_get_by_id",output:false);
+        Assert.That(input["properties"]!["id"]![Extension]!["resourceType"]!.ToString(),Is.EqualTo(Concepts.WellBore));
+        Assert.That(Model.ProviderSemantics.ForProperty(typeof(Model.RigJob).GetProperty("RigID")!)!["resourceType"]!.ToString(),Is.EqualTo(Concepts.Rig));
+        Assert.That(Rest(typeof(Model.RigJob))["properties"]!["RigID"]![Extension]!["resourceType"]!.ToString(),Is.EqualTo(Concepts.Rig));
+    }
 
     [Test]
     public void EveryPublishedBindingResolvesToReviewedVocabulary()

@@ -44,6 +44,9 @@ public static class ProviderSemantics
 
     public static JsonObject? ForProperty(PropertyInfo property)
     {
+        if(property.Name=="RigID" && property.DeclaringType is {} owner && (owner==typeof(WellBore) || owner==typeof(RigJob))) {
+            var identifier=Metadata(Concepts.ResourceIdentifier);identifier["resourceType"]=Concepts.Rig;return identifier;
+        }
         if (SemanticMetadata.For(property) is JsonObject direct) return direct;
         Type type = property.DeclaringType!;
         if (typeof(Point3DGlobalCoordinates).IsAssignableFrom(type))

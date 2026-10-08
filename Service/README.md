@@ -231,3 +231,6 @@ TieInPointAlongHoleDepth retains its JSON name. Its preferred concept is TieInAl
 
 
 Canonical reference metadata describes storage and REST/MCP payloads (`referenceScope: canonical-storage-and-api`), not a restriction on display choices (`presentationReferencesAllowed: true`). Web editors convert between the canonical reference and the supported reference selected by the user. Reference changes apply to coordinate values, not their standard uncertainties.
+
+
+Wellbore by-id read arguments declare the WellBore resource target in REST and MCP. RigID relationships declare the Rig target, including timed RigJobs. The compatibility RigID projection must not override an active timed association. These annotations support generic relationship and reference-origin traversal.

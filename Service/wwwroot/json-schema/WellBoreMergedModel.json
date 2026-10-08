@@ -15433,7 +15433,27 @@
             "required": true,
             "schema": {
               "type": "string",
-              "format": "uuid"
+              "format": "uuid",
+              "x-osdc-semantic": {
+                "catalogue": "urn:osdc:semantic-catalogue",
+                "catalogueVersion": "0.16.0",
+                "concept": "urn:osdc:semantic:resource-identifier",
+                "curationStatus": "Reviewed",
+                "assertionSource": "provider-binding-registry",
+                "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+                "referenceProfileVersion": "2000-01-01",
+                "referenceScope": "canonical-storage-and-api",
+                "presentationReferencesAllowed": true,
+                "requiredContext": [
+                  "identified object type",
+                  "owning service or containing resource"
+                ],
+                "constraints": [
+                  "A display name or assigned external identity value is not this UUID.",
+                  "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
+                ],
+                "resourceType": "urn:osdc:semantic:wellbore"
+              }
             }
           }
         ],
@@ -45847,7 +45867,11 @@
               "catalogueVersion": "0.16.0",
               "concept": "urn:osdc:semantic:resource-identifier",
               "curationStatus": "Reviewed",
-              "assertionSource": "provider-model-attribute",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "2000-01-01",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
               "requiredContext": [
                 "identified object type",
                 "owning service or containing resource"
@@ -45855,7 +45879,8 @@
               "constraints": [
                 "A display name or assigned external identity value is not this UUID.",
                 "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
-              ]
+              ],
+              "resourceType": "urn:osdc:semantic:rig"
             }
           },
           "StartDate": {
@@ -46291,7 +46316,11 @@
               "catalogueVersion": "0.16.0",
               "concept": "urn:osdc:semantic:resource-identifier",
               "curationStatus": "Reviewed",
-              "assertionSource": "provider-model-attribute",
+              "assertionSource": "provider-binding-registry",
+              "referenceProfile": "urn:osdc:reference-profile:canonical-drilling",
+              "referenceProfileVersion": "2000-01-01",
+              "referenceScope": "canonical-storage-and-api",
+              "presentationReferencesAllowed": true,
               "requiredContext": [
                 "identified object type",
                 "owning service or containing resource"
@@ -46299,7 +46328,8 @@
               "constraints": [
                 "A display name or assigned external identity value is not this UUID.",
                 "Null means absent where permitted by the provider; an empty UUID does not identify a resource."
-              ]
+              ],
+              "resourceType": "urn:osdc:semantic:rig"
             }
           },
           "RigJobs": {

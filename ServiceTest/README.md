@@ -29,6 +29,6 @@ The ResourceClassification 0.1.0 adoption is covered by ModelTest/Classification
 `SemanticContractTests` verifies REST/MCP binding parity, inherited classification semantics and that published MCP bindings resolve to reviewed SemanticCatalogue 0.16.0 concepts. It also checks parent-path along-hole depth versus drill-floor depth, WGS84 references, LengthStandard uncertainties, rig-job endpoints/ownership and the absence of a new tie-in reference field.
 
 
-## Canonical reference adoption (0.9.0)
+## Canonical reference adoption
 
-Semantic contract tests verify the 0.9.0 bindings and reviewed concepts. WellBore also asserts the WGS84 path-intersection origin, rejects a vertical-reference substitution and retains separate uncertainty semantics.
+Semantic contract tests verify SemanticCatalogue 0.16.0 bindings and reviewed concepts. WellBore also asserts the WGS84 path-intersection origin, rejects a vertical-reference substitution and retains separate uncertainty semantics. Rig relationship UUIDs and by-id wellbore reads declare their target resource nouns in REST/MCP contracts.
