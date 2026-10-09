@@ -1,6 +1,9 @@
 using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
@@ -10,19 +13,29 @@ using OSDC.Drilling.WellBore.Service.Mcp.Tools;
 namespace OSDC.Drilling.WellBore.ServiceTest;
 
 [TestFixture]
+[NonParallelizable]
 public sealed class McpServerHttpTests
 {
+    private WebApplicationFactory<Program> _factory = null!;
+    private HttpClient _httpClient = null!;
     private HttpClientTransport _transport = null!;
     private McpClient _client = null!;
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
+        ServiceTestHost.ResetManagerSingletons();
+        _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseContentRoot(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Service")));
+            builder.ConfigureLogging(logging => logging.ClearProviders());
+        });
+        _httpClient = _factory.CreateClient();
         _transport = new HttpClientTransport(new HttpClientTransportOptions
         {
-            Endpoint = new Uri("http://localhost:8080/wellbore/api/mcp"),
-            TransportMode = HttpTransportMode.AutoDetect
-        }, NullLoggerFactory.Instance);
+            Endpoint = new Uri(_httpClient.BaseAddress!, "WellBore/api/mcp"),
+            TransportMode = HttpTransportMode.StreamableHttp
+        }, _httpClient, NullLoggerFactory.Instance, ownsHttpClient: false);
         _client = await McpClient.CreateAsync(_transport, new McpClientOptions
         {
             ClientInfo = new Implementation { Name = "WellBoreServiceTest", Version = "1.0.0" }
@@ -34,6 +47,8 @@ public sealed class McpServerHttpTests
     {
         if (_client is not null) await _client.DisposeAsync();
         if (_transport is not null) await _transport.DisposeAsync();
+        _httpClient?.Dispose();
+        _factory?.Dispose();
     }
 
     [Test]

@@ -16,30 +16,24 @@ using NUnit.Framework;
 namespace OSDC.Drilling.WellBore.ServiceTest
 {
     [TestFixture]
+    [NonParallelizable]
     public class WellBoreControllerTests
     {
         private HttpClient _http = null!;
         private Client _client = null!;
+        private WebApplicationFactory<Program> _factory = null!;
 
-        public static HttpClient SetHttpClient(string host, string microServiceUri)
-        {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; }; // temporary workaround for testing purposes: bypass certificate validation (not recommended for production environments due to security risks)
-            HttpClient httpClient = new(handler)
-            {
-                BaseAddress = new Uri(host + microServiceUri)
-            };
-            httpClient.DefaultRequestHeaders.Accept.Clear();
-            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            return httpClient;
-        }
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            string HostNameWellBore = Environment.GetEnvironmentVariable("OSDC_SERVICE_TEST_BASE_URL") ?? "https://localhost:5001/";
-            string HostBasePathWellBore = "WellBore/api/";
-            _http = SetHttpClient(HostNameWellBore, HostBasePathWellBore);
-            var baseUrl = new Uri(_http.BaseAddress!, "/WellBore/api/").ToString();
+            ServiceTestHost.ResetManagerSingletons();
+            _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+            {
+                builder.UseContentRoot(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Service")));
+                builder.ConfigureLogging(logging => logging.ClearProviders());
+            });
+            _http = _factory.CreateClient();
+            var baseUrl = new Uri(_http.BaseAddress!, "WellBore/api/").ToString();
             _client = new Client(baseUrl, _http);
         }
 
@@ -47,6 +41,7 @@ namespace OSDC.Drilling.WellBore.ServiceTest
         public void OneTimeTearDown()
         {
             _http?.Dispose();
+            _factory?.Dispose();
         }
 
         [Test]

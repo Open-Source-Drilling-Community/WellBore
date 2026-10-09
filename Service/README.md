@@ -216,16 +216,16 @@ ResourceClassification 0.1.0 supplies identity and feature models through Model.
 
 The complete exported OpenAPI document was verified equal before and after this migration, and equal to the checked-in schema. REST/MCP payloads and database schemas therefore remain unchanged. Rebuild the Service image to include the published package; no database conversion or reseeding is required.
 
-## SemanticCatalogue 0.16.0
+## SemanticCatalogue 0.18.0
 
-`SemanticSchemaFilter` and the MCP schema builders use the same model/provider registry with SemanticCatalogue 0.16.0. `x-osdc-semantic` contains the concept, catalogue version, curation status, and applicable role, reference and physical quantity. Annotations apply to resource, catalogue, assignment, batch and granular-update contracts. Existing routes, tool names, validation and persistence remain unchanged.
+`SemanticSchemaFilter` and the MCP schema builders use the same model/provider registry with SemanticCatalogue 0.18.0. `x-osdc-semantic` contains the concept, catalogue version, curation status, and applicable role, reference and physical quantity. MCP input roots declare generic resource operations for discovery-driven composition. Annotations apply to resource, catalogue, assignment, batch and granular-update contracts. Existing routes, tool names, validation and persistence remain unchanged.
 
 Property-context Gaussian scalar bindings are exposed as relative JSON Pointers in `x-osdc-semantic-bindings`, with matching inline MCP scalar annotations. This avoids assigning a single quantity to the shared Gaussian wrapper. `TieInPointAlongHoleDepth` remains the existing Gaussian parent-wellbore along-hole property, in SI metres under the OSDC WGS84 convention. `ParentWellBoreID` identifies the path. No additional reference property is introduced, and measured depth is not described as vertical depth. Drill-floor depth is vertical depth relative to WGS84. Means use `DepthDrilling`; standard uncertainties use `LengthStandard` in metres, without a coordinate origin. `MinValue`/`MaxValue` are domain-limit metadata, not confidence limits or Gaussian truncation instructions.
 
 
 ## Canonical reference adoption (0.9.0)
 
-The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.16.0 is consumed from NuGet; no local-project or local-feed fallback is required.
+The provider registry uses the shared SemanticMetadata.Create factory and OSDC canonical drilling profile. A contradictory explicit reference fails. Along-hole and vertical coordinates have distinct references; uncertainties remain origin-free. SemanticCatalogue 0.18.0 is consumed from NuGet; no local-project or local-feed fallback is required.
 
 TieInPointAlongHoleDepth retains its JSON name. Its preferred concept is TieInAlongHoleDepth, with zero at the parent path intersection (or defined extension) with the WGS84 ellipsoid. No new reference field or stored-value migration is introduced. Historical values cannot be corrected from a scalar alone; their provenance and applicable parent path must first be established.
 

@@ -47,7 +47,7 @@ public class SemanticContractTests
     {
         var rest = Rest(typeof(Model.WellBore));
         var mcp = Mcp("well_bore_get_by_id")["properties"]!["data"]!;
-        Assert.That(rest[Extension]!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.16.0"));
+        Assert.That(rest[Extension]!["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.18.0"));
         Assert.That(JsonNode.DeepEquals(rest[Extension], mcp[Extension]), Is.True);
         var category = Rest(typeof(Model.WellBoreFeatureCategory));
         Assert.That(category[Extension]!["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.FeatureCategory));
@@ -56,6 +56,16 @@ public class SemanticContractTests
         Assert.That(assignment["properties"]!["FromDate"]![Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ValidityStart));
         Assert.That(assignment["properties"]!["ToDate"]![Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ValidityEnd));
         Assert.That(assignment["properties"]!["FeatureOptionID"]![Extension]!["concept"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceIdentifier));
+    }
+
+    [Test]
+    public void Mcp_inputs_declare_generic_resource_operation_roles()
+    {
+        Assert.That(Mcp("well_bore_get_all", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
+        Assert.That(Mcp("well_bore_get_by_id", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceRetrieval));
+        Assert.That(Mcp("well_bore_create", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceCreation));
+        Assert.That(Mcp("well_bore_update_by_id", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceReplacement));
+        Assert.That(Mcp("well_bore_delete_by_id", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceDeletion));
     }
     [Test] public void RigRelationshipsAndWellboreLookupDeclareTargetResourceTypes()
     {
@@ -81,7 +91,7 @@ public class SemanticContractTests
                     if (obj["concept"] != null)
                     {
                         count++;
-                        Assert.That(obj["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.16.0"));
+                        Assert.That(obj["catalogueVersion"]!.GetValue<string>(), Is.EqualTo("0.18.0"));
                         Assert.That(obj["curationStatus"]!.GetValue<string>(), Is.EqualTo("Reviewed"));
                         Assert.That(SemanticCatalogue.Default.Get(obj["concept"]!.GetValue<string>()).Status, Is.EqualTo(CurationStatus.Reviewed));
                     }
