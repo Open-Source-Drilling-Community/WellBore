@@ -100,3 +100,9 @@ Tables/selectors use light discovery. Editors retrieve the selected complete res
 ## Package release 2.0.0
 
 This release packages the current WebPages and generated contracts. Update consuming WebApps to `OSDC.Drilling.WellBore.WebPages` version `2.0.0` after it is available on nuget.org. This is a major update for the bounded light discovery contracts; rebuild consumers together with their updated service clients.
+
+## Trusted NuGet publishing
+
+The `publish-webpages-nuget.yml` workflow authenticates with GitHub OIDC through `NuGet/login@v1`; no long-lived `NUGET_API_KEY` secret is used. Set `NUGET_USER` to the nuget.org profile username as a repository variable (a repository secret is also accepted). The publishing job requests `contents: read` and `id-token: write` and obtains its temporary credential immediately before uploading.
+
+On nuget.org, the package owner must configure a trusted-publishing policy for `Open-Source-Drilling-Community/WellBore`, workflow filename `publish-webpages-nuget.yml`, with permission to push new versions of `OSDC.Drilling.WellBore.WebPages`. Leave the policy environment empty because the workflow does not declare a GitHub environment. Trigger the workflow manually with the intended version or push a `webpages-v*` tag. Already published versions are skipped.
