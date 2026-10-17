@@ -51,3 +51,5 @@ This is a breaking REST/MCP contract change: update generated clients, UIs, and 
 
 
 Contract checks cover removed heavy routes/tools, bounded pagination and strict invalid-argument rejection, and omission of engineering collections from discovery. Persistence tests exercise ordering, filters, totals, continuation, empty results, and retained selected reads. Run transport tests against isolated test storage.
+
+`PlotFrameTests` builds 200 traces without a rendered Plotly chart, checks coordinate preservation, replacement without duplication, and empty-selection clearing for both shared plot components.

@@ -91,9 +91,8 @@
             if (!_plotlyReady || chart == null) return;
             string plotSignature = BuildPlotSignature();
             if (!_forceReplot && _lastPlotSignature == plotSignature) return;
-            await ManageTracesAsync();
+            ManageTraces();
             try { await chart.React(); } catch { }
-            await InvokeAsync(StateHasChanged);
             _lastPlotSignature = plotSignature;
             _forceReplot = false;
         }
@@ -103,11 +102,12 @@
         }
     }
 
-    private async Task ManageTracesAsync()
+    private void ManageTraces()
     {
+        // Build the complete frame locally; PlotAsync submits it with one React call.
+        data.Clear();
         if (_disposed || !_plotlyReady || chart == null) return;
         if (XValuesList == null || YValuesList == null || ZValuesList == null || !XValuesList.Any() || !YValuesList.Any() || !ZValuesList.Any()) return;
-        try { await chart.Clear(); } catch (NullReferenceException) { return; }
 
         int nTraces = new[] { XValuesList.Count, YValuesList.Count, ZValuesList.Count }.Min();
         for (int i = 0; i < nTraces; i++)
@@ -143,7 +143,7 @@
             };
             if (marker != null) trace.Marker = marker;
             if (line != null) trace.Line = line;
-            await chart.AddTrace(trace);
+            data.Add(trace);
         }
     }
 
