@@ -52,6 +52,21 @@ public sealed class McpServerHttpTests
     }
 
     [Test]
+    public async Task Removed_heavy_route_returns_404_and_light_discovery_returns_a_bounded_page()
+    {
+        using var retired = await _httpClient.GetAsync("WellBore/api/WellBore/HeavyData");
+        Assert.That(retired.StatusCode, Is.AnyOf(System.Net.HttpStatusCode.NotFound, System.Net.HttpStatusCode.BadRequest));
+        using var discovery = await _httpClient.GetAsync("WellBore/api/WellBore/LightData?offset=0&limit=1");
+        Assert.That(discovery.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
+        var page = JsonNode.Parse(await discovery.Content.ReadAsStringAsync())!;
+        Assert.That(page["Items"]!.AsArray().Count, Is.LessThanOrEqualTo(1));
+        Assert.That(page["Limit"]!.GetValue<int>(), Is.EqualTo(1));
+        Assert.That(page.AsObject().ContainsKey("NextOffset"), Is.True);
+        using var invalid = await _httpClient.GetAsync("WellBore/api/WellBore/LightData?limit=201");
+        Assert.That(invalid.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.BadRequest));
+    }
+
+    [Test]
     public async Task Http_endpoint_publishes_every_registered_non_statistics_tool()
     {
         var services = new ServiceCollection();

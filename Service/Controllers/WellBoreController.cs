@@ -1,3 +1,4 @@
+using OSDC.Drilling.WellBore.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,28 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
     [ApiController]
     public class WellBoreController : ControllerBase
     {
+        private readonly SqlConnectionManager _discoveryConnections;
+
+        /// <summary>Discover WellBore resources as bounded light records; retrieve selected full records by ID.</summary>
+        [HttpGet("LightData", Name = "DiscoverWellBore")]
+        public ActionResult<OSDC.Drilling.WellBore.Model.WellBoreDiscoveryPage> DiscoverWellBore([FromQuery] int offset = 0, [FromQuery] int limit = 50, [FromQuery] string? name = null, [FromQuery] System.Guid? wellId = null, [FromQuery] System.Guid? rigId = null, [FromQuery] System.Guid? parentWellBoreId = null, [FromQuery] bool? isSidetrack = null)
+        {
+            UsageStatisticsWellBore.Instance.IncrementDiscoveryRequestsPerDay();
+            if (offset < 0 || limit < 1 || limit > 200 || name?.Length > 200 || wellId == System.Guid.Empty || rigId == System.Guid.Empty || parentWellBoreId == System.Guid.Empty)
+                return BadRequest(new { error = "invalid_discovery_query", message = "Offset must be non-negative, limit 1–200, name at most 200 characters, and UUID filters non-empty." });
+            try
+            {
+                var records = DiscoveryRecords.ReadPage<OSDC.Drilling.WellBore.Model.WellBoreLight>(_discoveryConnections.GetConnection(), "WellBoreTable", "WellBore", offset, limit, name,
+                    new System.Collections.Generic.Dictionary<string, object?> { ["WellID"] = wellId, ["RigID"] = rigId, ["ParentWellBoreID"] = parentWellBoreId, ["IsSidetrack"] = isSidetrack }, out int total);
+                return Ok(new OSDC.Drilling.WellBore.Model.WellBoreDiscoveryPage { Items = records, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && records.Count < total - offset ? offset + records.Count : null });
+            }
+            catch (System.Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or System.InvalidOperationException)
+            {
+                return StatusCode(500, new { error = "discovery_failed" });
+            }
+        }
+
         private readonly ILogger<WellBoreManager> _logger;
         private readonly WellBoreManager _wellBoreManager;
         private readonly IWellBoreExternalReferenceValidator _externalReferenceValidator;
@@ -25,6 +48,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         public WellBoreController(ILogger<WellBoreManager> logger, SqlConnectionManager connectionManager,
             IWellBoreExternalReferenceValidator? externalReferenceValidator = null)
         {
+            _discoveryConnections = connectionManager;
             _logger = logger;
             _wellBoreManager = WellBoreManager.GetInstance(_logger, connectionManager);
             _externalReferenceValidator = externalReferenceValidator ?? new UnavailableWellBoreExternalReferenceValidator();
@@ -100,7 +124,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("HeavyData", Name = "GetAllWellBore")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBore()
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBorePerDay();
@@ -256,7 +280,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore with given Well ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore with given Well ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("ByWellID", Name = "GetAllWellBoreByWellID")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByWellID(Guid wellID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreByWellIDPerDay();
@@ -274,7 +298,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore with given Rig ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("ByRigID", Name = "GetAllWellBoreByRigId")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByRigId(Guid rigID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreByRigIDPerDay();
@@ -293,7 +317,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore with given Parent Wellbore ID present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("ByParentID", Name = "GetAllWellBoreByParentWellBoreId")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBore?>> GetAllWellBoreByParentWellBoreId(Guid parentID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllWellBoreParentWellBoreIDPerDay();
@@ -312,7 +336,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
         /// Returns the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData
         /// </summary>
         /// <returns>the list of all WellBore that are sidetracked present in the microservice database, at endpoint WellBore/api/WellBore/HeavyData</returns>
-        [HttpGet("IsSidetracked", Name = "GetAllSidetrackedWellBore")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBore?>> GetAllSidetrackedWellBore(Guid parentID)
         {
             UsageStatisticsWellBore.Instance.IncrementGetAllSidetrackedWellBorePerDay();

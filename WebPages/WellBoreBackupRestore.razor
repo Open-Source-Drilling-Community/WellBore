@@ -264,7 +264,7 @@
     {
         try
         {
-            _wellBores = ((await Api.ClientWellBore.GetAllWellBoreAsync()) ?? [])
+            _wellBores = ((await Api.ClientWellBore.ListWellBoreReferencesAsync()) ?? [])
                 .Where(wellBore => wellBore?.MetaInfo?.ID is Guid id && id != Guid.Empty)
                 .OrderBy(wellBore => wellBore.Name, StringComparer.OrdinalIgnoreCase)
                 .ToList();

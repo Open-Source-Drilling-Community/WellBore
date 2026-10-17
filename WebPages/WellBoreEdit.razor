@@ -1,4 +1,4 @@
-﻿@implements IUnitAwareComponent
+@implements IUnitAwareComponent
 @inject ILogger<WellBoreEdit> logger
 @inject ISnackbar Snackbar
 @inject IWellBoreAPIUtils Api
@@ -313,6 +313,8 @@
 
     private async Task ProcessSelectedClusterAsync()
     {
+        if (_selectedCluster?.MetaInfo?.ID is Guid id && _selectedCluster.Slots == null)
+            _selectedCluster = await Api.ClientCluster.GetClusterByIdAsync(id);
         if (_selectedCluster == null)
         {
             if (GroundMudLineDepthSource != null)
@@ -434,6 +436,8 @@
                 descr = CurrentWellBore.Description;
                 _wellBoreIdentityAssignments = CloneIdentityAssignments(CurrentWellBore.WellBoreIdentityAssignments);
                 _wellBoreFeatureAssignments = CloneFeatureAssignments(CurrentWellBore.WellBoreFeatureAssignments);
+                foreach (Guid assignedCategoryId in _wellBoreFeatureAssignments.Where(value => value.FeatureCategoryID.HasValue).Select(value => value.FeatureCategoryID!.Value).Distinct())
+                    await Api.ClientWellBore.LoadWellBoreFeatureCategoryDetailsAsync(_wellBoreFeatureCategories, assignedCategoryId);
                 _rigJobs = CloneRigJobs(CurrentWellBore.RigJobs);
                 _isSidetrack = CurrentWellBore.IsSidetrack;
                 if (_isSidetrack && WellBores != null && CurrentWellBore.ParentWellBoreID != null && CurrentWellBore.ParentWellBoreID != Guid.Empty)
@@ -665,7 +669,7 @@
     {
         try
         {
-            return ((IEnumerable<WellBoreIdentity>)await Api.ClientWellBore.GetAllWellBoreIdentityAsync())
+            return ((IEnumerable<WellBoreIdentity>)await Api.ClientWellBore.ListWellBoreIdentityReferencesAsync())
                 .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
         catch (ApiException exception) when (exception.StatusCode == 404)
@@ -680,7 +684,7 @@
     {
         try
         {
-            return ((IEnumerable<WellBoreFeatureCategory>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryAsync())
+            return ((IEnumerable<WellBoreFeatureCategory>)await Api.ClientWellBore.ListWellBoreFeatureCategoryReferencesAsync())
                 .OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
         }
         catch (ApiException exception) when (exception.StatusCode == 404)
@@ -694,8 +698,10 @@
     private string GetIdentityName(WellBoreIdentityAssignment assignment) =>
         _wellBoreIdentities.FirstOrDefault(item => item.MetaInfo?.ID == assignment.IdentityID)?.Name ?? "Unknown identity";
 
-    private void SelectFeatureCategory(Guid? categoryId)
+    private async Task SelectFeatureCategory(Guid? categoryId)
     {
+        if (categoryId is Guid id)
+            await Api.ClientWellBore.LoadWellBoreFeatureCategoryDetailsAsync(_wellBoreFeatureCategories, id);
         _selectedFeatureCategoryId = categoryId;
         _selectedFeatureOptionId = null;
     }

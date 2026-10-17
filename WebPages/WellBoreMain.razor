@@ -1,4 +1,4 @@
-﻿@page "/WellBore"
+@page "/WellBore"
 @inject ILogger<WellBoreMain> logger
 @inject ISnackbar Snackbar
 @inject IWellBoreAPIUtils Api
@@ -99,16 +99,16 @@
 
             // Starting all loading tasks asynchronously
             logger.LogInformation("Trying to load list of WellBore from client: " + Api.HostNameWellBore);
-            var wellBoreTask = Api.ClientWellBore.GetAllWellBoreAsync();
+            var wellBoreTask = Api.ClientWellBore.ListWellBoreReferencesAsync();
 
             logger.LogInformation("Trying to load list of Well from client: " + Api.HostNameWell);
-            var wellTask = Api.ClientWell.GetAllWellAsync();
+            var wellTask = Api.ClientWell.ListWellReferencesAsync();
             logger.LogInformation("Trying to load list of Cluster from client: " + Api.HostNameCluster);
-            var clusterTask = Api.ClientCluster.GetAllClusterAsync();
+            var clusterTask = Api.ClientCluster.ListClusterReferencesAsync();
             logger.LogInformation("Trying to load list of Field from client: " + Api.HostNameField);
-            var fieldTask = Api.ClientField.GetAllFieldAsync();
+            var fieldTask = Api.ClientField.ListFieldReferencesAsync();
             logger.LogInformation("Trying to load list of Rig from client: " + Api.HostNameRig);
-            var rigTask = Api.ClientRig.GetAllRigAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
 
             List<Task> loadingTaskList = new List<Task> { wellBoreTask, wellTask, clusterTask, fieldTask, rigTask };
 

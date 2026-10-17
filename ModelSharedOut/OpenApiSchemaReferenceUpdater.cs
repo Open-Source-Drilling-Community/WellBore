@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 
@@ -104,6 +104,18 @@ public class OpenApiSchemaReferenceUpdater
             };
         }
 
+        if (schema.Discriminator?.Mapping != null)
+        {
+            foreach (string discriminatorValue in schema.Discriminator.Mapping.Keys.ToList())
+            {
+                string reference = schema.Discriminator.Mapping[discriminatorValue];
+                const string prefix = "#/components/schemas/";
+                if (reference.StartsWith(prefix, StringComparison.Ordinal) &&
+                    _renamedSchemas.TryGetValue(reference[prefix.Length..], out string? renamed))
+                    schema.Discriminator.Mapping[discriminatorValue] = prefix + renamed;
+            }
+        }
+
         foreach (var property in schema.Properties.Values)
             UpdateSchemaRef(property);
 
@@ -157,7 +169,11 @@ public class OpenApiSchemaReferenceUpdater
                 }
                 : null,
             Required = new HashSet<string>(source.Required),
-            Discriminator = source.Discriminator,
+            Discriminator = source.Discriminator == null ? null : new OpenApiDiscriminator
+            {
+                PropertyName = source.Discriminator.PropertyName,
+                Mapping = new Dictionary<string, string>(source.Discriminator.Mapping)
+            },
             MaxItems = source.MaxItems,
             MinItems = source.MinItems,
             MaxLength = source.MaxLength,

@@ -236,11 +236,11 @@
         try
         {
             logger.LogInformation("Trying to load list of Fields, Clusters, Wells and WellBores");
-            Task<ICollection<WellBoreModelShared.Field>> fieldTask = Api.ClientField.GetAllFieldAsync();
-            Task<ICollection<WellBoreModelShared.Cluster>> clusterTask = Api.ClientCluster.GetAllClusterAsync();
-            Task<ICollection<WellBoreModelShared.RigReadResponse>> rigTask = Api.ClientRig.GetAllRigAsync();
-            Task<ICollection<WellBoreModelShared.Well>> wellTask = Api.ClientWell.GetAllWellAsync();
-            Task<ICollection<WellBoreModelShared.WellBore>> wellBoreTask = Api.ClientWellBore.GetAllWellBoreAsync();
+            var fieldTask = Api.ClientField.ListFieldReferencesAsync();
+            var clusterTask = Api.ClientCluster.ListClusterReferencesAsync();
+            var rigTask = Api.ClientRig.ListRigReferencesAsync();
+            var wellTask = Api.ClientWell.ListWellReferencesAsync();
+            var wellBoreTask = Api.ClientWellBore.ListWellBoreReferencesAsync();
             await Task.WhenAll(fieldTask, clusterTask, rigTask, wellTask, wellBoreTask);
 
             fieldList = fieldTask.Result.Where(x => x?.MetaInfo != null).OrderBy(x => x.Name).ToList();
@@ -381,6 +381,13 @@
 
     private async Task UpdateSelectedClusterDepthReferenceSourcesAsync(Guid? clusterId, Guid? wellBoreId)
     {
+        if (wellBoreId is Guid selectedBoreId && wellBoreList != null)
+            await Api.ClientWellBore.LoadWellBoreDetailsAsync(wellBoreList, selectedBoreId);
+        var boreContext = wellBoreList?.FirstOrDefault(value => value.MetaInfo?.ID == wellBoreId);
+        var wellContext = wellList?.FirstOrDefault(value => value.MetaInfo?.ID == (boreContext?.WellID ?? selectedWellId));
+        var clusterContext = clusterList?.FirstOrDefault(value => value.MetaInfo?.ID == (clusterId ?? wellContext?.ClusterID));
+        if (clusterContext != null) await Api.ClientCluster.LoadClusterSlotReferencesAsync(clusterContext);
+
         groundMudLineDepthSource.GroundMudLineDepthReference = null;
         topWaterDepthSource.SeaWaterLevelDepthReference = null;
         meanSeaLevelDepthSource.MeanSeaLevelDepthReference = null;
@@ -513,7 +520,7 @@
             await InvokeAsync(StateHasChanged);
 
             logger.LogInformation("Loading trajectory light data for field {FieldId}, cluster {ClusterId}, well {WellId} and wellbore {WellBoreId}", fieldId, clusterId, wellId, wellBoreId);
-            trajectoryLightList = (await Api.ClientTrajectory.GetAllTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId, wellBoreId: wellBoreId))
+            trajectoryLightList = (await Api.ClientTrajectory.ListTrajectoryLightAsync(fieldId: fieldId, clusterId: clusterId, wellId: wellId, wellBoreId: wellBoreId))
                 .Where(t => t?.MetaInfo != null && t.MetaInfo.ID != Guid.Empty)
                 .OrderBy(t => t.Name)
                 .ToList();

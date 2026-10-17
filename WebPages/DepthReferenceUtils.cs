@@ -12,6 +12,10 @@ public static class DepthReferenceUtils
         IEnumerable<ModelShared.Well>? wells,
         IEnumerable<ModelShared.Cluster>? clusters)
     {
+        var root = ResolveRootWellBore(wellBore, wellBores);
+        var well = wells?.FirstOrDefault(value => value.MetaInfo?.ID == root?.WellID);
+        var cluster = clusters?.FirstOrDefault(value => value.MetaInfo?.ID == well?.ClusterID);
+        if (cluster != null) await api.ClientCluster.LoadClusterSlotReferencesAsync(cluster);
         Slot? slot = ResolveRootSlot(wellBore, wellBores, wells, clusters);
         double? latitude = slot?.Latitude?.GaussianValue?.Mean;
         double? longitude = slot?.Longitude?.GaussianValue?.Mean;

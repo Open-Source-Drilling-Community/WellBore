@@ -15,7 +15,7 @@ public class RigClientSerializationTests
         using var httpClient = new HttpClient(new JsonHandler(payload));
         var client = new Client("http://rig.test/Rig/api/", httpClient);
 
-        RigReadResponse rig = (await client.GetAllRigAsync()).Single();
+        RigReadResponse rig = (await client.ListRigReferencesAsync()).Single();
 
         Assert.That(rig.StationKeepingSystem.Modes,
             Is.EqualTo(new[] { StationKeepingMode.DynamicPositioning, StationKeepingMode.Moored }));

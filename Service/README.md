@@ -190,7 +190,7 @@ The current work has been funded by the [Research Council of Norway](https://www
 
 ## MCP server
 
-The service publishes 38 REST-backed MCP tools plus `ping`: 24 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, single and paged external-reference diagnostics, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Success envelopes use lowercase `status` and `data`, while model properties inside `data` preserve their declared PascalCase names such as `MetaInfo`, `ID`, and `WellID`, exactly matching the output schema. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
+The service publishes the current MCP tools plus `ping`: 24 WellBore operations and 14 identity/feature-catalogue operations. The contract includes bounded `well_bore_search`, single and paged external-reference diagnostics, granular detail/topology and assignment mutations, concurrency-protected full update/delete, and batch export/restore. Usage statistics are excluded. Every tool publishes strict input and output schemas plus read-only, destructive, idempotent, and open-world behavior annotations. Success envelopes use lowercase `status` and `data`, while model properties inside `data` preserve their declared PascalCase names such as `MetaInfo`, `ID`, and `WellID`, exactly matching the output schema. Protocol failures are returned as MCP errors with normalized structured details. `TieInPointAlongHoleDepth` is expressed in meters (SI) against the fixed WGS84 vertical datum.
 
 `well_bore_create` returns the created WellBore rather than a status-only response, including its server-owned `CreationDate` and initial `LastModificationDate` concurrency token.
 
@@ -234,3 +234,19 @@ Canonical reference metadata describes storage and REST/MCP payloads (`reference
 
 
 Wellbore by-id read arguments declare the WellBore resource target in REST and MCP. RigID relationships declare the Rig target, including timed RigJobs. The compatibility RigID projection must not override an active timed association. These annotations support generic relationship and reference-origin traversal.
+
+## Bounded light discovery
+
+Resource and catalog discovery returns light pages, with `offset` defaulting to 0 and `limit` defaulting to 50 (allowed range 1–200). Names and relevant resource-reference filters are evaluated on the server. Unbounded full-object `HeavyData` routes and tools, including filtered full-object lists, have been removed. Existing UUID and HTTP-metadata listings remain available; use named light pages for routine discovery.
+
+REST routes and MCP tool names (relative to the service's existing API path base):
+
+- `/WellBore/LightData` / `well_bore_discover`
+- `/WellBoreFeatureCategory/LightData` / `well_bore_feature_category_discover`
+- `/WellBoreIdentity/LightData` / `well_bore_identity_discover`
+
+Pages contain `Items`, `Offset`, `Limit`, `TotalCount`, and `NextOffset`; `NextOffset` is null on the final page. Offset pages are individually consistent reads, not a snapshot spanning requests: concurrent inserts/deletes can change later pages. Refresh discovery when the underlying collection changes. EarthGeodesy's existing search pages instead expose `Items[].Value`, `Offset`, `Limit`, and `TotalCount`.
+
+Single-record reads, result/chunk reads, and deliberate backup/export/restore operations are preserved. Backups can still contain complete resources and should be treated as explicit bulk operations.
+
+This is a breaking REST/MCP contract change: update generated clients, UIs, and external integrations together with the service release. Removed heavy-list names are not compatibility aliases. No persisted engineering shapes, database names, or storage volumes are changed. Historical usage counters are retained; bounded discovery has a separate additive `DiscoveryRequestsPerDay` history in resource services.

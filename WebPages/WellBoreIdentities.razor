@@ -62,7 +62,7 @@ else
     {
         try
         {
-            identities = (List<WellBoreIdentity>)await Api.ClientWellBore.GetAllWellBoreIdentityAsync();
+            identities = (List<WellBoreIdentity>)await Api.ClientWellBore.ListWellBoreIdentityReferencesAsync();
             identities = identities
                 .Where(identity => identity?.MetaInfo?.ID != null)
                 .OrderBy(identity => identity.Name, StringComparer.OrdinalIgnoreCase)

@@ -17,16 +17,16 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreId"] = "well_bore_get_all_ids",
         ["GetAllWellBoreMetaInfo"] = "well_bore_get_all_meta_info",
         ["GetWellBoreById"] = "well_bore_get_by_id",
-        ["GetAllWellBore"] = "well_bore_get_all",
+        ["DiscoverWellBore"] = "well_bore_discover",
         ["SearchWellBores"] = "well_bore_search",
         ["ValidateWellBoreExternalReferences"] = "well_bore_validate_external_references",
         ["AuditWellBoreExternalReferences"] = "well_bore_audit_external_references",
         ["BatchExportWellBores"] = "well_bore_batch_export",
         ["BatchRestoreWellBores"] = "well_bore_batch_restore",
-        ["GetAllWellBoreByWellID"] = "well_bore_get_all_by_well_id",
-        ["GetAllWellBoreByRigId"] = "well_bore_get_all_by_rig_id",
-        ["GetAllWellBoreByParentWellBoreId"] = "well_bore_get_all_by_parent_id",
-        ["GetAllSidetrackedWellBore"] = "well_bore_get_all_sidetracked",
+
+
+
+
         ["PostWellBore"] = "well_bore_create",
         ["PutWellBoreById"] = "well_bore_update_by_id",
         ["PutWellBoreDetails"] = "well_bore_details_update",
@@ -41,17 +41,17 @@ public sealed class McpToolRegistrationTests
         ["GetAllWellBoreIdentityId"] = "well_bore_identity_get_all_ids",
         ["GetAllWellBoreIdentityMetaInfo"] = "well_bore_identity_get_all_meta_info",
         ["GetWellBoreIdentityById"] = "well_bore_identity_get_by_id",
-        ["GetAllWellBoreIdentity"] = "well_bore_identity_get_all",
+        ["DiscoverWellBoreIdentity"] = "well_bore_identity_discover",
         ["PostWellBoreIdentity"] = "well_bore_identity_create",
         ["PutWellBoreIdentityById"] = "well_bore_identity_update_by_id",
         ["DeleteWellBoreIdentityById"] = "well_bore_identity_delete_by_id",
         ["GetAllWellBoreFeatureCategoryId"] = "well_bore_feature_category_get_all_ids",
         ["GetAllWellBoreFeatureCategoryMetaInfo"] = "well_bore_feature_category_get_all_meta_info",
         ["GetWellBoreFeatureCategoryById"] = "well_bore_feature_category_get_by_id",
-        ["GetAllWellBoreFeatureCategory"] = "well_bore_feature_category_get_all",
+        ["DiscoverWellBoreFeatureCategory"] = "well_bore_feature_category_discover",
         ["PostWellBoreFeatureCategory"] = "well_bore_feature_category_create",
         ["PutWellBoreFeatureCategoryById"] = "well_bore_feature_category_update_by_id",
-        ["DeleteWellBoreFeatureCategoryById"] = "well_bore_feature_category_delete_by_id"
+        ["DeleteWellBoreFeatureCategoryById"] = "well_bore_feature_category_delete_by_id",
     };
 
     private ServiceProvider _provider = null!;
@@ -125,8 +125,7 @@ public sealed class McpToolRegistrationTests
 
     [TestCase("well_bore_get_all_ids")]
     [TestCase("well_bore_get_all_meta_info")]
-    [TestCase("well_bore_get_all")]
-    [TestCase("well_bore_get_all_sidetracked")]
+    [TestCase("well_bore_discover")]
     public void Parameterless_tools_publish_an_explicit_empty_object_schema(string toolName)
     {
         JsonObject schema = RequireObject(_tools[toolName].InputSchema);
@@ -268,9 +267,6 @@ public sealed class McpToolRegistrationTests
     }
 
     [TestCase("well_bore_get_by_id")]
-    [TestCase("well_bore_get_all_by_well_id")]
-    [TestCase("well_bore_get_all_by_rig_id")]
-    [TestCase("well_bore_get_all_by_parent_id")]
     public async Task Identifier_tools_require_their_identifier(string toolName)
     {
         JsonObject? response = await _tools[toolName].InvokeAsync(new JsonObject(), CancellationToken.None) as JsonObject;

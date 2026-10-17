@@ -1,3 +1,4 @@
+using OSDC.Drilling.WellBore.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -15,12 +16,35 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
     [ApiController]
     public class WellBoreFeatureCategoryController : ControllerBase
     {
+        private readonly SqlConnectionManager _discoveryConnections;
+
+        /// <summary>Discover WellBoreFeatureCategory resources as bounded light records; retrieve selected full records by ID.</summary>
+        [HttpGet("LightData", Name = "DiscoverWellBoreFeatureCategory")]
+        public ActionResult<OSDC.Drilling.WellBore.Model.WellBoreFeatureCategoryDiscoveryPage> DiscoverWellBoreFeatureCategory([FromQuery] int offset = 0, [FromQuery] int limit = 50, [FromQuery] string? name = null)
+        {
+            UsageStatisticsWellBore.Instance.IncrementDiscoveryRequestsPerDay();
+            if (offset < 0 || limit < 1 || limit > 200 || name?.Length > 200)
+                return BadRequest(new { error = "invalid_discovery_query", message = "Offset must be non-negative, limit 1–200, name at most 200 characters, and UUID filters non-empty." });
+            try
+            {
+                var records = DiscoveryRecords.ReadPage<OSDC.Drilling.WellBore.Model.WellBoreFeatureCategoryLight>(_discoveryConnections.GetConnection(), "WellBoreFeatureCategoryTable", "WellBoreFeatureCategory", offset, limit, name,
+                    new System.Collections.Generic.Dictionary<string, object?> {  }, out int total);
+                return Ok(new OSDC.Drilling.WellBore.Model.WellBoreFeatureCategoryDiscoveryPage { Items = records, Offset = offset, Limit = limit, TotalCount = total,
+                    NextOffset = offset < total && records.Count < total - offset ? offset + records.Count : null });
+            }
+            catch (System.Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or System.Text.Json.JsonException or System.InvalidOperationException)
+            {
+                return StatusCode(500, new { error = "discovery_failed" });
+            }
+        }
+
         private readonly ILogger<WellBoreFeatureCategoryManager> _logger;
         private readonly WellBoreFeatureCategoryManager _manager;
         private readonly SqlConnectionManager _connectionManager;
 
         public WellBoreFeatureCategoryController(ILogger<WellBoreFeatureCategoryManager> logger, SqlConnectionManager connectionManager)
         {
+            _discoveryConnections = connectionManager;
             _logger = logger;
             _connectionManager = connectionManager;
             _manager = WellBoreFeatureCategoryManager.GetInstance(_logger, connectionManager);
@@ -52,7 +76,7 @@ namespace OSDC.Drilling.WellBore.Service.Controllers
             return data != null ? Ok(data) : NotFound();
         }
 
-        [HttpGet("HeavyData", Name = "GetAllWellBoreFeatureCategory")]
+        [NonAction]
         public ActionResult<IEnumerable<Model.WellBoreFeatureCategory?>> GetAllWellBoreFeatureCategory()
         {
             var data = _manager.GetAllWellBoreFeatureCategory();

@@ -61,7 +61,7 @@ namespace OSDC.Drilling.WellBore.ServiceTest
         [Test]
         public async Task GetAllWellBore_HeavyData_ReturnsArray()
         {
-            var vals = await _client.GetAllWellBoreAsync();
+            var vals = await _client.ListWellBoreReferencesAsync();
             Assert.That(vals, Is.Not.Null);
         }
 

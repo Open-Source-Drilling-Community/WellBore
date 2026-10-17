@@ -14,7 +14,10 @@ Client wellBoreClient = ClientSetup(devHostName, wellHostBase);
 // Create clients to access databases from local/ environment
 Client wellBoreLocalClient = ClientSetup(localHostName, wellHostBase);
 // Get all wells and cartographic projection sets from the APIs
-List<WellBore> wells = (List<WellBore>) (await wellBoreClient.GetAllWellBoreAsync()).ToList();
+// This explicit administrative copy reads full records individually after light discovery.
+List<WellBore> wells = [];
+foreach (var summary in await wellBoreClient.ListWellBoreLightAsync())
+    wells.Add(await wellBoreClient.GetWellBoreByIdAsync(summary.MetaInfo!.ID));
 
 // Update local database with data from dev/ database
 foreach (var well in wells)
@@ -25,10 +28,10 @@ foreach (var well in wells)
 }
 // Test if the new method works...
 Guid wellID = wells[0].WellID!.Value;
-List<WellBore> wellBoresByWellId = (List<WellBore>) (await wellBoreLocalClient.GetAllWellBoreByWellIDAsync(wellID)).ToList();
+List<WellBoreLight> wellBoresByWellId = (List<WellBoreLight>) (await wellBoreLocalClient.ListWellBoreLightAsync(wellId: wellID)).ToList();
 Console.WriteLine($"Number of wells with slot ID {wellID} in local database: {wellBoresByWellId.Count}");
 
-List<WellBore> sidetrackedWellBores = (List<WellBore>) (await wellBoreLocalClient.GetAllSidetrackedWellBoreAsync()).ToList();
+List<WellBoreLight> sidetrackedWellBores = (List<WellBoreLight>) (await wellBoreLocalClient.ListWellBoreLightAsync(isSidetrack: true)).ToList();
 Console.WriteLine($"Number of sidetracked wells in local database: {sidetrackedWellBores.Count}");
 
 

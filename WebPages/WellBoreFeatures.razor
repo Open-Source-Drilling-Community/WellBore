@@ -37,7 +37,10 @@ else
 
     @foreach (WellBoreFeatureCategory category in categories)
     {
-        <MudGrid Class="mt-2" @key="category.MetaInfo?.ID">
+        <MudButton Class="mt-2" Variant="Variant.Outlined" OnClick="@(() => LoadDefinitionAsync(category))" Disabled="@(_loadedDefinitionIds.Contains(category.MetaInfo!.ID))">Load @category.Name details</MudButton>
+        @if (category.LastModificationDate == null || _loadedDefinitionIds.Contains(category.MetaInfo!.ID))
+        {
+            <MudGrid Class="mt-2" @key="category.MetaInfo?.ID">
             <MudItem xs="2" md="1" Class="d-flex align-center">
                 <MudCheckBox T="bool" Value="@IsCategorySelected(category)" ValueChanged="@((bool selected) => SetCategorySelected(category, selected))" />
             </MudItem>
@@ -72,6 +75,7 @@ else
                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => DeleteCategoryAsync(category))" />
             </MudItem>
         </MudGrid>
+        }
     }
 
     <MudContainer Class="d-flex flex-row pa-0 mt-4">
@@ -81,6 +85,16 @@ else
 }
 
 @code {
+
+    private readonly HashSet<Guid> _loadedDefinitionIds = [];
+    private async Task LoadDefinitionAsync(WellBoreFeatureCategory category)
+    {
+        var full = await Api.ClientWellBore.GetWellBoreFeatureCategoryByIdAsync(category.MetaInfo!.ID);
+        foreach (var property in typeof(WellBoreFeatureCategory).GetProperties().Where(property => property.CanWrite))
+            property.SetValue(category, property.GetValue(full));
+        _loadedDefinitionIds.Add(category.MetaInfo!.ID);
+    }
+
     private List<WellBoreFeatureCategory>? categories;
     private readonly HashSet<Guid> _selectedCategoryIds = [];
     private readonly HashSet<Guid> _selectedOptionIds = [];
@@ -92,9 +106,10 @@ else
 
     private async Task LoadDataAsync()
     {
+        _loadedDefinitionIds.Clear();
         try
         {
-            categories = (List<WellBoreFeatureCategory>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryAsync();
+            categories = (List<WellBoreFeatureCategory>)await Api.ClientWellBore.ListWellBoreFeatureCategoryReferencesAsync();
             categories = categories
                 .Where(category => category?.MetaInfo?.ID != null)
                 .OrderBy(category => category.Name, StringComparer.OrdinalIgnoreCase)
@@ -155,6 +170,7 @@ else
             List<Guid> existingIds = ((IEnumerable<Guid>)await Api.ClientWellBore.GetAllWellBoreFeatureCategoryIdAsync()).ToList();
             foreach (WellBoreFeatureCategory category in categories)
             {
+                if (category.LastModificationDate != null && !_loadedDefinitionIds.Contains(category.MetaInfo!.ID)) continue;
                 EnsureCategory(category);
                 if (existingIds.Contains(category.MetaInfo!.ID))
                 {
@@ -251,6 +267,7 @@ else
         }
         foreach (WellBoreFeatureCategory category in categories)
         {
+                if (category.LastModificationDate != null && !_loadedDefinitionIds.Contains(category.MetaInfo!.ID)) continue;
             if (category.Options == null || category.Options.Count == 0)
             {
                 Snackbar.Add($"WellBore feature category '{category.Name}' must have at least one option", Severity.Warning);

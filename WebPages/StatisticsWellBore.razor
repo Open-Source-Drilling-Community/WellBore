@@ -153,6 +153,8 @@
 
     private static EndpointDescriptor ToEndpointDescriptor(string propertyName)
     {
+        if (propertyName == "DiscoveryRequestsPerDay") return new EndpointDescriptor("Light discovery (all resources)", "GET");
+
         string name = propertyName.EndsWith("PerDay", StringComparison.Ordinal)
             ? propertyName[..^"PerDay".Length]
             : propertyName;
