@@ -61,7 +61,7 @@ public class SemanticContractTests
     [Test]
     public void Mcp_inputs_declare_generic_resource_operation_roles()
     {
-        Assert.That(Mcp("well_bore_get_all", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
+        Assert.That(Mcp("well_bore_discover", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceCollectionRetrieval));
         Assert.That(Mcp("well_bore_get_by_id", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceRetrieval));
         Assert.That(Mcp("well_bore_create", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceCreation));
         Assert.That(Mcp("well_bore_update_by_id", false)[Extension]!["role"]!.GetValue<string>(), Is.EqualTo(Concepts.ResourceReplacement));

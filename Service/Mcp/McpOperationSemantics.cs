@@ -17,7 +17,7 @@ internal static class McpOperationSemantics
     }
     private static string Classify(string name) =>
         name.Contains("validate", StringComparison.Ordinal) || name.Contains("audit", StringComparison.Ordinal) ? Concepts.StatelessEvaluation
-        : name.Contains("batch_export", StringComparison.Ordinal) || name.Contains("get_all", StringComparison.Ordinal) || name.EndsWith("_search", StringComparison.Ordinal) ? Concepts.ResourceCollectionRetrieval
+        : name.Contains("batch_export", StringComparison.Ordinal) || name.Contains("get_all", StringComparison.Ordinal) || name.EndsWith("_search", StringComparison.Ordinal) || name.EndsWith("_discover", StringComparison.Ordinal) ? Concepts.ResourceCollectionRetrieval
         : name.EndsWith("_get_by_id", StringComparison.Ordinal) ? Concepts.ResourceRetrieval
         : name.Contains("batch_restore", StringComparison.Ordinal) ? Concepts.ResourceOperation
         : name.EndsWith("_create", StringComparison.Ordinal) || name.EndsWith("_add", StringComparison.Ordinal) ? Concepts.ResourceCreation
