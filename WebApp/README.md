@@ -85,9 +85,9 @@ Open: `http://localhost:8080/WellBore/webapp/WellBore`
 ## Dependencies
 From `WebApp/WebApp.csproj`:
 - `OSDC.DotnetLibraries.General.DataManagement` — common data primitives used in UI.
-- `OSDC.Drilling.Well.WebPages` 1.1.0 — embedded Well pages.
-- `OSDC.Drilling.Cluster.WebPages` 1.1.0, `OSDC.Drilling.Field.WebPages` 2.0.0, and `OSDC.Drilling.Rig.WebPages` 1.1.0 — contextual-data pages.
-- `OSDC.Drilling.EarthCartographicProjection.WebPages` 1.1.0, `OSDC.Drilling.EarthGeodesy.WebPages` 1.1.1, `OSDC.Drilling.EarthGravity.WebPages` 1.0.2, `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.2, and `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.2 — calculator pages and clients.
+- `OSDC.Drilling.Well.WebPages` 2.0.0 — embedded Well pages.
+- `OSDC.Drilling.Cluster.WebPages` 2.0.0, `OSDC.Drilling.Field.WebPages` 3.0.0, and `OSDC.Drilling.Rig.WebPages` 2.0.0 — contextual-data pages.
+- `OSDC.Drilling.EarthCartographicProjection.WebPages` 2.0.0, `OSDC.Drilling.EarthGeodesy.WebPages` 2.0.0, `OSDC.Drilling.EarthGravity.WebPages` 1.0.4, `OSDC.Drilling.EarthMagneticField.WebPages` 1.0.4, and `OSDC.Drilling.EarthVerticalDatum.WebPages` 1.1.4 — calculator pages and clients.
 
 Transitive/runtime:
 - MudBlazor — UI toolkit used via `AddMudServices` in `WebApp/Program.cs`.
@@ -149,3 +149,21 @@ This is a breaking REST/MCP contract change: update generated clients, UIs, and 
 
 
 Tables/selectors use light discovery. Editors retrieve the selected complete resource; category options load only for chosen or already assigned definitions. Slot context uses paginated light locations, and rig-history context reads the selected wellbore. Backup selection uses discovery while the dedicated export/restore APIs retain full backup semantics.
+
+## Coordinated WebPages package upgrade
+
+The host embeds the following current WebPages packages. Publish these versions and verify their availability on nuget.org before restoring and publishing this WebApp image. The host's own WebPages remain a project reference.
+
+| Package | Version |
+| --- | --- |
+| `OSDC.Drilling.Cluster.WebPages` | `2.0.0` |
+| `OSDC.Drilling.EarthCartographicProjection.WebPages` | `2.0.0` |
+| `OSDC.Drilling.EarthGeodesy.WebPages` | `2.0.0` |
+| `OSDC.Drilling.EarthGravity.WebPages` | `1.0.4` |
+| `OSDC.Drilling.EarthMagneticField.WebPages` | `1.0.4` |
+| `OSDC.Drilling.EarthVerticalDatum.WebPages` | `1.1.4` |
+| `OSDC.Drilling.Field.WebPages` | `3.0.0` |
+| `OSDC.Drilling.Rig.WebPages` | `2.0.0` |
+| `OSDC.Drilling.Well.WebPages` | `2.0.0` |
+
+Package releases with a new major version use the bounded light discovery contracts. Selected full-record reads and dedicated backup operations remain available.
