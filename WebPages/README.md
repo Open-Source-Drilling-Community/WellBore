@@ -109,4 +109,4 @@ On nuget.org, the package owner must configure a trusted-publishing policy for `
 
 ## Package release 2.0.1
 
-Pins OSDC.UnitConversion.DrillingRazorMudComponents 3.4.8 explicitly so embedded unit selectors consume paginated UnitSystem discovery. This replaces the obsolete indirect dependency inherited through WebAppUtils.
+Pins OSDC.UnitConversion.DrillingRazorMudComponents 3.4.9 explicitly so embedded unit selectors consume paginated UnitSystem discovery. This replaces the obsolete indirect dependency inherited through WebAppUtils.
