@@ -30,7 +30,7 @@
     <PackageReference Include="OSDC.Drilling.EarthGeodesy.WebPages" Version="2.0.2" />
     <PackageReference Include="OSDC.Drilling.EarthGravity.WebPages" Version="1.0.5" />
     <PackageReference Include="OSDC.Drilling.EarthMagneticField.WebPages" Version="1.0.5" />
-    <PackageReference Include="OSDC.Drilling.EarthVerticalDatum.WebPages" Version="1.1.5" />
+    <PackageReference Include="OSDC.Drilling.EarthVerticalDatum.WebPages" Version="1.1.6" />
     <PackageReference Include="OSDC.Drilling.Field.WebPages" Version="3.0.1" />
     <PackageReference Include="OSDC.Drilling.Rig.WebPages" Version="2.0.1" />
     <PackageReference Include="OSDC.Drilling.Well.WebPages" Version="2.0.2" />
