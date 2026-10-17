@@ -96,3 +96,7 @@ This is a breaking REST/MCP contract change: update generated clients, UIs, and 
 
 
 Tables/selectors use light discovery. Editors retrieve the selected complete resource; category options load only for chosen or already assigned definitions. Slot context uses paginated light locations, and rig-history context reads the selected wellbore. Backup selection uses discovery while the dedicated export/restore APIs retain full backup semantics.
+
+## Package release 2.0.0
+
+This release packages the current WebPages and generated contracts. Update consuming WebApps to `OSDC.Drilling.WellBore.WebPages` version `2.0.0` after it is available on nuget.org. This is a major update for the bounded light discovery contracts; rebuild consumers together with their updated service clients.
